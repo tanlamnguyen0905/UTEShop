@@ -110,6 +110,13 @@
 			<version>13.2.0.jre11</version>
 			<scope>compile</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.40</version>
+		</dependency>
 	</dependencies>
 
 	<build>
