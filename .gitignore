@@ -17,19 +17,37 @@ buildNumber.properties
 .springBeans
 .apt_generated/
 .factorypath
+.sts4-cache/
 
-# ---- IntelliJ IDEA (if opened in IntelliJ) ----
+# ---- IntelliJ IDEA ----
 *.iml
 .idea/
 out/
 
+# ---- Build dirs ----
+bin/
+build/
+
 # ---- Logs ----
 *.log
+hs_err_pid*
 
 # ---- OS Files ----
 .DS_Store
 Thumbs.db
 
+# ---- Test / Coverage ----
+surefire-reports/
+jacoco.exec
+
 # ---- Other ----
 *.swp
 *.swo
+
+# ---- Upload / Static generated files ----
+/upload/
+src/main/resources/static/upload/
+
+# ---- Env / Config (tùy dự án) ----
+*.env
+application-*.properties
