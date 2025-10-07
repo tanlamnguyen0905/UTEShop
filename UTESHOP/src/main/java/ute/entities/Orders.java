@@ -36,7 +36,7 @@ public class Orders {
 	private double amount;
 	
 	@ManyToOne
-	@JoinColumn(name = "paymentMethonId", nullable = false)
+	@JoinColumn(name = "paymentMethodId", nullable = false)
 	private PaymentMethods paymentMethod;
 	
 	
