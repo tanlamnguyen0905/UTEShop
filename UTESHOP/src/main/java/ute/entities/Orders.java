@@ -36,10 +36,6 @@ public class Orders {
 	private double amount;
 	
 	@ManyToOne
-	@JoinColumn(name = "paymentMethonId", nullable = false)
-	private PaymentMethods paymentMethod;
-	
-	@ManyToOne
 	@JoinColumn(name = "userID", nullable = false)
 	private Users user;
 	
