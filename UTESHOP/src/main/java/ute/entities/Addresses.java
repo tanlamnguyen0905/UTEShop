@@ -1,6 +1,5 @@
 package ute.entities;
 
-
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -25,15 +24,14 @@ public class Addresses {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int addressID;
-	
+
 	@Column(name = "address", columnDefinition = "nvarchar(max)", nullable = false)
 	private String address;
-	
-	
+
 	@ManyToOne
 	@JoinColumn(name = "userID", nullable = false)
 	private Users user;
-	
+
 	@OneToMany(mappedBy = "address")
 	private List<Orders> orders;
 }

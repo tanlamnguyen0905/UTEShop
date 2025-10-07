@@ -1,7 +1,6 @@
 package ute.entities;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,37 +9,41 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "OrderDetails")
+@Table(name = "Reviews")
 @Data
 @NoArgsConstructor
+
 @AllArgsConstructor
-public class OrderDetails {
+public class Reviews {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int orderDetailID;
-
-	@Column(name = "quantity", nullable = false)
-	private int quantity;
+	private int ReviewID;
 	
-	@Column(name = "totalPrice", nullable = false)
-	private BigDecimal totalPrice;
-
-	@OneToMany(mappedBy = "orderDetails")
-	private List<UserCoupon> discounts;
-
-	@ManyToOne
-	@JoinColumn(name = "orderID", nullable = false)
-	private Orders order;
-
+	@Column(name = "Rating", nullable = false, columnDefinition = "int check (Rating >=1 and Rating <=5)")
+	private int Rating;
+	
+	@Column(name = "content",columnDefinition =  "nvarchar(max)", nullable = false)
+	private String content;
+	
+	@Column(name = "CreatAt", nullable = false)
+	private Date CreatAt;
+	
+	@Column(name = "image",columnDefinition =  "nvarchar(max)")
+	private String image;
+	
 	@ManyToOne
 	@JoinColumn(name = "productID", nullable = false)
 	private Products product;
-
+	
+	@ManyToOne
+	@JoinColumn(name = "userID", nullable = false)
+	private Users user;
+	
+	
 }

@@ -11,30 +11,33 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "Categories")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Categories {
+@Data
+@Getter
+@Setter
+
+@Table(name = "Brand")
+public class Brand {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int categoryID;
+	private int brandID;
 	
-	@Column(name = "categoryName",columnDefinition =  "nvarchar(100)", nullable = false)
-	private String categoryName;
+	@Column(name = "brandName", columnDefinition = "nvarchar(max)", nullable = false)
+	private String brandName;
 	
-	@Column(name = "description",columnDefinition =  "nvarchar(max)")
+	@Column(name = "brandLogo", columnDefinition = "nvarchar(max)")
+	private String brandLogo;
+	
+	@Column(name = "description", columnDefinition = "nvarchar(max)")
 	private String description;
 	
-	@Column(name = "image", columnDefinition = "nvarchar(max)")
-	private String image;
-	
-	@OneToMany(mappedBy = "category")
+	@OneToMany(mappedBy = "brand")
 	private List<Products> products;
-	
-	@OneToMany(mappedBy = "category")
-	private List<Categories> subCategories;
 }
