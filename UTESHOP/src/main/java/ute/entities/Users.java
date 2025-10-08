@@ -44,12 +44,9 @@ public class Users {
 	
 	@Column(name = "phone", columnDefinition = "nvarchar(20)", nullable = false, unique = true)
 	private String phone;
-	
-	@Column(name = "isAdmin", nullable = false)
-	private boolean isAdmin;
-	
-	@Column(name = "isManager", nullable = false)
-	private boolean isManager;
+
+    @Column(name = "Role", columnDefinition = "nvarchar(50)", nullable = false)
+    private String role;
 	
 	@Column(name = "active", nullable = false)
 	private boolean active;
