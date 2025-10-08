@@ -22,24 +22,22 @@ import lombok.Setter;
 @Setter
 @Table(name = "CartProduct")
 public class CartProduct {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int cartProductID;
-	
-	@Column(name = "cartID", nullable = false)
-	private int cartID;
-	
-	@Column(name = "productID", nullable = false)
-	private int productID;
-	
-	@Column(name = "quantity", nullable = false)
-	private int quantity;
-	
-	@Column(name = "totalPrice", nullable = false)
-	private double totalPrice;
-	
-	@ManyToOne
-	@JoinColumn(name = "cartID")
-	private Cart cart;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int cartProductID;
+
+    @Column(name = "quantity", nullable = false)
+    private int quantity;
+
+    @Column(name = "totalPrice", nullable = false)
+    private double totalPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "cartID", nullable = false)
+    private Cart cart;
+
+    @ManyToOne
+    @JoinColumn(name = "productID", nullable = false)
+    private Products product;
 }
