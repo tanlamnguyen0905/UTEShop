@@ -1,5 +1,5 @@
 package ute.configs;
 
-public class JpaConfig {
+public class JwtFilter {
 
 }
