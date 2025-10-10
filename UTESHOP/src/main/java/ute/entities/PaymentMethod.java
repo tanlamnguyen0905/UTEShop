@@ -7,24 +7,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "PaymentMethods")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentMethods {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int paymentMethodID;
-	
-	@Column(name = "methodName", nullable = false)
-	private String methodName;
-	
-	@Column(name = "description", columnDefinition = "nvarchar(max)")
-	private String description;
-	
+@Builder
+public class PaymentMethod {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private String name;
+    private String description;
 }

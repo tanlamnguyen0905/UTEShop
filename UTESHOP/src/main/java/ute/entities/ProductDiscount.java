@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,32 +17,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Orders")
-public class Orders {
+public class ProductDiscount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderID;
+    private Long productDiscountID;
 
-    private Double amount;
-    private LocalDateTime orderDate;
-
-    @ManyToOne
-    @JoinColumn(name = "userID")
-    private Users user;
+    private Double discountPercent;
+    private LocalDateTime discountStart;
+    private LocalDateTime discountEnd;
 
     @ManyToOne
-    @JoinColumn(name = "addressID")
-    private Addresses address;
-
-    @ManyToOne
-    @JoinColumn(name = "paymentID")
-    private PaymentMethod paymentMethod;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails;
+    @JoinColumn(name = "productID")
+    private Product product;
 }

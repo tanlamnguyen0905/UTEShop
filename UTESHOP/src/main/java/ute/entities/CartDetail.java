@@ -1,9 +1,5 @@
 package ute.entities;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,19 +20,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserCoupon {
+public class CartDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userCouponID;
+    private Long cartDetailID;
 
-    private String description;
-    private Double discountPercent;
-    private LocalDateTime userCouponStart;
-    private LocalDateTime userCouponEnd;
-    private Double maxDiscountAmount;
+    private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "userID")
-    private Users user;
-}
+    @JoinColumn(name = "cartID")
+    private Cart cart;
 
+    @ManyToOne
+    @JoinColumn(name = "productID")
+    private Product product;
+}

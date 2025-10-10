@@ -1,7 +1,6 @@
 package ute.entities;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -13,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,27 +23,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Orders")
-public class Orders {
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderID;
+    private Long orderDetailID;
 
-    private Double amount;
-    private LocalDateTime orderDate;
-
-    @ManyToOne
-    @JoinColumn(name = "userID")
-    private Users user;
+    private Integer quantity;
+    private Double unitPrice;
+    private String status;
 
     @ManyToOne
-    @JoinColumn(name = "addressID")
-    private Addresses address;
+    @JoinColumn(name = "orderID")
+    private Orders order;
 
     @ManyToOne
-    @JoinColumn(name = "paymentID")
-    private PaymentMethod paymentMethod;
+    @JoinColumn(name = "productID")
+    private Product product;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails;
+    @OneToOne(mappedBy = "orderDetail", cascade = CascadeType.ALL)
+    private Review review;
 }
