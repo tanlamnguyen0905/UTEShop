@@ -22,25 +22,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderDetailID;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int orderDetailID;
 
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
+	@Column(name = "quantity", nullable = false)
+	private int quantity;
+	
+	@Column(name = "totalPrice", nullable = false)
+	private BigDecimal totalPrice;
 
-    @Column(name = "totalPrice", nullable = false)
-    private BigDecimal totalPrice;
+	@OneToMany(mappedBy = "orderDetails")
+	private List<UserCoupon> discounts;
 
-    @OneToMany(mappedBy = "orderDetails")
-    private List<UserCoupon> discounts;
+	@ManyToOne
+	@JoinColumn(name = "orderID", nullable = false)
+	private Orders order;
 
-    @ManyToOne
-    @JoinColumn(name = "orderID", nullable = false)
-    private Orders order;
-
-    @ManyToOne
-    @JoinColumn(name = "productID", nullable = false)
-    private Products product;
+	@ManyToOne
+	@JoinColumn(name = "productID", nullable = false)
+	private Products product;
 
 }

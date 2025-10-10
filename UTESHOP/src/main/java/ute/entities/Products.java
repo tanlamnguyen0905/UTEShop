@@ -21,58 +21,56 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+
 @Table(name = "Products")
 public class Products {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int productID;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int productID;
 
-    @Column(name = "productName", columnDefinition = "nvarchar(max)", nullable = false)
-    private String productName;
+	@Column(name = "productName", columnDefinition = "nvarchar(max)", nullable = false)
+	private String productName;
 
-    @Column(name = "image", columnDefinition = "nvarchar(max)", nullable = false)
-    private String image;
+	@Column(name = "image", columnDefinition = "nvarchar(max)", nullable = false)
+	private String image;
+	
+	@Column(name = "price", nullable = false)
+	private BigDecimal price;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+	@Column(name = "stockQuantity", nullable = false)
+	private int stockQuantity;
 
-    @Column(name = "stockQuantity", nullable = false)
-    private int stockQuantity;
+	@Column(name = "description", columnDefinition = "nvarchar(max)")
+	private String description;
+	
+	@Column(name = "discount")
+	private int discount;
+	
+	@Column(name = "soldCount", nullable = false)
+	private int soldCount;
+	
+	@Column(name = "reviewCount", nullable = false)
+	private int reviewCount;
+	
+	@Column(name = "Rating", nullable = false, columnDefinition = "int check (Rating >=1 and Rating <=5)")
+	private float rating;
+	
+	@Column(name = "Available", nullable = false)
+	private boolean available;
+	
+	@ManyToOne
+	@JoinColumn(name = "brandID", nullable = false)
+	private Brand brand;
 
-    @Column(name = "description", columnDefinition = "nvarchar(max)")
-    private String description;
+	@ManyToOne
+	@JoinColumn(name = "categoryID", nullable = false)
+	private Categories category;
 
-    @Column(name = "discount")
-    private int discount;
+	@OneToMany(mappedBy = "product")
+	private List<Reviews> reviews;
 
-    @Column(name = "soldCount", nullable = false)
-    private int soldCount;
+	@OneToMany(mappedBy = "product")
+	private List<OrderDetails> orderDetails;
 
-    @Column(name = "reviewCount", nullable = false)
-    private int reviewCount;
-
-    @Column(name = "Rating", nullable = false, columnDefinition = "int check (Rating >=1 and Rating <=5)")
-    private float rating;
-
-    @Column(name = "Available", nullable = false)
-    private boolean available;
-
-    @ManyToOne
-    @JoinColumn(name = "brandID", nullable = false)
-    private Brand brand;
-
-    @ManyToOne
-    @JoinColumn(name = "categoryID", nullable = false)
-    private Categories category;
-
-    @OneToMany(mappedBy = "product")
-    private List<Reviews> reviews;
-
-    @OneToMany(mappedBy = "product")
-    private List<OrderDetails> orderDetails;
-
-    @ManyToOne
-    @JoinColumn(name = "productDiscountID")
-    private ProductDiscounts product;
 }
