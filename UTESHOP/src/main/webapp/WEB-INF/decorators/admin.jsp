@@ -5,54 +5,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-  <meta charset="utf-8">
-  <title>Metronic Shop UI</title>
-
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
-  <meta content="Metronic Shop UI description" name="description">
-  <meta content="Metronic Shop UI keywords" name="keywords">
-  <meta content="keenthemes" name="author">
-
-  <meta property="og:site_name" content="-CUSTOMER VALUE-">
-  <meta property="og:title" content="-CUSTOMER VALUE-">
-  <meta property="og:description" content="-CUSTOMER VALUE-">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="-CUSTOMER VALUE-"><!-- link to image for socio -->
-  <meta property="og:url" content="-CUSTOMER VALUE-">
-
-  <link rel="shortcut icon" href="favicon.ico">
-
-  <!-- Fonts START -->
-  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
-  <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css"><!--- fonts for slider on the index page -->  
-  <!-- Fonts END -->
-
-
-
-  <!-- Theme styles START -->
-  <link href="${URL}assets/global/css/components.css" rel="stylesheet">
-  <link href="${URL}assets/frontend/layout/css/style.css" rel="stylesheet">
-  <link href="${URL}assets/frontend/pages/css/style-shop.css" rel="stylesheet" type="text/css">
-  <link href="${URL}assets/frontend/pages/css/style-layer-slider.css" rel="stylesheet">
-  <link href="${URL}assets/frontend/layout/css/style-responsive.css" rel="stylesheet">
-  <link href="${URL}assets/frontend/layout/css/themes/red.css" rel="stylesheet" id="style-color">
-  <link href="${URL}assets/frontend/layout/css/custom.css" rel="stylesheet">
-  <!-- Theme styles END -->
-</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body>
-<div>
+	<!-- Begin header -->
 <%@ include file="/commons/admin/header.jsp" %>
-</div>
-<div>
+	<!-- End header -->
+	
+	<!-- Begin body -->
 <sitemesh:write property="body"/>
-</div>
-<div>
+    <!-- End body -->
+    
+    
+    <!-- Begin footer -->
 <%@ include file="/commons/admin/footer.jsp" %>
-</div>
+    <!-- End footer -->
 
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
