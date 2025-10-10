@@ -41,6 +41,9 @@ public class Users {
 	
 	@Column(name = "email", columnDefinition = "nvarchar(255)", nullable = false, unique = true)
 	private String email;
+
+    @Column(name = "Sex", columnDefinition = "nvarchar(10)", nullable = false)
+    private String sex;
 	
 	@Column(name = "phone", columnDefinition = "nvarchar(20)", nullable = false, unique = true)
 	private String phone;
