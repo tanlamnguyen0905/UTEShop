@@ -11,9 +11,6 @@ import ute.entities.Categories;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Servlet implementation class HomeController
- */
 @WebServlet(urlPatterns = {"/home"})
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
