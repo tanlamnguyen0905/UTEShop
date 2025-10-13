@@ -1,5 +1,6 @@
 package ute.entities;
 
+
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -20,28 +21,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productID;
+    private Long imageID;
 
-    private String productName;
-    private String describe;
-    private Double unitPrice;
-    private Integer stockQuantity;
+    private String dirImage;
 
     @ManyToOne
-    @JoinColumn(name = "categoryID")
-    private Categories category;
+    @JoinColumn(name = "productID")
+    private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "brandID")
-    private Brand brand;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductDiscount> productDiscounts;
 }
 
