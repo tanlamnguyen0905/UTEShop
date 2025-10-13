@@ -1,4 +1,4 @@
-package ute.dao;
+package ute.dao.inter;
 
 import java.util.List;
 
@@ -46,4 +46,8 @@ public interface ProductDao {
 
     // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
+    
+    
+    
+    
 }
