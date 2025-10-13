@@ -94,7 +94,6 @@
                 <label for="fullName" class="form-label">Họ và tên</label>
                 <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>
             </div>
-
             <div class="col-md-6">
                 <label for="dob" class="form-label">Ngày sinh</label>
                 <input type="date" id="dob" name="dob" class="form-control" required>
@@ -108,16 +107,6 @@
             <div class="col-md-6">
                 <label for="phone" class="form-label">Số điện thoại</label>
                 <input type="text" id="phone" name="phone" class="form-control" placeholder="0123456789" required>
-            </div>
-
-            <div class="col-md-6">
-                <label for="sex" class="form-label">Giới tính</label>
-                <select id="sex" name="sex" class="form-select" required>
-                    <option value="">-- Chọn giới tính --</option>
-                    <option value="Male">Nam</option>
-                    <option value="Female">Nữ</option>
-                    <option value="Other">Khác</option>
-                </select>
             </div>
 
             <div class="col-md-6">

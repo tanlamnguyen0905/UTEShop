@@ -84,25 +84,16 @@ body {
 					Danh mục: <strong>${product.category.categoryName}</strong>
 				</p>
 
-				<div class="rating mb-2">
-					<c:forEach begin="1" end="5" var="i">
-						<i class="fa-solid fa-star${i <= product.rating ? '' : '-o'}"></i>
-					</c:forEach>
-					<span class="text-muted">(${product.reviewCount} đánh giá)</span>
-				</div>
-
 				<p class="price">
-					${product.price}₫
-					<c:if test="${product.discount > 0}">
-						<span class="discount">(-${product.discount}%)</span>
-					</c:if>
+					<fmt:formatNumber value="${product.unitPrice}" type="number"
+						groupingUsed="true" />
+					₫
 				</p>
 
-				<p class="text-muted">${product.description}</p>
+				<p class="text-muted">${product.describe}</p>
 
 				<p>
-					<strong>Đã bán:</strong> ${product.soldCount} | <strong>Tồn
-						kho:</strong> ${product.stockQuantity}
+					<strong>Tồn kho:</strong> ${product.stockQuantity}
 				</p>
 
 				<div class="mt-4">
