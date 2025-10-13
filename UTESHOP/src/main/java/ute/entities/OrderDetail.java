@@ -30,7 +30,8 @@ public class OrderDetail {
 
     private Integer quantity;
     private Double unitPrice;
-    private String status;
+    
+    private int status;
 
     @ManyToOne
     @JoinColumn(name = "orderID")

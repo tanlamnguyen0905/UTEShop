@@ -5,7 +5,7 @@
 	version="6.0">
 	<display-name>UTESHOP</display-name>
 	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>home.jsp</welcome-file>
 	</welcome-file-list>
 	<session-config>
 		<tracking-mode>COOKIE</tracking-mode>

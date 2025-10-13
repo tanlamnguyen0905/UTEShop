@@ -15,14 +15,17 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userID;
 
+    
     private String username;
     private String password;
+    
+    @Column(columnDefinition = "nvarchar 255" )
     private String fullname;
     private String email;
     private String phone;
     private String avatar;
     private String role;
-    private String status;
+    private int status;
 
     private LocalDateTime createAt;
     private LocalDateTime lastLoginAt;

@@ -3,6 +3,7 @@ package ute.entities;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,10 +26,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productID;
 
+    @Column(columnDefinition = "nvarchar 255" )
     private String productName;
+    @Column(columnDefinition = "nvarchar 255" )
     private String describe;
     private Double unitPrice;
     private Integer stockQuantity;
+    private Long soldCount;
 
     @ManyToOne
     @JoinColumn(name = "categoryID")

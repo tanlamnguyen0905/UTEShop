@@ -1,5 +1,6 @@
 package ute.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,7 @@ public class Addresses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressID;
 
+    @Column(columnDefinition = "nvarchar 255" )
     private String address;
 
     @ManyToOne
