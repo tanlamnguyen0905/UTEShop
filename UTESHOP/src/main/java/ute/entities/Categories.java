@@ -2,6 +2,7 @@ package ute.entities;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,31 +11,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Categories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Categories {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int categoryID;
-	
-	@Column(name = "categoryName",columnDefinition =  "nvarchar(100)", nullable = false)
-	private String categoryName;
-	
-	@Column(name = "description",columnDefinition =  "nvarchar(max)")
-	private String description;
-	
-	@Column(name = "image", columnDefinition = "nvarchar(max)")
-	private String image;
-	
-	@OneToMany(mappedBy = "category")
-	private List<Products> products;
-	
-	@OneToMany(mappedBy = "category")
-	private List<Categories> subCategories;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long categoryID;
+
+    private String categoryName;
+    private String description;
+    private String image;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
 }
