@@ -42,11 +42,6 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public boolean delete(int id) {
-		return userDao.delete(id);
-	}
-
-	@Override
 	public boolean existsByUsername(String username) {
 		return userDao.findAll().stream().anyMatch(u -> u.getUsername().equalsIgnoreCase(username));
 	}
@@ -69,6 +64,12 @@ public class UserServiceImpl implements IUserService {
 			user.setPassword(newPassword);
 			return userDao.update(user);
 		}
+		return false;
+	}
+
+	@Override
+	public boolean delete(Long UserId) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 }

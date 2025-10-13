@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.Optional;
 
+import org.hibernate.type.descriptor.java.LocalDateTimeJavaType;
+
 import ute.entities.Users;
 import ute.services.IUserService;
 import ute.services.impl.UserServiceImpl;
@@ -85,18 +87,16 @@ public class UserController extends HttpServlet {
 			}
 
 			Users user = new Users();
-			user.setFullName(req.getParameter("fullName"));
+			user.setFullname(req.getParameter("fullName"));
 			user.setUsername(req.getParameter("username"));
 			user.setEmail(req.getParameter("email"));
 			user.setPassword(password);
 			user.setPhone(req.getParameter("phone"));
-			user.setSex(req.getParameter("sex"));
-			user.setDob(req.getParameter("dob") != null && !req.getParameter("dob").isEmpty()
-					? Date.valueOf(req.getParameter("dob"))
-					: null);
-			user.setActive(true);
+			user.setAvatar("");
 			user.setRole("USER");
-			user.setCreatedAt(new java.util.Date());
+			user.setStatus("ACTIVE");
+			user.setCreateAt(LocalDateTimeJavaType.INSTANCE.getJavaType().cast(java.time.LocalDateTime.now()));
+			user.setLastLoginAt(null);
 
 			if (userService.register(user)) {
 				req.setAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
@@ -148,13 +148,8 @@ public class UserController extends HttpServlet {
 		}
 
 		Users user = (Users) session.getAttribute("currentUser");
-		user.setFullName(req.getParameter("fullName"));
+		user.setFullname(req.getParameter("fullName"));
 		user.setPhone(req.getParameter("phone"));
-		user.setSex(req.getParameter("sex"));
-		user.setDob(req.getParameter("dob") != null && !req.getParameter("dob").isEmpty()
-				? Date.valueOf(req.getParameter("dob"))
-				: null);
-
 		userService.update(user);
 		session.setAttribute("currentUser", user);
 

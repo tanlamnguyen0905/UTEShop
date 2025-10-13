@@ -25,7 +25,7 @@ public interface IUserService {
 	boolean update(Users user);
 
 	// Xóa user
-	boolean delete(int id);
+	boolean delete(Long UserId);
 
 	// Kiểm tra tồn tại
 	boolean existsByUsername(String username);

@@ -1,13 +1,13 @@
 package ute.entities;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,15 +18,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Brand {
+public class ProductDiscount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long brandID;
+    private Long productDiscountID;
 
-    private String brandName;
-    private String description;
-    private String brandLogo;
+    private Double discountPercent;
+    private LocalDateTime discountStart;
+    private LocalDateTime discountEnd;
 
-    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)
-    private List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "productID")
+    private Product product;
 }
