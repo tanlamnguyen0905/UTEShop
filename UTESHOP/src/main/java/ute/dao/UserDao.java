@@ -1,74 +1,128 @@
 package ute.dao;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import ute.entities.Users;
-import ute.utils.HibernateUtil;
+import ute.configs.JPAConfig;
+
+import java.util.List;
 
 public class UserDao {
-	// ------------------ Thêm hoặc cập nhật ------------------
-	public void save(Users user) {
-		Transaction tx = null;
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			tx = session.beginTransaction();
-			session.merge(user); // merge = insert or update tùy theo trạng thái
-			tx.commit();
+
+	// -------------------- CREATE / REGISTER --------------------
+	public boolean register(Users user) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			em.getTransaction().begin();
+
+			// Kiểm tra username hoặc email đã tồn tại chưa
+			TypedQuery<Long> query = em.createQuery(
+					"SELECT COUNT(u) FROM Users u WHERE u.username = :username OR u.email = :email OR u.phone = :phone",
+					Long.class);
+			query.setParameter("username", user.getUsername());
+			query.setParameter("email", user.getEmail());
+			query.setParameter("phone", user.getPhone());
+
+			if (query.getSingleResult() > 0) {
+				return false; // Đã tồn tại
+			}
+
+			em.persist(user);
+			em.getTransaction().commit();
+			return true;
 		} catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
+			em.getTransaction().rollback();
 			e.printStackTrace();
+			return false;
+		} finally {
+			em.close();
 		}
 	}
 
-	// ------------------ Xóa người dùng ------------------
-	public void delete(Users user) {
-		Transaction tx = null;
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			tx = session.beginTransaction();
-			session.remove(session.contains(user) ? user : session.merge(user));
-			tx.commit();
-		} catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
-			e.printStackTrace();
+	// -------------------- LOGIN --------------------
+	public Users login(String username, String password) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery(
+					"SELECT u FROM Users u WHERE u.username = :username AND u.password = :password AND u.active = true",
+					Users.class);
+			query.setParameter("username", username);
+			query.setParameter("password", password);
+
+			List<Users> results = query.getResultList();
+			return results.isEmpty() ? null : results.get(0);
+		} finally {
+			em.close();
 		}
 	}
 
-	// ------------------ Tìm theo username ------------------
-	public Optional<Users> findByUsername(String username) {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Users user = session.createQuery("FROM Users WHERE username = :u", Users.class).setParameter("u", username)
-					.uniqueResult();
-			return Optional.ofNullable(user);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Optional.empty();
+	// -------------------- FIND --------------------
+	public Users findById(int id) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.find(Users.class, id);
+		} finally {
+			em.close();
 		}
 	}
 
-	// ------------------ Tìm theo email ------------------
-	public Optional<Users> findByEmail(String email) {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			Users user = session.createQuery("FROM Users WHERE email = :e", Users.class).setParameter("e", email)
-					.uniqueResult();
-			return Optional.ofNullable(user);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Optional.empty();
-		}
-	}
-
-	// ------------------ Lấy tất cả người dùng ------------------
 	public List<Users> findAll() {
-		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-			return session.createQuery("FROM Users", Users.class).list();
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery("SELECT u FROM Users u", Users.class);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<Users> searchByNameOrEmail(String keyword) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em
+					.createQuery("SELECT u FROM Users u WHERE u.fullName LIKE :kw OR u.email LIKE :kw", Users.class);
+			query.setParameter("kw", "%" + keyword + "%");
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	// -------------------- UPDATE --------------------
+	public boolean update(Users user) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(user);
+			em.getTransaction().commit();
+			return true;
 		} catch (Exception e) {
+			em.getTransaction().rollback();
 			e.printStackTrace();
-			return List.of();
+			return false;
+		} finally {
+			em.close();
+		}
+	}
+
+	// -------------------- DELETE --------------------
+	public boolean delete(int id) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			Users user = em.find(Users.class, id);
+			if (user != null) {
+				em.getTransaction().begin();
+				em.remove(user);
+				em.getTransaction().commit();
+				return true;
+			}
+			return false;
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			e.printStackTrace();
+			return false;
+		} finally {
+			em.close();
 		}
 	}
 }

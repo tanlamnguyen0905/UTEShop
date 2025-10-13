@@ -1,9 +1,6 @@
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<sitemesh>-->
-<!--	&lt;!&ndash;<mapping path="/home/user*" name="user" decorator="user.jsp" />&ndash;&gt;-->
-<!--	-->
-<!--	&lt;!&ndash;<mapping path="/home/admin*" name="admin" decorator="admin.jsp" />&ndash;&gt;&lt;!&ndash; Exclude-->
-<!--	path from decoration. &ndash;&gt;-->
-<!--	<mapping path="/*" name="web" decorator="web.jsp" />-->
-<!--	<mapping path="/api*" exclude="true" />&ndash;&gt;-->
-<!--</sitemesh>-->
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+	<mapping path="/home/admin*" name="admin" decorator="admin.jsp" />
+	<mapping path="/*" name="web" decorator="web.jsp" />
+	<mapping path="/api*" exclude="true" />
+</sitemesh>

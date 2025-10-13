@@ -1,79 +1,74 @@
 package ute.services.impl;
 
-import java.util.Optional;
-
-import org.mindrot.jbcrypt.BCrypt;
-
 import ute.dao.UserDao;
 import ute.entities.Users;
 import ute.services.IUserService;
 
+import java.util.List;
+import java.util.Optional;
+
 public class UserServiceImpl implements IUserService {
 
-    private UserDao userDAO = new UserDao();
+	private final UserDao userDao = new UserDao();
 
-    @Override
-    public Users register(Users user) {
-        // Kiểm tra trùng username
-        if (userDAO.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
-        }
+	@Override
+	public boolean register(Users user) {
+		return userDao.register(user);
+	}
 
-        // Kiểm tra trùng email
-        if (userDAO.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
+	@Override
+	public Optional<Users> login(String username, String password) {
+		return Optional.ofNullable(userDao.login(username, password));
+	}
 
-        // Mã hoá mật khẩu trước khi lưu
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashed);
+	@Override
+	public Optional<Users> findById(int id) {
+		return Optional.ofNullable(userDao.findById(id));
+	}
 
-        // Lưu user
-        userDAO.save(user);
-        return user;
-    }
+	@Override
+	public List<Users> findAll() {
+		return userDao.findAll();
+	}
 
-    @Override
-    public Optional<Users> login(String username, String password) {
-        Optional<Users> u = userDAO.findByUsername(username);
+	@Override
+	public List<Users> searchByNameOrEmail(String keyword) {
+		return userDao.searchByNameOrEmail(keyword);
+	}
 
-        if (u.isPresent()) {
-            Users user = u.get();
-            // So sánh mật khẩu (hash)
-            if (BCrypt.checkpw(password, user.getPassword())) {
-                return Optional.of(user);
-            }
-        }
+	@Override
+	public boolean update(Users user) {
+		return userDao.update(user);
+	}
 
-        return Optional.empty();
-    }
+	@Override
+	public boolean delete(int id) {
+		return userDao.delete(id);
+	}
 
-    @Override
-    public boolean existsByUsername(String username) {
-        return userDAO.findByUsername(username).isPresent();
-    }
+	@Override
+	public boolean existsByUsername(String username) {
+		return userDao.findAll().stream().anyMatch(u -> u.getUsername().equalsIgnoreCase(username));
+	}
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return userDAO.findByEmail(email).isPresent();
-    }
+	@Override
+	public boolean existsByEmail(String email) {
+		return userDao.findAll().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
+	}
 
-    @Override
-    public Optional<Users> findByEmail(String email) {
-        return userDAO.findByEmail(email);
-    }
+	@Override
+	public Optional<Users> findByEmail(String email) {
+		return userDao.findAll().stream().filter(u -> u.getEmail().equalsIgnoreCase(email)).findFirst();
+	}
 
-    @Override
-    public void updatePassword(String email, String newPassword) {
-        Optional<Users> u = userDAO.findByEmail(email);
-
-        if (u.isPresent()) {
-            Users user = u.get();
-            // Mã hoá mật khẩu mới
-            user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            userDAO.save(user);
-        } else {
-            throw new RuntimeException("Email not found");
-        }
-    }
+	@Override
+	public boolean updatePassword(String email, String newPassword) {
+		Optional<Users> userOpt = findByEmail(email);
+		if (userOpt.isPresent()) {
+			Users user = userOpt.get();
+			user.setPassword(newPassword);
+			return userDao.update(user);
+		}
+		return false;
+	}
 }

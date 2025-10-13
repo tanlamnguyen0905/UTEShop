@@ -95,11 +95,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/opensymphony/sitemesh -->
+		<!-- https://mvnrepository.com/artifact/org.sitemesh/sitemesh -->
 		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>sitemesh</artifactId>
-			<version>2.7.0-M1</version>
+		    <groupId>org.sitemesh</groupId>
+		    <artifactId>sitemesh</artifactId>
+		    <version>3.2.1</version>
 		</dependency>
 
 		<!--
@@ -117,7 +117,7 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.40</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
 		<dependency>
 		    <groupId>org.mindrot</groupId>
