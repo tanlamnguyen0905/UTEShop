@@ -3,6 +3,7 @@ package ute.entities;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +26,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productID;
 
+    	@Column(name = "productName", columnDefinition = "NVARCHAR(255)")
     private String productName;
     private String describe;
     private Double unitPrice;

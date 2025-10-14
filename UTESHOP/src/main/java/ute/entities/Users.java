@@ -17,6 +17,7 @@ public class Users {
 
     private String username;
     private String password;
+    @Column(name = "fullname", columnDefinition = "NVARCHAR(100)")
     private String fullname;
     private String email;
     private String phone;

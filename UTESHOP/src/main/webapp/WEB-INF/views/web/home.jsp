@@ -13,12 +13,7 @@
 
 	<div class="container-fluid">
 
-
-
-
 		<!-------begin Category -->
-
-
 
 		<div class="row g-4 text-center py-5">
 			<h3 class="text-start">Phân loại</h3>
@@ -101,15 +96,7 @@
 		</div>
 		<!-- End Category -->
 
-
-
-
-
-		<!-- ---------------------------------------------Begin Sản phẩm bán chạy -->
-
-
-
-
+		<!-- Begin Sản phẩm bán chạy -->
 
 		<div class="row g-4 text-center py-5">
 			<div class="row align-items-center">
@@ -127,9 +114,6 @@
 					</a>
 				</div>
 			</div>
-
-
-
 			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
 			<div class="col-6 col-md-4 col-lg-2">
 				<div
@@ -143,18 +127,9 @@
 
 				</div>
 			</div>
-
-
-
 		</div>
 
-
-
-		<!-- ---------------------------------------------Begin Sản phẩm Tieu bieu -->
-
-
-
-
+		<!-- Begin Sản phẩm Tieu bieu -->
 
 		<div class="row g-4 text-center py-5">
 			<div class="row align-items-center">
@@ -172,8 +147,6 @@
 					</a>
 				</div>
 			</div>
-
-
 
 			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
 			<div class="col-6 col-md-4 col-lg-2">
@@ -193,12 +166,8 @@
 
 		<!-- --san pham tieu bieu tuy bien them hoac xoa -->
 
-
-
 		<div class="row g-4 text-center py-1">
 			<a><img src="image.png" class="img-fluid py-5" alt="banner"></a>
-
-
 
 			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
 			<div class="row align-items-center">
@@ -216,8 +185,6 @@
 					</a>
 				</div>
 			</div>
-
-
 
 			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
 			<div class="col-6 col-md-4 col-lg-2">

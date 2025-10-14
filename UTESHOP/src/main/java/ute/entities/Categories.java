@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +24,7 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryID;
 
+    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
     private String categoryName;
     private String description;
     private String image;

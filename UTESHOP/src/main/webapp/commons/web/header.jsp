@@ -2,13 +2,17 @@
 	pageEncoding="UTF-8"%>
 
 <!-- ====== HEADER ====== -->
+<jsp:include page="/WEB-INF/views/auth/login.jsp" />
+<jsp:include page="/WEB-INF/views/auth/register.jsp" />
+
 <header class="border-bottom bg-white py-3">
 	<div class="container">
 		<div class="row align-items-center">
 			<!-- Logo -->
 			<div class="col-auto">
 				<a href="#" class="d-flex align-items-center me-3"> <img
-					src="${URL}assets/images/logo.png" alt="UTESHOP" style="height: 40px;">
+					src="${URL}assets/images/logo.png" alt="UTESHOP"
+					style="height: 40px;">
 				</a>
 			</div>
 
@@ -46,9 +50,16 @@
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end text-center"
 							aria-labelledby="userDropdown">
-							<li><a class="dropdown-item" href="#">Đăng nhập</a></li>
-							<li><a class="dropdown-item" href="#">Đăng ký</a></li>
+							<li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+								data-bs-target="#loginModal"> <i
+									class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+							</a></li>
+							<li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+								data-bs-target="#registerModal"> <i
+									class="fa-solid fa-user-plus me-1"></i> Đăng ký
+							</a></li>
 						</ul>
+
 					</div>
 					<!-- Cart -->
 					<div class="position-relative">

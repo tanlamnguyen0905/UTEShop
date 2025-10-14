@@ -1,128 +1,125 @@
 package ute.dao.impl;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import ute.entities.Users;
-import ute.configs.JPAConfig;
+import ute.dao.inter.UserDao;
 
 import java.util.List;
 
-public class UserDaoImpl {
+public class UserDaoImpl implements UserDao {
 
-	// -------------------- CREATE / REGISTER --------------------
-	public boolean register(Users user) {
-		EntityManager em = JPAConfig.getEntityManager();
+	private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("UTESHOP");
+
+	@Override
+	public Users findByUsername(String username) {
+		EntityManager em = emf.createEntityManager();
 		try {
-			em.getTransaction().begin();
-
-			// Kiểm tra username hoặc email đã tồn tại chưa
-			TypedQuery<Long> query = em.createQuery(
-					"SELECT COUNT(u) FROM Users u WHERE u.username = :username OR u.email = :email OR u.phone = :phone",
-					Long.class);
-			query.setParameter("username", user.getUsername());
-			query.setParameter("email", user.getEmail());
-			query.setParameter("phone", user.getPhone());
-
-			if (query.getSingleResult() > 0) {
-				return false; // Đã tồn tại
-			}
-
-			em.persist(user);
-			em.getTransaction().commit();
-			return true;
-		} catch (Exception e) {
-			em.getTransaction().rollback();
-			e.printStackTrace();
-			return false;
-		} finally {
-			em.close();
-		}
-	}
-
-	// -------------------- LOGIN --------------------
-	public Users login(String username, String password) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			TypedQuery<Users> query = em.createQuery(
-					"SELECT u FROM Users u WHERE u.username = :username AND u.password = :password AND u.active = true",
-					Users.class);
+			TypedQuery<Users> query = em.createQuery("SELECT u FROM Users u WHERE u.username = :username", Users.class);
 			query.setParameter("username", username);
-			query.setParameter("password", password);
-
-			List<Users> results = query.getResultList();
-			return results.isEmpty() ? null : results.get(0);
+			List<Users> result = query.getResultList();
+			return result.isEmpty() ? null : result.get(0);
 		} finally {
 			em.close();
 		}
 	}
 
-	// -------------------- FIND --------------------
-	public Users findById(int id) {
-		EntityManager em = JPAConfig.getEntityManager();
+	@Override
+	public boolean existsByUsername(String username) {
+		EntityManager em = emf.createEntityManager();
 		try {
-			return em.find(Users.class, id);
+			Long count = em.createQuery("SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
+					.setParameter("username", username).getSingleResult();
+			return count > 0;
 		} finally {
 			em.close();
 		}
 	}
 
-	public List<Users> findAll() {
-		EntityManager em = JPAConfig.getEntityManager();
+	@Override
+	public boolean existsByEmail(String email) {
+		EntityManager em = emf.createEntityManager();
 		try {
-			TypedQuery<Users> query = em.createQuery("SELECT u FROM Users u", Users.class);
-			return query.getResultList();
+			Long count = em.createQuery("SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class)
+					.setParameter("email", email).getSingleResult();
+			return count > 0;
 		} finally {
 			em.close();
 		}
 	}
 
-	public List<Users> searchByNameOrEmail(String keyword) {
-		EntityManager em = JPAConfig.getEntityManager();
+	@Override
+	public void insert(Users user) {
+		EntityManager em = emf.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
 		try {
-			TypedQuery<Users> query = em
-					.createQuery("SELECT u FROM Users u WHERE u.fullName LIKE :kw OR u.email LIKE :kw", Users.class);
-			query.setParameter("kw", "%" + keyword + "%");
-			return query.getResultList();
-		} finally {
-			em.close();
-		}
-	}
-
-	// -------------------- UPDATE --------------------
-	public boolean update(Users user) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			em.getTransaction().begin();
-			em.merge(user);
-			em.getTransaction().commit();
-			return true;
+			tx.begin();
+			em.persist(user);
+			tx.commit();
 		} catch (Exception e) {
-			em.getTransaction().rollback();
+			if (tx.isActive())
+				tx.rollback();
 			e.printStackTrace();
-			return false;
 		} finally {
 			em.close();
 		}
+	}
+	
+	@Override
+	public void update(Users user) {
+	    EntityManager em = emf.createEntityManager();
+	    EntityTransaction tx = em.getTransaction();
+	    try {
+	        tx.begin();
+
+	        // Tìm user hiện có trong DB
+	        Users existingUser = em.find(Users.class, user.getUserID());
+	        if (existingUser == null) {
+	            throw new IllegalArgumentException("Không tìm thấy người dùng với ID: " + user.getUserID());
+	        }
+
+	        // Cập nhật các thông tin cho phép thay đổi
+	        // (giữ nguyên các quan hệ và dữ liệu hệ thống như createAt, role, status nếu bạn muốn)
+
+	        if (user.getFullname() != null)
+	            existingUser.setFullname(user.getFullname());
+
+	        if (user.getEmail() != null)
+	            existingUser.setEmail(user.getEmail());
+
+	        if (user.getPhone() != null)
+	            existingUser.setPhone(user.getPhone());
+
+	        if (user.getAvatar() != null)
+	            existingUser.setAvatar(user.getAvatar());
+
+	        // Nếu có cập nhật mật khẩu (đã mã hóa sẵn trước khi truyền vào)
+	        if (user.getPassword() != null && !user.getPassword().isEmpty())
+	            existingUser.setPassword(user.getPassword());
+
+	        // Nếu có cập nhật trạng thái hoặc quyền
+	        if (user.getStatus() != null)
+	            existingUser.setStatus(user.getStatus());
+
+	        if (user.getRole() != null)
+	            existingUser.setRole(user.getRole());
+
+	        // Cập nhật thời gian đăng nhập gần nhất (nếu có)
+	        if (user.getLastLoginAt() != null)
+	            existingUser.setLastLoginAt(user.getLastLoginAt());
+
+	        em.merge(existingUser);
+	        tx.commit();
+
+	    } catch (Exception e) {
+	        if (tx.isActive()) tx.rollback();
+	        e.printStackTrace();
+	    } finally {
+	        em.close();
+	    }
 	}
 
-	// -------------------- DELETE --------------------
-	public boolean delete(int id) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			Users user = em.find(Users.class, id);
-			if (user != null) {
-				em.getTransaction().begin();
-				em.remove(user);
-				em.getTransaction().commit();
-				return true;
-			}
-			return false;
-		} catch (Exception e) {
-			em.getTransaction().rollback();
-			e.printStackTrace();
-			return false;
-		} finally {
-			em.close();
-		}
-	}
 }
