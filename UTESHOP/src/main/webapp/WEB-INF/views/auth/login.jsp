@@ -40,10 +40,21 @@ h3 {
 .btn-login:hover {
 	background-color: #5941d8;
 }
+
+#errorBox {
+	display: none;
+	background: #ffe0e0;
+	border-left: 5px solid #d63031;
+	color: #c0392b;
+	padding: 10px;
+	border-radius: 8px;
+	margin-bottom: 15px;
+	text-align: center;
+	font-weight: 500;
+}
 </style>
 
 				<div class="login-card">
-
 					<!-- Logo và tiêu đề -->
 					<div class="text-start">
 						<img
@@ -55,18 +66,28 @@ h3 {
 						<i class="fa-solid fa-right-to-bracket me-2"></i> Đăng nhập
 					</h3>
 
-					<form action="${pageContext.request.contextPath}/auth/login"
+					<!-- ====== FORM LOGIN ====== -->
+					<form id="loginForm"
+						action="${pageContext.request.contextPath}/auth/login"
 						method="post" class="mt-4">
+						<div id="errorBox">Sai tên đăng nhập hoặc mật khẩu!</div>
+
 						<div class="mb-3">
-							<label for="username" class="form-label">Tên đăng nhập</label> <input
-								type="text" id="username" name="username" class="form-control"
-								required>
+							<label for="loginUsername" class="form-label">Tên đăng
+								nhập</label> <input type="text" id="loginUsername" name="username"
+								class="form-control" placeholder="Nhập tên đăng nhập" required>
 						</div>
 
 						<div class="mb-3">
-							<label for="password" class="form-label">Mật khẩu</label> <input
-								type="password" id="password" name="password"
-								class="form-control" required>
+							<label for="loginPassword" class="form-label">Mật khẩu</label>
+							<div class="input-group">
+								<input type="password" id="loginPassword" name="password"
+									class="form-control" placeholder="Nhập mật khẩu" required>
+								<button class="btn btn-outline-secondary" type="button"
+									id="toggleLoginPassword">
+									<i class="fa-solid fa-eye"></i>
+								</button>
+							</div>
 						</div>
 
 						<button type="submit" class="btn btn-login w-100">
@@ -76,13 +97,75 @@ h3 {
 						<div class="text-center mt-3">
 							<a href="#" class="text-muted">Quên mật khẩu?</a><br> Chưa
 							có tài khoản? <a href="#" data-bs-toggle="modal"
-								data-bs-target="#registerModal" data-bs-dismiss="modal">Đăng
-								ký</a>
+								data-bs-target="#registerModal" data-bs-dismiss="modal">
+								Đăng ký </a>
 						</div>
 					</form>
 				</div>
 			</div>
-
 		</div>
 	</div>
 </div>
+
+<!-- ====== SCRIPT ====== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const togglePwd = document.getElementById("toggleLoginPassword");
+    const pwdInput = document.getElementById("loginPassword");
+    const form = document.getElementById("loginForm");
+    const errorBox = document.getElementById("errorBox");
+    let visible = false;
+
+    // 👁 Hiện / ẩn mật khẩu
+    togglePwd.addEventListener("click", () => {
+        visible = !visible;
+        pwdInput.type = visible ? "text" : "password";
+        togglePwd.innerHTML = visible
+            ? '<i class="fa-solid fa-eye-slash"></i>'
+            : '<i class="fa-solid fa-eye"></i>';
+    });
+
+    // 🚀 Xử lý đăng nhập qua AJAX
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorBox.style.display = "none";
+
+        const formData = new FormData(form);
+        const res = await fetch(form.action, {
+            method: "POST",
+            body: formData
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+
+            if (data.success) {
+                // Đăng nhập thành công
+                const loginModal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+                loginModal.hide();
+
+                // Thông báo toast
+                const toast = document.createElement("div");
+                toast.className = "toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3";
+                toast.role = "alert";
+                toast.innerHTML = `<div class="d-flex">
+                    <div class="toast-body"> Đăng nhập thành công! Xin chào ${data.username}.</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>`;
+                document.body.appendChild(toast);
+                new bootstrap.Toast(toast).show();
+
+                // Reload lại trang sau 1.5s
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                // ❌ Sai tài khoản / mật khẩu
+                errorBox.textContent = data.error || "Sai tên đăng nhập hoặc mật khẩu!";
+                errorBox.style.display = "block";
+            }
+        } else {
+            errorBox.textContent = "Sai tên đăng nhập hoặc mật khẩu!";
+            errorBox.style.display = "block";
+        }
+    });
+});
+</script>

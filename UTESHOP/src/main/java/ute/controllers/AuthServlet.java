@@ -23,21 +23,21 @@ public class AuthServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	    String path = req.getServletPath();
+		String path = req.getServletPath();
 
-	    if ("/auth/login".equals(path)) {
-	        req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-	    } else if ("/auth/register".equals(path)) {
-	        req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
-	    } else if ("/auth/logout".equals(path)) {
-	        // Hủy session khi đăng xuất
-	        HttpSession session = req.getSession(false);
-	        if (session != null) {
-	            session.invalidate();
-	        }
-	        // Chuyển hướng về trang chủ
-	        resp.sendRedirect(req.getContextPath() + "/home");
-	    }
+		if ("/auth/login".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
+		} else if ("/auth/register".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
+		} else if ("/auth/logout".equals(path)) {
+			// Hủy session khi đăng xuất
+			HttpSession session = req.getSession(false);
+			if (session != null) {
+				session.invalidate();
+			}
+			// Chuyển hướng về trang chủ
+			resp.sendRedirect(req.getContextPath() + "/home");
+		}
 	}
 
 	@Override
@@ -99,52 +99,51 @@ public class AuthServlet extends HttpServlet {
 		u.setCreateAt(LocalDateTime.now());
 
 		userDAO.insert(u);
-		resp.sendRedirect(req.getContextPath() + "/auth/login");
+		resp.setContentType("application/json;charset=UTF-8");
+		resp.setStatus(HttpServletResponse.SC_OK);
+		out.print("{\"success\":true}");
 	}
 
 	// ===================== LOGIN =====================
 	private void login(HttpServletRequest req, HttpServletResponse resp, PrintWriter out) throws IOException {
+		resp.setContentType("application/json;charset=UTF-8");
+
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
 
-		Users user = userDAO.findByUsername(username);
+		try {
+			Users user = userDAO.findByUsername(username);
 
-		if (user == null) {
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			req.setAttribute("error", "Tài khoản không tồn tại");
-			try {
-				req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-			} catch (ServletException e) {
-				throw new IOException(e);
+			if (user == null) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print("{\"success\":false, \"error\":\"Tài khoản không tồn tại!\"}");
+				return;
 			}
-			return;
-		}
 
-		// Kiểm tra mật khẩu mã hóa
-		if (!BCrypt.checkpw(password, user.getPassword())) {
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			req.setAttribute("error", "Sai mật khẩu");
-			try {
-				req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-			} catch (ServletException e) {
-				throw new IOException(e);
+			if (!BCrypt.checkpw(password, user.getPassword())) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print("{\"success\":false, \"error\":\"Sai mật khẩu!\"}");
+				return;
 			}
-			return;
+
+			// Đăng nhập thành công
+			user.setLastLoginAt(LocalDateTime.now());
+			userDAO.update(user);
+
+			HttpSession session = req.getSession();
+			session.setAttribute("currentUser", user);
+
+			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
+			session.setAttribute("token", token);
+
+			resp.setStatus(HttpServletResponse.SC_OK);
+			out.print(String.format("{\"success\":true, \"username\":\"%s\", \"role\":\"%s\"}", user.getUsername(),
+					user.getRole()));
+
+		} catch (Exception e) {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			out.print("{\"success\":false, \"error\":\"Lỗi hệ thống máy chủ!\"}");
+			e.printStackTrace();
 		}
-
-		// Cập nhật thời gian đăng nhập
-		user.setLastLoginAt(LocalDateTime.now());
-		userDAO.update(user);
-
-		// Lưu session
-		HttpSession session = req.getSession();
-		session.setAttribute("currentUser", user);
-
-		// Tạo token JWT (tùy chọn)
-		String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-		session.setAttribute("token", token);
-
-		// Chuyển hướng về trang chủ
-		resp.sendRedirect(req.getContextPath() + "/home");
 	}
 }
