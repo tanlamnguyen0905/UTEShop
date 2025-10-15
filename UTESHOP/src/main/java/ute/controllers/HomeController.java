@@ -16,38 +16,16 @@ import java.util.List;
 
 @WebServlet(urlPatterns = { "/home" })
 public class HomeController extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public HomeController() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		loadCategories(request, response);
-		loadProducts(request, response);
-		loadProductBestSeller(request, response);
-		loadBanner(request, response);
 		request.getRequestDispatcher("/WEB-INF/views/web/home.jsp").forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
@@ -62,11 +40,13 @@ public class HomeController extends HttpServlet {
 		request.setAttribute("listProducts", listProducts);
 
 	}
+
 	public void loadProductBestSeller(HttpServletRequest request, HttpServletResponse response) {
 		List<Product> listProducts = new ProductDaoImpl().findBestSeller(50);
 		request.setAttribute("listBestSell", listProducts);
 
 	}
+
 	public void loadBanner(HttpServletRequest request, HttpServletResponse response) {
 		List<Banner> listBanner = new BannerDaoImpl().findAll();
 		request.setAttribute("listBanner", listBanner);

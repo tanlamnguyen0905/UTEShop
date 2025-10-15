@@ -1,22 +1,16 @@
 package ute.dao.inter;
 
-import java.util.List;
-
 import ute.entities.Users;
 
 public interface UserDao {
 
-	boolean register(Users user);
+	Users findByUsername(String username);
 
-	Users login(String username, String password);
+	boolean existsByUsername(String username);
 
-	Users findById(int id);
+	boolean existsByEmail(String email);
 
-	boolean update(Users user);
-	
-	boolean delete(Long UserId);
-	
-	List<Users> findAll();
-	
-	List<Users> searchByNameOrEmail(String keyword);
+	void insert(Users user);
+
+	void update(Users user);
 }

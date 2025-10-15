@@ -15,11 +15,10 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userID;
 
-    
     private String username;
     private String password;
-    
-    @Column(columnDefinition = "nvarchar(255)" )
+
+    @Column(name = "fullname", columnDefinition = "NVARCHAR(100)")
     private String fullname;
     private String email;
     private String phone;

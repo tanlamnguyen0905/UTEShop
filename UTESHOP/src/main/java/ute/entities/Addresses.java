@@ -23,11 +23,10 @@ public class Addresses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressID;
 
-    @Column(columnDefinition = "nvarchar(255)" )
+    @Column(name = "address", columnDefinition = "NVARCHAR(255)")
     private String address;
 
     @ManyToOne
     @JoinColumn(name = "userID")
     private Users user;
 }
-

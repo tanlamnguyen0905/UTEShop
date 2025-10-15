@@ -1,197 +1,126 @@
 package ute.controllers;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
-import org.hibernate.type.descriptor.java.LocalDateTimeJavaType;
+import org.mindrot.jbcrypt.BCrypt;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import ute.dao.impl.UserDaoImpl;
+import ute.dao.inter.UserDao;
 import ute.entities.Users;
-import ute.service.impl.UserServiceImpl;
-import ute.service.inter.UserService;
 
-
-@WebServlet({ "/user/register", "/user/login", "/user/logout", "/user/profile", "/user/delete",
-		"/user/forgot-password" })
+@WebServlet({ "/user/profile", "/user/update-profile", "/user/change-password" })
+@MultipartConfig
 public class UserController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private final UserService userService = new UserServiceImpl();
+	private final UserDao userDao = new UserDaoImpl();
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 		String path = req.getServletPath();
 
 		switch (path) {
-		case "/user/register":
-			req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
+		case "/user/update-profile":
+			req.getRequestDispatcher("/WEB-INF/views/user/edit-profile.jsp").forward(req, resp);
 			break;
-		case "/user/login":
-			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
+
+		case "/user/change-password":
+			req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
 			break;
-		case "/user/forgot-password":
-			req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
-			break;
-		case "/user/profile":
+
+		default: // /user/profile
 			req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
 			break;
-		case "/user/logout":
-			handleLogout(req, resp);
-			break;
-		default:
-			resp.sendRedirect(req.getContextPath() + "/user/login");
 		}
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 		String path = req.getServletPath();
 
 		switch (path) {
-		case "/user/register":
-			handleRegister(req, resp);
+		case "/user/update-profile":
+			updateProfile(req, resp);
 			break;
-		case "/user/login":
-			handleLogin(req, resp);
+
+		case "/user/change-password":
+			changePassword(req, resp);
 			break;
-		case "/user/forgot-password":
-			handleForgotPassword(req, resp);
-			break;
-		case "/user/profile":
-			handleUpdateProfile(req, resp);
-			break;
-		case "/user/delete":
-			handleDeleteAccount(req, resp);
-			break;
-		default:
-			resp.sendRedirect(req.getContextPath() + "/user/login");
 		}
 	}
 
-	// ------------------ Đăng ký ------------------
-	private void handleRegister(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		try {
-			String password = req.getParameter("password");
-			String confirm = req.getParameter("confirmPassword");
+	// ======================= CẬP NHẬT HỒ SƠ =======================
+	private void updateProfile(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 
-			if (!password.equals(confirm)) {
-				req.setAttribute("error", "Mật khẩu xác nhận không khớp");
-				req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
-				return;
-			}
+		HttpSession session = req.getSession();
+		Users currentUser = (Users) session.getAttribute("currentUser");
 
-			Users user = new Users();
-			user.setFullname(req.getParameter("fullName"));
-			user.setUsername(req.getParameter("username"));
-			user.setEmail(req.getParameter("email"));
-			user.setPassword(password);
-			user.setPhone(req.getParameter("phone"));
-			user.setAvatar("");
-			user.setRole("USER");
-			user.setStatus("ACTIVE");
-			user.setCreateAt(LocalDateTimeJavaType.INSTANCE.getJavaType().cast(java.time.LocalDateTime.now()));
-			user.setLastLoginAt(null);
-
-			if (userService.register(user)) {
-				req.setAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
-				req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-			} else {
-				req.setAttribute("error", "Tên đăng nhập hoặc email/phone đã tồn tại!");
-				req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			req.setAttribute("error", "Có lỗi xảy ra, vui lòng thử lại!");
-			req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
-		}
-	}
-
-	// ------------------ Đăng nhập ------------------
-	private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String username = req.getParameter("username");
-		String password = req.getParameter("password");
-
-		Optional<Users> userOpt = userService.login(username, password);
-		if (userOpt.isPresent()) {
-			HttpSession session = req.getSession();
-			session.setAttribute("currentUser", userOpt.get());
-			resp.sendRedirect(req.getContextPath() + "/user/profile");
-		} else {
-			req.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu!");
-			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-		}
-	}
-
-	// ------------------ Đăng xuất ------------------
-	private void handleLogout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		HttpSession session = req.getSession(false);
-		if (session != null) {
-			session.invalidate();
-		}
-		resp.sendRedirect(req.getContextPath() + "/user/login");
-	}
-
-	// ------------------ Cập nhật thông tin ------------------
-	private void handleUpdateProfile(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		HttpSession session = req.getSession(false);
-		if (session == null || session.getAttribute("currentUser") == null) {
-			resp.sendRedirect(req.getContextPath() + "/user/login");
+		if (currentUser == null) {
+			resp.sendRedirect(req.getContextPath() + "/auth/login");
 			return;
 		}
 
-		Users user = (Users) session.getAttribute("currentUser");
-		user.setFullname(req.getParameter("fullName"));
-		user.setPhone(req.getParameter("phone"));
-		userService.update(user);
-		session.setAttribute("currentUser", user);
-
-		req.setAttribute("success", "Cập nhật thông tin thành công!");
-		req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-	}
-
-	// ------------------ Quên mật khẩu ------------------
-	private void handleForgotPassword(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+		String fullname = req.getParameter("fullname");
 		String email = req.getParameter("email");
+		String phone = req.getParameter("phone");
+		Part avatarPart = req.getPart("avatar");
 
-		if (email == null || email.isEmpty()) {
-			req.setAttribute("error", "Vui lòng nhập email đã đăng ký");
-			req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
+		// upload ảnh mới (nếu có)
+		String avatarFileName = currentUser.getAvatar();
+		if (avatarPart != null && avatarPart.getSize() > 0) {
+			String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
+			java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
+			avatarFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
+			avatarPart.write(uploadDir + avatarFileName);
+		}
+
+		// cập nhật dữ liệu
+		currentUser.setFullname(fullname);
+		currentUser.setEmail(email);
+		currentUser.setPhone(phone);
+		currentUser.setAvatar(avatarFileName);
+
+		userDao.update(currentUser);
+		session.setAttribute("currentUser", currentUser);
+
+		resp.sendRedirect(req.getContextPath() + "/user/profile");
+	}
+
+	// ======================= ĐỔI MẬT KHẨU =======================
+	private void changePassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+
+		HttpSession session = req.getSession();
+		Users currentUser = (Users) session.getAttribute("currentUser");
+
+		if (currentUser == null) {
+			resp.sendRedirect(req.getContextPath() + "/auth/login");
 			return;
 		}
 
-		Optional<Users> userOpt = userService.findByEmail(email);
-		if (userOpt.isPresent()) {
-			// Reset mật khẩu tạm thời
-			String newPass = "123456";
-			userService.updatePassword(email, newPass);
+		String currentPassword = req.getParameter("currentPassword");
+		String newPassword = req.getParameter("newPassword");
 
-			req.setAttribute("success", "Mật khẩu mới đã được đặt lại là: " + newPass);
-			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-		} else {
-			req.setAttribute("error", "Không tìm thấy tài khoản với email này!");
-			req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
+		if (!BCrypt.checkpw(currentPassword, currentUser.getPassword())) {
+			req.setAttribute("error", "❌ Mật khẩu hiện tại không chính xác!");
+			req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
+			return;
 		}
-	}
 
-	// ------------------ Xóa tài khoản ------------------
-	private void handleDeleteAccount(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		HttpSession session = req.getSession(false);
-		if (session != null && session.getAttribute("currentUser") != null) {
-			Users user = (Users) session.getAttribute("currentUser");
-			userService.findByEmail(user.getEmail()).ifPresent(u -> {
-				userService.delete(u.getUserID());
-			});
-			session.invalidate();
-		}
-		resp.sendRedirect(req.getContextPath() + "/user/login");
+		// Cập nhật mật khẩu mới
+		String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+		currentUser.setPassword(hashed);
+		userDao.update(currentUser);
+		session.setAttribute("currentUser", currentUser);
+
+		// Gửi thông báo thành công
+		req.setAttribute("success", "✅ Đổi mật khẩu thành công! Hệ thống sẽ quay lại hồ sơ sau ít giây...");
+		req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
 	}
 }

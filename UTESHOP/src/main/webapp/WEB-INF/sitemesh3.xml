@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
-	<!--<mapping path="/home/user*" name="user" decorator="user.jsp" />-->
-	
-	<!--<mapping path="/home/admin*" name="admin" decorator="admin.jsp" />--><!-- Exclude
-	path from decoration. -->
-	<mapping path="/*" name="web" decorator="web.jsp" />
-	<mapping path="/api*" exclude="true" />-->
+
+    <!-- Decorator mặc định cho toàn site -->
+    <mapping path="/*" name="web" decorator="web.jsp" />
+
+    <!-- Loại trừ các trang không cần layout (auth + API) -->
+    <mapping path="/auth/*" exclude="true" />
+    <mapping path="/api/*" exclude="true" />
+
 </sitemesh>

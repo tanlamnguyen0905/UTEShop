@@ -1,0 +1,149 @@
+package ute.controllers;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import ute.dao.inter.UserDao;
+import ute.dao.impl.UserDaoImpl;
+import ute.entities.Users;
+import ute.utils.JwtUtil;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+@WebServlet(urlPatterns = { "/auth/register", "/auth/login", "/auth/logout" })
+@MultipartConfig
+public class AuthServlet extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+	private final UserDao userDAO = new UserDaoImpl();
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String path = req.getServletPath();
+
+		if ("/auth/login".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
+		} else if ("/auth/register".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
+		} else if ("/auth/logout".equals(path)) {
+			// Hủy session khi đăng xuất
+			HttpSession session = req.getSession(false);
+			if (session != null) {
+				session.invalidate();
+			}
+			// Chuyển hướng về trang chủ
+			resp.sendRedirect(req.getContextPath() + "/home");
+		}
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setContentType("application/json;charset=UTF-8");
+		PrintWriter out = resp.getWriter();
+
+		String path = req.getServletPath();
+
+		if ("/auth/register".equals(path)) {
+			register(req, resp, out);
+		} else if ("/auth/login".equals(path)) {
+			login(req, resp, out);
+		}
+	}
+
+	// ===================== REGISTER =====================
+	private void register(HttpServletRequest req, HttpServletResponse resp, PrintWriter out)
+			throws IOException, ServletException {
+		String username = req.getParameter("username");
+		String password = req.getParameter("password");
+		String fullname = req.getParameter("fullname");
+		String email = req.getParameter("email");
+		String phone = req.getParameter("phone");
+		Part avatarPart = req.getPart("avatar");
+		String avatarFileName = null;
+
+		if (userDAO.existsByUsername(username)) {
+			resp.setStatus(HttpServletResponse.SC_CONFLICT);
+			out.print("{\"error\":\"Tên đăng nhập đã tồn tại\"}");
+			return;
+		}
+		if (userDAO.existsByEmail(email)) {
+			resp.setStatus(HttpServletResponse.SC_CONFLICT);
+			out.print("{\"error\":\"Email đã tồn tại\"}");
+			return;
+		}
+		// Xử lý upload ảnh đại diện
+		if (avatarPart != null && avatarPart.getSize() > 0) {
+			String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
+			java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
+
+			avatarFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
+			avatarPart.write(uploadDir + avatarFileName);
+		}
+
+		// Mã hóa mật khẩu trước khi lưu
+		String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+		Users u = new Users();
+		u.setUsername(username);
+		u.setPassword(hashedPassword);
+		u.setFullname(fullname);
+		u.setEmail(email);
+		u.setPhone(phone);
+		u.setAvatar(avatarFileName);
+		u.setRole("USER");
+		u.setStatus("ACTIVE");
+		u.setCreateAt(LocalDateTime.now());
+
+		userDAO.insert(u);
+		resp.setContentType("application/json;charset=UTF-8");
+		resp.setStatus(HttpServletResponse.SC_OK);
+		out.print("{\"success\":true}");
+	}
+
+	// ===================== LOGIN =====================
+	private void login(HttpServletRequest req, HttpServletResponse resp, PrintWriter out) throws IOException {
+		resp.setContentType("application/json;charset=UTF-8");
+
+		String username = req.getParameter("username");
+		String password = req.getParameter("password");
+
+		try {
+			Users user = userDAO.findByUsername(username);
+
+			if (user == null) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print("{\"success\":false, \"error\":\"Tài khoản không tồn tại!\"}");
+				return;
+			}
+
+			if (!BCrypt.checkpw(password, user.getPassword())) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print("{\"success\":false, \"error\":\"Sai mật khẩu!\"}");
+				return;
+			}
+
+			// Đăng nhập thành công
+			user.setLastLoginAt(LocalDateTime.now());
+			userDAO.update(user);
+
+			HttpSession session = req.getSession();
+			session.setAttribute("currentUser", user);
+
+			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
+			session.setAttribute("token", token);
+
+			resp.setStatus(HttpServletResponse.SC_OK);
+			out.print(String.format("{\"success\":true, \"username\":\"%s\", \"role\":\"%s\"}", user.getUsername(),
+					user.getRole()));
+
+		} catch (Exception e) {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			out.print("{\"success\":false, \"error\":\"Lỗi hệ thống máy chủ!\"}");
+			e.printStackTrace();
+		}
+	}
+}
