@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
 
-    <!-- Decorator mặc định cho toàn site -->
-    <mapping path="/*" name="web" decorator="web.jsp" />
+	<!-- Decorator mặc định cho toàn site -->
+	<mapping path="/*" name="web" decorator="web.jsp" />
 
-    <!-- Loại trừ các trang không cần layout (auth + API) -->
-    <mapping path="/auth/*" exclude="true" />
-    <mapping path="/api/*" exclude="true" />
-
+	<!-- Loại trừ các trang không cần layout (auth + API) -->
+	<mapping path="/auth/*" exclude="true" />
+	<mapping path="/api/*" exclude="true" />
+	
+	
+	<mapping path="/assets/*" exclude="true" />
 </sitemesh>
