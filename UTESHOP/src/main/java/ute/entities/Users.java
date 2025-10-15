@@ -20,11 +20,12 @@ public class Users {
 
     @Column(name = "fullname", columnDefinition = "NVARCHAR(100)")
     private String fullname;
+    
     private String email;
     private String phone;
     private String avatar;
     private String role;
-    private int status;
+    private String status;
 
     private LocalDateTime createAt;
     private LocalDateTime lastLoginAt;

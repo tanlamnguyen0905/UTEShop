@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html>
 
@@ -36,11 +38,12 @@
 			<div class="carousel-inner">
 
 				<!-- Slide 1 -->
-				<c:forEach var="banner" items="${listBanner}">
-				<div class="carousel-item active">
-					<c:url value="/image?fname=${banner.bannerImage}" var="imgUrl"></c:url>
-					<img src="${imgUrl}" class="d-block w-100" alt="Coolmate banner 1">
-				</div>
+				<c:forEach var="banner" items="${listBanner}" varStatus="loop">
+					<div class="carousel-item ${loop.first ? 'active' : ''}">
+						<c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
+						<img src="${imgUrl}" class="d-block w-100"
+							alt="Coolmate banner ${loop.index + 1}">
+					</div>
 				</c:forEach>
 
 			</div>
@@ -107,11 +110,12 @@
 					</a>
 				</div>
 			</div>
+
 			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
 			<c:forEach var="p" items="${listBestSell}">
 				<div class="col-6 col-md-4 col-lg-2">
 					<div
-						class="card border-0 shadow-sm rou3nded-4 overflow-hidden bg-white h-100">
+						class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
 
 						<c:choose>
 							<c:when test="${not empty p.images}">
@@ -121,8 +125,35 @@
 									class="card-img-top rounded-4"
 									style="height: 300px; object-fit: cover;">
 									<div class="card-body p-2">
-										<h6 class="text-dark text-uppercase">${p.productName}</h6>
-										<h6 class="text-dark text-uppercase">${p.unitPrice}VND</h6>
+										<h6 class="text-dark mb-2">${p.productName}</h6>
+
+										<c:choose>
+											<c:when test="${p.discountPrice != p.unitPrice}">
+												<!-- Giá sau giảm -->
+												<c:set var="discountPercent"
+													value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+												<!-- Giá -->
+												<div class="d-flex align-items-center py-2">
+													<span class="fw-bold fs-6 text-dark me-2 text-center">${p.discountPrice}đ</span>
+													<span
+														class="badge rounded-pill text-white fw-bold px-2 text-center"
+														style="background-color: #2f52ff;">-${discountPercent}%
+													</span>
+												</div>
+
+												<!-- Giá gốc -->
+												<div>
+													<span class="text-muted text-decoration-line-through">${p.discountPrice}</span>
+												</div>
+
+											</c:when>
+											<c:otherwise>
+												<!-- Nếu không có giá giảm, chỉ hiển thị giá gốc -->
+												<span class="fw-bold fs-5 me-2 text-dark">${p.unitPrice}đ</span>
+											</c:otherwise>
+										</c:choose>
+
+
 									</div>
 								</a>
 							</c:when>
@@ -144,14 +175,8 @@
 
 					</div>
 				</div>
-<<<<<<< HEAD
 			</c:forEach>
 
-
-
-=======
-			</div>
->>>>>>> origin/trung
 		</div>
 
 		<!-- Begin Sản phẩm Tieu bieu -->

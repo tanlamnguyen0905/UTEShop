@@ -13,7 +13,7 @@
 			<div class="col-auto">
 				<a href="${pageContext.request.contextPath}/"
 					class="d-flex align-items-center me-3"> <img
-					src="${pageContext.request.contextPath}/assets/images/logo.png"
+					src="${URL}assets/images/logo.png"
 					alt="UTESHOP" style="height: 40px;">
 				</a>
 			</div>

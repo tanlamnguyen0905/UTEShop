@@ -25,7 +25,7 @@ public class Categories {
     private Long categoryID;
 
     @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
-    private String categoryName;
+    private String categoryName; 
     @Column(columnDefinition = "nvarchar(255)")
     private String description;
     private String image;

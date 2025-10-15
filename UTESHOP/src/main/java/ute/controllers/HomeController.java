@@ -21,6 +21,10 @@ public class HomeController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		loadCategories(request, response);
+		loadProducts(request, response);
+		loadProductBestSeller(request, response);
+		loadBanner(request, response);
 		request.getRequestDispatcher("/WEB-INF/views/web/home.jsp").forward(request, response);
 	}
 
