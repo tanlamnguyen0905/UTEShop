@@ -31,6 +31,7 @@ public interface ProductDao {
 
     // Tìm theo danh mục (category)
     List<Product> findByCategoryId(int categoryId);
+    
 
     // Lấy các sản phẩm mới nhất (giới hạn n)
     List<Product> findLatest(int limit);

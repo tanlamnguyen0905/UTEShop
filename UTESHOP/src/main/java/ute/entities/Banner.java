@@ -8,8 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,17 +21,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Categories {
+public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryID;
+    private Long bannerID;
 
     @Column(columnDefinition = "nvarchar(255)" )
-    private String categoryName;
-    @Column(columnDefinition = "nvarchar(255)" )
-    private String description;
-    private String image;
+    private String bannerName;
+    
+    private String bannerImage;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "banner", cascade = CascadeType.ALL)
     private List<Product> products;
 }
+

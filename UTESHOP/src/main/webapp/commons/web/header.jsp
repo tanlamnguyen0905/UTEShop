@@ -7,7 +7,7 @@
 		<div class="row align-items-center">
 			<!-- Logo -->
 			<div class="col-auto">
-				<a href="#" class="d-flex align-items-center me-3"> <img
+				<a href="/UTESHOP/home" class="d-flex align-items-center me-3"> <img
 					src="${URL}assets/images/logo.png" alt="UTESHOP" style="height: 40px;">
 				</a>
 			</div>

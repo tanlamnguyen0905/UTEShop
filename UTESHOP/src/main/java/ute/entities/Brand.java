@@ -27,12 +27,12 @@ public class Brand {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long brandID;
 
-    @Column( columnDefinition = "nvarchar 255" )
+    @Column( columnDefinition = "nvarchar(255)" )
     private String brandName;
-    @Column( columnDefinition = "nvarchar 255" )
+    @Column( columnDefinition = "nvarchar(255)" )
     
     private String description;
-    @Column( columnDefinition = "nvarchar 255" )
+    @Column( columnDefinition = "nvarchar(255)" )
     private String brandLogo;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)

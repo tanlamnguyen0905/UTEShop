@@ -29,7 +29,7 @@ public class UserCoupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userCouponID;
 
-    @Column(columnDefinition = "nvarchar 255" )
+    @Column(columnDefinition = "nvarchar(255)" )
     private String description;
     private Double discountPercent;
     private LocalDateTime userCouponStart;

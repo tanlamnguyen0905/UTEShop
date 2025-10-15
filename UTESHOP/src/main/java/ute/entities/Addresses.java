@@ -23,7 +23,7 @@ public class Addresses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressID;
 
-    @Column(columnDefinition = "nvarchar 255" )
+    @Column(columnDefinition = "nvarchar(255)" )
     private String address;
 
     @ManyToOne

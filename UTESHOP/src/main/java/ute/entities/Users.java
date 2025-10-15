@@ -19,7 +19,7 @@ public class Users {
     private String username;
     private String password;
     
-    @Column(columnDefinition = "nvarchar 255" )
+    @Column(columnDefinition = "nvarchar(255)" )
     private String fullname;
     private String email;
     private String phone;

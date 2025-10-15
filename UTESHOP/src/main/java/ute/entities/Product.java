@@ -26,9 +26,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productID;
 
-    @Column(columnDefinition = "nvarchar 255" )
+    @Column(columnDefinition = "nvarchar(255)" )
     private String productName;
-    @Column(columnDefinition = "nvarchar 255" )
+    @Column(columnDefinition = "nvarchar(255)" )
     private String describe;
     private Double unitPrice;
     private Integer stockQuantity;
@@ -47,5 +47,9 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductDiscount> productDiscounts;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Image> images;
+    
 }
 

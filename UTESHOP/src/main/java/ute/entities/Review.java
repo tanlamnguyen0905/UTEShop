@@ -26,7 +26,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewID;
 
-    @Column( columnDefinition = "nvarchar 255" )
+    @Column( columnDefinition = "nvarchar(255)" )
     private String content;
     private String image;
     private Double rating;
