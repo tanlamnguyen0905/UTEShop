@@ -1,8 +1,7 @@
 package ute.entities;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,27 +9,33 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Categories {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryID;
+    private Long reviewID;
 
-    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
-    private String categoryName;
-    private String description;
+    	@Column(name = "content", columnDefinition = "NVARCHAR(MAX)")
+    private String content;
     private String image;
+    private Double rating;
+    private LocalDateTime createAt;
+    private String status;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "userID")
+    private Users user;
+
+    @OneToOne
+    @JoinColumn(name = "orderDetailID")
+    private OrderDetail orderDetail;
 }

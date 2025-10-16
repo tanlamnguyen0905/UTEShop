@@ -1,291 +1,158 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-    <!-- BEGIN HEADER -->
-    <div class="header">
-      <div class="container">
-        <a class="site-logo" href="shop-index.html"><img src="${URL}assets/frontend/layout/img/logos/logo-shop-red.png" alt="Metronic Shop UI"></a>
+	pageEncoding="UTF-8"%>
 
-        <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+<jsp:include page="/WEB-INF/views/auth/login.jsp" />
+<jsp:include page="/WEB-INF/views/auth/register.jsp" />
 
-        <!-- BEGIN CART -->
-        <div class="top-cart-block">
-          <div class="top-cart-info">
-            <a href="javascript:void(0);" class="top-cart-info-count">3 items</a>
-            <a href="javascript:void(0);" class="top-cart-info-value">$1260</a>
-          </div>
-          <i class="fa fa-shopping-cart"></i>
-                        
-          <div class="top-cart-content-wrapper">
-            <div class="top-cart-content">
-              <ul class="scroller" style="height: 250px;">
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/cart-img.jpg" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
-                </li>
-              </ul>
-              <div class="text-right">
-                <a href="shop-shopping-cart.html" class="btn btn-default">View Cart</a>
-                <a href="shop-checkout.html" class="btn btn-primary">Checkout</a>
-              </div>
-            </div>
-          </div>            
-        </div>
-        <!--END CART -->
+<!-- ====== HEADER ====== -->
+<header class="border-bottom bg-white py-3 shadow-sm"
+	style="position: sticky; top: 0; z-index: 1030; transition: backdrop-filter 0.3s ease; backdrop-filter: blur(5px);">
+	<div class="container">
+		<div class="row align-items-center">
+			<!-- Logo -->
+			<div class="col-auto">
+				<a href="${pageContext.request.contextPath}/"
+					class="d-flex align-items-center me-3"> <img
+					src="${pageContext.request.contextPath}/assets/images/logo.png"
+					alt="UTESHOP" style="height: 40px;">
+				</a>
+			</div>
 
-        <!-- BEGIN NAVIGATION -->
-        <div class="header-navigation">
-          <ul>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Woman 
-                
-              </a>
-                
-              <!-- BEGIN DROPDOWN MENU -->
-              <ul class="dropdown-menu">
-                <li class="dropdown-submenu">
-                  <a href="shop-product-list.html">Hi Tops <i class="fa fa-angle-right"></i></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="shop-product-list.html">Second Level Link</a></li>
-                    <li><a href="shop-product-list.html">Second Level Link</a></li>
-                    <li class="dropdown-submenu">
-                      <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                        Second Level Link 
-                        <i class="fa fa-angle-right"></i>
-                      </a>
-                      <ul class="dropdown-menu">
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-                <li><a href="shop-product-list.html">Running Shoes</a></li>
-                <li><a href="shop-product-list.html">Jackets and Coats</a></li>
-              </ul>
-              <!-- END DROPDOWN MENU -->
-            </li>
-            <li class="dropdown dropdown-megamenu">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Man
-                
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <div class="header-navigation-content">
-                    <div class="row">
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Footwear</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Astro Trainers</a></li>
-                          <li><a href="shop-product-list.html">Basketball Shoes</a></li>
-                          <li><a href="shop-product-list.html">Boots</a></li>
-                          <li><a href="shop-product-list.html">Canvas Shoes</a></li>
-                          <li><a href="shop-product-list.html">Football Boots</a></li>
-                          <li><a href="shop-product-list.html">Golf Shoes</a></li>
-                          <li><a href="shop-product-list.html">Hi Tops</a></li>
-                          <li><a href="shop-product-list.html">Indoor and Court Trainers</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Clothing</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Base Layer</a></li>
-                          <li><a href="shop-product-list.html">Character</a></li>
-                          <li><a href="shop-product-list.html">Chinos</a></li>
-                          <li><a href="shop-product-list.html">Combats</a></li>
-                          <li><a href="shop-product-list.html">Cricket Clothing</a></li>
-                          <li><a href="shop-product-list.html">Fleeces</a></li>
-                          <li><a href="shop-product-list.html">Gilets</a></li>
-                          <li><a href="shop-product-list.html">Golf Tops</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Accessories</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Belts</a></li>
-                          <li><a href="shop-product-list.html">Caps</a></li>
-                          <li><a href="shop-product-list.html">Gloves, Hats and Scarves</a></li>
-                        </ul>
+			<!-- Navbar -->
+			<div class="col d-flex justify-content-center">
+				<nav class="nav main-nav">
+					<a class="nav-link fw-bold text-dark" href="#">Sản Phẩm</a> <a
+						class="nav-link fw-bold text-danger" href="#">Đang Sale</a> <a
+						class="nav-link fw-bold text-dark" href="#">Quần áo</a> <a
+						class="nav-link fw-bold text-dark" href="#">Phụ kiện</a>
+				</nav>
+			</div>
 
-                        <h4>Clearance</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Jackets</a></li>
-                          <li><a href="shop-product-list.html">Bottoms</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-12 nav-brands">
-                        <ul>
-                          <li><a href="shop-product-list.html"><img title="esprit" alt="esprit" src="${URL}assets/frontend/pages/img/brands/esprit.jpg"></a></li>
-                          <li><a href="shop-product-list.html"><img title="gap" alt="gap" src="${URL}assets/frontend/pages/img/brands/gap.jpg"></a></li>
-                          <li><a href="shop-product-list.html"><img title="next" alt="next" src="${URL}assets/frontend/pages/img/brands/next.jpg"></a></li>
-                          <li><a href="shop-product-list.html"><img title="puma" alt="puma" src="${URL}assets/frontend/pages/img/brands/puma.jpg"></a></li>
-                          <li><a href="shop-product-list.html"><img title="zara" alt="zara" src="${URL}assets/frontend/pages/img/brands/zara.jpg"></a></li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </li>
-            <li><a href="shop-item.html">Kids</a></li>
-            <li class="dropdown dropdown100 nav-catalogue">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                New
-                
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <div class="header-navigation-content">
-                    <div class="row">
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/products/model4.jpg" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/products/model3.jpg" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/products/model7.jpg" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/pages/img/products/model4.jpg" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </li>
-            <li class="dropdown active">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Pages 
-                
-              </a>
-                
-              <ul class="dropdown-menu">
-                <li><a href="shop-index.html">Home Default</a></li>
-                <li class="active"><a href="shop-index-header-fix.html">Home Header Fixed</a></li>
-                <li><a href="shop-index-light-footer.html">Home Light Footer</a></li>
-                <li><a href="shop-product-list.html">Product List</a></li>
-                <li><a href="shop-search-result.html">Search Result</a></li>
-                <li><a href="shop-item.html">Product Page</a></li>
-                <li><a href="shop-shopping-cart-null.html">Shopping Cart (Null Cart)</a></li>
-                <li><a href="shop-shopping-cart.html">Shopping Cart</a></li>
-                <li><a href="shop-checkout.html">Checkout</a></li>
-                <li><a href="shop-about.html">About</a></li>
-                <li><a href="shop-contacts.html">Contacts</a></li>
-                <li><a href="shop-account.html">My account</a></li>
-                <li><a href="shop-wishlist.html">My Wish List</a></li>
-                <li><a href="shop-goods-compare.html">Product Comparison</a></li>
-                <li><a href="shop-standart-forms.html">Standart Forms</a></li>
-                <li><a href="shop-faq.html">FAQ</a></li>
-                <li><a href="shop-privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="shop-terms-conditions-page.html">Terms &amp; Conditions</a></li>
-              </ul>
-            </li>
-            <li><a href="index.html" target="_blank">Corporate</a></li>
-            <li><a href="onepage-index.html" target="_blank">One Page</a></li>
-            <li><a href="http://keenthemes.com/preview/metronic/theme/templates/admin&amp;page=ecommerce_index.html" target="_blank">Admin theme</a></li>
+			<!-- Search + Icons -->
+			<div class="col-auto ms-auto">
+				<div class="d-flex align-items-center gap-3">
+					<form class="d-flex align-items-center bg-light rounded-pill px-2"
+						style="max-width: 260px;">
+						<input type="text"
+							class="form-control border-0 bg-light rounded-pill"
+							placeholder="Tìm kiếm..." style="box-shadow: none;">
+						<button class="btn btn-link text-dark px-2" type="submit">
+							<i class="bi bi-search fs-5"></i>
+						</button>
+					</form>
 
-            <!-- BEGIN TOP SEARCH -->
-            <li class="menu-search">
-              <span class="sep"></span>
-              <i class="fa fa-search search-btn"></i>
-              <div class="search-box">
-                <form action="#">
-                  <div class="input-group">
-                    <input type="text" placeholder="Search" class="form-control">
-                    <span class="input-group-btn">
-                      <button class="btn btn-primary" type="submit">Search</button>
-                    </span>
-                  </div>
-                </form>
-              </div> 
-            </li>
-            <!-- END TOP SEARCH -->
-          </ul>
-        </div>
-        <!-- END NAVIGATION -->
-      </div>
-    </div>
-    <!-- Header END -->
+					<!-- User dropdown -->
+					<c:choose>
+						<c:when test="${empty sessionScope.currentUser}">
+							<div class="dropdown">
+								<a href="#" class="btn btn-light rounded-circle"
+									id="userDropdown" data-bs-toggle="dropdown"
+									aria-expanded="false"> <i
+									class="bi bi-person-fill fs-4 text-primary"></i>
+								</a>
+								<ul class="dropdown-menu dropdown-menu-end text-center"
+									aria-labelledby="userDropdown">
+									<li><a class="dropdown-item" href="#"
+										data-bs-toggle="modal" data-bs-target="#loginModal"> <i
+											class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+									</a></li>
+									<li><a class="dropdown-item" href="#"
+										data-bs-toggle="modal" data-bs-target="#registerModal"> <i
+											class="fa-solid fa-user-plus me-1"></i> Đăng ký
+									</a></li>
+								</ul>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="dropdown">
+								<a href="#"
+									class="d-flex align-items-center text-decoration-none dropdown-toggle"
+									id="userDropdown" data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<!-- Tên người dùng --> <span class="fw-semibold text-dark">${sessionScope.currentUser.fullname}</span>
+								</a>
+
+								<ul
+									class="dropdown-menu dropdown-menu-end text-center shadow-sm"
+									aria-labelledby="userDropdown">
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/user/profile"> <i
+											class="fa-solid fa-user me-1 text-primary"></i> Hồ sơ của tôi
+									</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a class="dropdown-item text-danger"
+										href="${pageContext.request.contextPath}/auth/logout"> <i
+											class="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất
+									</a></li>
+								</ul>
+							</div>
+						</c:otherwise>
+					</c:choose>
+
+					<!-- Cart -->
+					<div class="position-relative">
+						<a href="#" class="btn btn-light rounded-circle"> <i
+							class="bi bi-bag-fill fs-4 text-dark"></i>
+						</a> <span
+							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+							20 </span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+
+<!-- ====== CSS tùy chỉnh ====== -->
+<style>
+/* Hiệu ứng highlight khi hover */
+.main-nav .nav-link {
+	position: relative;
+	margin: 0 12px;
+	color: #212529;
+	transition: color 0.3s ease;
+}
+
+.main-nav .nav-link:hover {
+	color: #d32f2f; /* đỏ khi hover */
+}
+
+/* Gạch chân chạy mượt dưới link khi hover */
+.main-nav .nav-link::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: -6px;
+	width: 0;
+	height: 2px;
+	background-color: #d32f2f;
+	transition: width 0.3s ease;
+}
+
+.main-nav .nav-link:hover::after {
+	width: 100%;
+}
+
+/* Gạch chân giữ nguyên cho menu đang active */
+.main-nav .nav-link.active {
+	color: #d32f2f;
+}
+
+.main-nav .nav-link.active::after {
+	width: 100%;
+}
+</style>
+
+<!-- ====== Hiệu ứng mờ khi cuộn ====== -->
+<script>
+	window.addEventListener('scroll', function() {
+		const header = document.querySelector('header');
+		if (window.scrollY > 20) {
+			header.style.backdropFilter = 'blur(10px)';
+			header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.15)';
+		} else {
+			header.style.backdropFilter = 'blur(5px)';
+			header.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+		}
+	});
+</script>
