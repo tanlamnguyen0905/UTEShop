@@ -7,7 +7,6 @@
 	<!-- Loại trừ các trang không cần layout (auth + API) -->
 	<mapping path="/auth/*" exclude="true" />
 	<mapping path="/api/*" exclude="true" />
-	
-	
 	<mapping path="/assets/*" exclude="true" />
+	
 </sitemesh>

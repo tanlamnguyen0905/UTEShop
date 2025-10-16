@@ -101,11 +101,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/opensymphony/sitemesh -->
+		<!-- https://mvnrepository.com/artifact/org.sitemesh/sitemesh -->
 		<dependency>
-			<groupId>opensymphony</groupId>
+			<groupId>org.sitemesh</groupId>
 			<artifactId>sitemesh</artifactId>
-			<version>2.7.0-M1</version>
+			<version>3.2.2</version>
 		</dependency>
 
 		<!--
