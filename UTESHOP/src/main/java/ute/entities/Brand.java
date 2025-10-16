@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,7 +25,10 @@ public class Brand {
     private Long brandID;
     @Column(name = "brandName", columnDefinition = "NVARCHAR(255)")
     private String brandName;
+    @Column(columnDefinition = "nvarchar(255)")
+
     private String description;
+    @Column(columnDefinition = "nvarchar(255)")
     private String brandLogo;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)

@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Quên mật khẩu</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%);
@@ -44,7 +42,7 @@
 
     <!-- Logo trái + tiêu đề giữa -->
     <div class="text-start">
-        <img src="${pageContext.request.contextPath}/assets/images/logo.png" 
+        <img src="${URL}assets/images/logo.png" 
              alt="Logo" style="height:60px;">
     </div>
     <h3 class="text-center mt-2">

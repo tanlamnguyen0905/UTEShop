@@ -5,13 +5,14 @@ import java.util.List;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import ute.configs.JPAConfig;
 import ute.dao.inter.ProductDao;
 import ute.entities.Product;
 
 public class ProductDaoImpl implements ProductDao {
-
-	private EntityManager em;
+	private EntityManager em =  Persistence.createEntityManagerFactory("UTESHOP").createEntityManager();
 
 	public ProductDaoImpl() {
 		// "UTESHOP" là tên persistence-unit bạn đã khai báo trong persistence.xml
@@ -98,10 +99,20 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findBestSeller(int limit) {
 		// Giả sử dựa theo số lượng bán trong OrderDetail
 		TypedQuery<Product> query = em.createQuery(
-				"SELECT p FROM Product p JOIN p.orderDetails od GROUP BY p ORDER BY SUM(od.quantity) DESC",
-				Product.class);
+			    "SELECT p FROM OrderDetail od " +
+			    "JOIN od.product p " +
+			    "GROUP BY p " +
+			    "ORDER BY SUM(od.quantity) DESC",
+			    Product.class
+			);
 		query.setMaxResults(limit);
-		return query.getResultList();
+		List<Product> bestSellers = query.getResultList();
+		for (Product p : bestSellers) {
+		    p.getImages().size(); // kích hoạt lazy load ảnh
+		}
+		return bestSellers;
+
+
 	}
 
 	@Override
@@ -126,5 +137,6 @@ public class ProductDaoImpl implements ProductDao {
 		query.setMaxResults(pageSize);
 		return query.getResultList();
 	}
+
 
 }

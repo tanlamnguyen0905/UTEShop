@@ -22,5 +22,7 @@ public class PaymentMethod {
 
 	@Column(name = "name", columnDefinition = "NVARCHAR(255)")
 	private String name;
+
+	@Column(name = "description", columnDefinition = "NVARCHAR(255)")
 	private String description;
 }
