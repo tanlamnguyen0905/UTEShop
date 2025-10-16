@@ -28,7 +28,7 @@ public class HomeController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
-		request.getRequestDispatcher("/views/admin/home_admin.jsp").forward(request, response);
+		request.getRequestDispatcher("/views/admin/dashboard.jsp").forward(request, response);
 	}
 
 	/**

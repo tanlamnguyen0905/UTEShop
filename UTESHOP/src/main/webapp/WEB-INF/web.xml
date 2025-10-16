@@ -18,5 +18,24 @@
         <filter-name>sitemesh</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
+    <servlet>
+        <description></description>
+        <display-name>HomeController</display-name>
+        <servlet-name>HomeController</servlet-name>
+        <servlet-class>ute.controllers.web.HomeController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeController</servlet-name>
+        <url-pattern>/HomeController</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <description></description>
+        <display-name>HomeControllerWeb</display-name>
+        <servlet-name>HomeControllerWeb</servlet-name>
+        <servlet-class>ute.controllers.web.HomeController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeControllerWeb</servlet-name>
+        <url-pattern>/HomeControllerWeb</url-pattern>
+    </servlet-mapping>
 </web-app>

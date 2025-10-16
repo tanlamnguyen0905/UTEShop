@@ -1,27 +1,48 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<c:url value="/" var="URL"></c:url>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${page.title}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="${pageContext.request.contextPath}/templates/admin/assets/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- SB Admin CSS -->
+    <link href="${pageContext.request.contextPath}/templates/admin/css/styles.css" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    ${page.head}
 </head>
-<body>
-	<!-- Begin header -->
-<%@ include file="/commons/admin/header.jsp" %>
-	<!-- End header -->
-	
-	<!-- Begin body -->
-<sitemesh:write property="body"/>
-    <!-- End body -->
-    
-    
-    <!-- Begin footer -->
-<%@ include file="/commons/admin/footer.jsp" %>
-    <!-- End footer -->
 
+<body class="sb-nav-fixed">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<!-- Header -->
+<jsp:include page="/commons/admin/header.jsp" />
+
+<div id="layoutSidenav">
+
+    <!-- Sidebar -->
+    <jsp:include page="/commons/admin/sidebar.jsp" />
+
+    <div id="layoutSidenav_content">
+        <main class="p-4">
+            ${page.body}
+        </main>
+
+        <!-- Footer -->
+        <jsp:include page="/commons/admin/footer.jsp" />
+    </div>
+</div>
+
+<!-- Core JS -->
+<script src="${pageContext.request.contextPath}/templates/admin/assets/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/templates/admin/js/scripts.js"></script>
+
+${page.script}
 </body>
 </html>
