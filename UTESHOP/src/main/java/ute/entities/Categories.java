@@ -23,7 +23,9 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryID;
 
-    private String categoryName;
+    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
+    private String categoryName; 
+    @Column(columnDefinition = "nvarchar(255)")
     private String description;
     private String image;
 

@@ -28,3 +28,4 @@ public class Addresses {
     @JoinColumn(name = "userID")
     private Users user;
 }
+

@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -23,11 +24,13 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewID;
 
+    @Column(name = "content", columnDefinition = "NVARCHAR(MAX)")
     private String content;
     private String image;
     private Double rating;
     private LocalDateTime createAt;
-    private String status;
+
+    private int status;
 
     @ManyToOne
     @JoinColumn(name = "userID")
