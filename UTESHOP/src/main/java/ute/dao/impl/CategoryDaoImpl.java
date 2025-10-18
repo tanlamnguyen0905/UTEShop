@@ -4,17 +4,20 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import ute.configs.JPAConfig;
 import ute.dao.inter.CategoryDao;
 import ute.entities.Categories;
 
 public class CategoryDaoImpl implements CategoryDao {
-
-	private EntityManager em;
-	
 	@Override
 	public List<Categories> findAll() {
-        TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c", Categories.class);
-        return query.getResultList();
+		EntityManager em = JPAConfig.getEntityManager();
+		TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c", Categories.class);
+		try {
+			return query.getResultList();			
+		} finally {
+			em.close();
+		}
 	}
 
 }

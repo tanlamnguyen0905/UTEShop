@@ -35,4 +35,3 @@ public class UserCoupon {
     @JoinColumn(name = "userID")
     private Users user;
 }
-
