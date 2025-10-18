@@ -45,7 +45,6 @@ public class Product {
     @JoinColumn(name = "categoryID")
     private Categories category;
 
-    
     @ManyToOne
     @JoinColumn(name = "brandID")
     private Brand brand;
@@ -58,12 +57,11 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Image> images;
-    
+
     @ManyToMany
-    @JoinTable(
-        name = "product_banner",  // tên bảng trung gian
-        joinColumns = @JoinColumn(name = "productID"),       // khóa ngoại trỏ về Product
-        inverseJoinColumns = @JoinColumn(name = "bannerID")  // khóa ngoại trỏ về Banner
+    @JoinTable(name = "product_banner", // tên bảng trung gian
+            joinColumns = @JoinColumn(name = "productID"), // khóa ngoại trỏ về Product
+            inverseJoinColumns = @JoinColumn(name = "bannerID") // khóa ngoại trỏ về Banner
     )
     private Set<Banner> banners = new HashSet<>();
 
@@ -93,4 +91,13 @@ public class Product {
             return unitPrice;
         }
     }
+
+    @Transient
+    public float rating;
+
+    // public float getRating(){
+    // Long sum;
+    // for (Order)
+    // }
+
 }
