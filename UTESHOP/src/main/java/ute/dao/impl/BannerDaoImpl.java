@@ -14,8 +14,15 @@ public class BannerDaoImpl implements BannerDao {
 	@Override
 	public List<Banner> findAll() {
 		// TODO Auto-generated method stub
-		TypedQuery<Banner> query = em.createQuery("SELECT b FROM Banner b", Banner.class);
-		return query.getResultList();
+	    try {
+	        String jpql = "SELECT DISTINCT b FROM Banner b LEFT JOIN FETCH b.products p LEFT JOIN FETCH p.images";
+	        return em.createQuery(jpql, Banner.class).getResultList();
+	    } finally {
+	        em.close();
+	    }
+
+//		TypedQuery<Banner> query = em.createQuery("SELECT b FROM Banner b", Banner.class);
+//		return query.getResultList();
 	}
 	@Override
 	public List<Product> findByBannerId(int bannerId) {

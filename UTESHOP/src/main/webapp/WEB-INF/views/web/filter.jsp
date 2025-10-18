@@ -106,7 +106,7 @@
 				<div class="row g-4">
 
 					<div class="row align-items-center py-5">
-						<c:forEach var="p" items="${listCate}">
+						<c:forEach var="p" items="${listPro}">
 							<div class="col-6 col-md-4 col-lg-2">
 								<div
 									class="card border-0 shadow-sm rou3nded-4 overflow-hidden bg-white h-90">

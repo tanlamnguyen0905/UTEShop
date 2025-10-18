@@ -39,11 +39,17 @@
 
 				<!-- Slide 1 -->
 				<c:forEach var="banner" items="${listBanner}" varStatus="loop">
-					<div class="carousel-item ${loop.first ? 'active' : ''}">
-						<c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
-						<img src="${imgUrl}" class="d-block w-100"
-							alt="Coolmate banner ${loop.index + 1}">
-					</div>
+					<a
+						href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}"
+						class="text-decoration-none"> <img src="${imgUrl}"
+						class="card-img-top rounded-4" alt="${banner.bannerName}"
+						style="height: 300px; object-fit: cover;">
+						<div class="carousel-item ${loop.first ? 'active' : ''}">
+							<c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
+							<img src="${imgUrl}" class="d-block w-100"
+								alt="Coolmate banner ${loop.index + 1}">
+						</div>
+					</a>
 				</c:forEach>
 
 			</div>
@@ -76,7 +82,8 @@
 						class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
 						<c:url value="/image?fname=${cate.image}" var="imgUrl"></c:url>
 						<%-- <td><img height="150" width="200" src="${imgUrl}" alt="${book.title}" /></td> --%>
-						<a href="/UTESHOP/filter?category=${cate.categoryID}"
+						<a
+							href="${pageContext.request.contextPath}/filter?category=${cate.categoryID}"
 							class="text-decoration-none"> <img src="${imgUrl}"
 							class="card-img-top rounded-4" alt="${cate.categoryName}"
 							style="height: 300px; object-fit: cover;">
@@ -179,78 +186,88 @@
 
 		</div>
 
-		<!-- Begin Sản phẩm Tieu bieu -->
 
-		<div class="row g-4 text-center py-5">
-			<div class="row align-items-center">
-				<!-- Cột trái -->
-				<div class="col">
-					<h3 class="text-start mb-0">Sản phẩm tieu bieu</h3>
-				</div>
-
-				<!-- Cột phải -->
-				<div class="col-auto">
-					<a href="#" class="text-decoration-none">
-						<p
-							class="text-end text-dark mb-0 fw-semibold text-decoration-underline">Xem
-							thêm</p>
-					</a>
-				</div>
-			</div>
-
-			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
-			<div class="col-6 col-md-4 col-lg-2">
-				<div
-					class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-					<a href="#"><img src="logo.png" class="card-img-top rounded-4"
-						alt="Áo thun" style="height: 400;">
-						<div class="card-body p-2">
-							<h6 class="card-title text-uppercase fw-semibold mb-0">Áo
-								thun</h6>
-						</div> </a>
-
-				</div>
-			</div>
-
-		</div>
-
-		<!-- --san pham tieu bieu tuy bien them hoac xoa -->
+		<!-- Begin banner -->
 
 		<div class="row g-4 text-center py-1">
-			<a><img src="image.png" class="img-fluid py-5" alt="banner"></a>
+			<c:forEach var="banner" items="${listBanner}" varStatus="loop">
 
-			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
-			<div class="row align-items-center">
-				<!-- Cột trái -->
-				<div class="col">
-					<h3 class="text-start mb-0">Sản phẩm tieu bieu</h3>
-				</div>
+				<!-- URL ảnh banner -->
+				<c:url value="/image?fname=${banner.bannerImage}" var="bannerImgUrl" />
 
-				<!-- Cột phải -->
-				<div class="col-auto">
-					<a href="#" class="text-decoration-none">
-						<p
-							class="text-end text-dark mb-0 fw-semibold text-decoration-underline">Xem
-							thêm</p>
+				<!-- Banner -->
+				<div class="carousel-item ${loop.first ? 'active' : ''}">
+					<a
+						href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}"
+						class="text-decoration-none"> <img src="${bannerImgUrl}"
+						class="d-block w-100 rounded-4" alt="${banner.bannerName}"
+						style="height: 300px; object-fit: cover;">
 					</a>
 				</div>
-			</div>
 
-			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
-			<div class="col-6 col-md-4 col-lg-2">
-				<div
-					class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-					<a href="#"><img src="logo.png" class="card-img-top rounded-4"
-						alt="Áo thun" style="height: 400;">
-						<div class="card-body p-2">
-							<h6 class="card-title text-uppercase fw-semibold mb-0">Áo
-								thun</h6>
-						</div> </a>
-
+				<!-- Tiêu đề sản phẩm -->
+				<div class="row align-items-center mt-3 mb-2">
+					<div class="col">
+						<h3 class="text-start mb-0">Sản phẩm tiêu biểu</h3>
+					</div>
+					<div class="col-auto">
+						<a href="#" class="text-decoration-none">
+							<p
+								class="text-end text-dark mb-0 fw-semibold text-decoration-underline">Xem
+								thêm</p>
+						</a>
+					</div>
 				</div>
-			</div>
 
+				<!-- Danh sách sản phẩm -->
+				<div class="row g-3">
+					<c:forEach var="p" items="${banner.products}" varStatus="pLoop">
+						<div class="col-6 col-md-4 col-lg-2">
+							<div
+								class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
+								<c:choose>
+									<c:when test="${not empty p.images}">
+										<c:url value="/image?fname=${p.images[0].dirImage}"
+											var="imgUrl" />
+									</c:when>
+									<c:otherwise>
+										<c:url value="/image?fname=logo.png" var="imgUrl" />
+									</c:otherwise>
+								</c:choose>
+
+								<a href="#" class="text-decoration-none"> <img
+									src="${imgUrl}" alt="${p.productName}"
+									class="card-img-top rounded-4"
+									style="height: 300px; object-fit: cover;">
+									<div class="card-body p-2">
+										<h6 class="text-dark mb-2">${p.productName}</h6>
+										<c:choose>
+											<c:when test="${p.discountPrice != p.unitPrice}">
+												<c:set var="discountPercent"
+													value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+												<div class="d-flex align-items-center py-2">
+													<span class="fw-bold fs-6 text-dark me-2">${p.discountPrice}đ</span>
+													<span class="badge rounded-pill text-white fw-bold px-2"
+														style="background-color: #2f52ff;">-${discountPercent}%</span>
+												</div>
+												<div>
+													<span class="text-muted text-decoration-line-through">${p.unitPrice}đ</span>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<span class="fw-bold fs-5 text-dark">${p.unitPrice}đ</span>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</a>
+							</div>
+						</div>
+					</c:forEach>
+				</div>
+
+			</c:forEach>
 		</div>
+
 	</div>
 </body>
 
