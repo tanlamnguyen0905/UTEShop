@@ -5,8 +5,6 @@ import java.util.List;
 import ute.entities.Product;
 
 public interface ProductDao {
-	
-
     // ======== CRUD cơ bản ========
 
     // Thêm sản phẩm mới
@@ -16,10 +14,10 @@ public interface ProductDao {
     void update(Product product);
 
     // Xóa sản phẩm theo id
-    void delete(int id);
+    void delete(Long id);
 
     // Tìm sản phẩm theo id
-    Product findById(int id);
+    Product findById(Long id);
 
     // Lấy danh sách tất cả sản phẩm
     List<Product> findAll();
@@ -30,8 +28,7 @@ public interface ProductDao {
     List<Product> findByName(String name);
 
     // Tìm theo danh mục (category)
-    List<Product> findByCategoryId(int categoryId);
-    
+    List<Product> findByCategoryId(Long categoryId);
 
     // Lấy các sản phẩm mới nhất (giới hạn n)
     List<Product> findLatest(int limit);
@@ -47,8 +44,10 @@ public interface ProductDao {
 
     // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
-    
-    
-    
-    
+
+    // Phân trang với tìm kiếm theo tên
+    List<Product> findByNamePaginated(String name, int firstResult, int maxResults);
+
+    // Đếm số sản phẩm với tìm kiếm theo tên
+    long countByName(String name);
 }

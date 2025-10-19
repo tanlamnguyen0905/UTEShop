@@ -1,27 +1,23 @@
-package ute.controllers;
+package ute.controllers.admin;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ute.dao.impl.ProductDaoImpl;
-import ute.entities.Product;
-
 import java.io.IOException;
-import java.util.List;
 
 /**
- * Servlet implementation class FilterController
+ * Servlet implementation class HomeController
  */
-@WebServlet(urlPatterns = {"/filter"})
-public class FilterController extends HttpServlet {
+@WebServlet("/admin/home/dashboard")
+public class HomeController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public FilterController() {
+    public HomeController() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,20 +27,8 @@ public class FilterController extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // TODO Auto-generated method stub
-        String category = request.getParameter("category");
-//		if(category != null) {
-//			List<Product> listCate = new ProductDaoImpl().findByCategoryId(1);
-//			System.out.println(listCate.size());
-//			request.setAttribute("listCate", listCate);
-//			request.getRequestDispatcher("/WEB-INF/views/web/filter.jsp").forward(request, response);
-//		}
-//		else {
-//			response.sendRedirect("home");
-//		}
-        List<Product> listCate = new ProductDaoImpl().findByCategoryId(1L);
-        System.out.println(listCate.size());
-        request.setAttribute("listCate", listCate);
-        request.getRequestDispatcher("/WEB-INF/views/web/filter.jsp").forward(request, response);
+//		response.getWriter().append("Served at: ").append(request.getContextPath());
+        request.getRequestDispatcher("/views/admin/dashboard.jsp").forward(request, response);
     }
 
     /**

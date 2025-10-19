@@ -6,18 +6,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
-import ute.dao.inter.ProductDao;
-import ute.entities.Product;
+import ute.dao.inter.CategoriesDao;
+import ute.entities.Categories;
 
-public class ProductDaoImpl implements ProductDao {
+public class CategoriesDaoImpl implements CategoriesDao {
 
     @Override
-    public void insert(Product product) {
+    public void insert(Categories category) {
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            em.persist(product);
+            em.persist(category);
             trans.commit();
         } catch (Exception e) {
             if (trans.isActive()) {
@@ -30,12 +30,12 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public void update(Product product) {
+    public void update(Categories category) {
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            em.merge(product);
+            em.merge(category);
             trans.commit();
         } catch (Exception e) {
             if (trans.isActive()) {
@@ -53,9 +53,9 @@ public class ProductDaoImpl implements ProductDao {
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            Product product = em.find(Product.class, id);
-            if (product != null) {
-                em.remove(product);
+            Categories category = em.find(Categories.class, id);
+            if (category != null) {
+                em.remove(category);
             }
             trans.commit();
         } catch (Exception e) {
@@ -69,19 +69,24 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public Product findById(Long id) {
+    public Categories findById(Long id) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            return em.find(Product.class, id);
+            TypedQuery<Categories> query = em.createQuery(
+                    "SELECT c FROM Categories c LEFT JOIN FETCH c.products WHERE c.categoryID = :id",
+                    Categories.class);
+            query.setParameter("id", id);
+            List<Categories> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
         } finally {
             em.close();
         }
     }
 
     @Override
-    public List<Product> findAll() {
+    public List<Categories> findAll() {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p", Product.class);
+        TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c LEFT JOIN FETCH c.products", Categories.class);
         try {
             return query.getResultList();
         } finally {
@@ -90,10 +95,10 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> findByName(String name) {
+    public List<Categories> findByName(String name) {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(:name)", Product.class);
+        TypedQuery<Categories> query = em.createQuery(
+                "SELECT c FROM Categories c LEFT JOIN FETCH c.products WHERE LOWER(c.categoryName) LIKE LOWER(:name)", Categories.class);
         query.setParameter("name", "%" + name + "%");
         try {
             return query.getResultList();
@@ -103,53 +108,14 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> findByCategoryId(Long categoryId) {
+    public Categories findByNameExact(String name) {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p WHERE p.category.categoryID = :categoryId", Product.class);
-        query.setParameter("categoryId", categoryId);
+        TypedQuery<Categories> query = em.createQuery(
+                "SELECT c FROM Categories c LEFT JOIN FETCH c.products WHERE LOWER(c.categoryName) = LOWER(:name)", Categories.class);
+        query.setParameter("name", name);
         try {
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public List<Product> findLatest(int limit) {
-        EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p ORDER BY p.productID DESC", Product.class);
-        query.setMaxResults(limit);
-        try {
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public List<Product> findBestSeller(int limit) {
-        EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p JOIN p.orderDetails od GROUP BY p ORDER BY SUM(od.quantity) DESC", Product.class);
-        query.setMaxResults(limit);
-        try {
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public List<Product> findByPriceRange(double minPrice, double maxPrice) {
-        EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p WHERE p.unitPrice BETWEEN :minPrice AND :maxPrice", Product.class);
-        query.setParameter("minPrice", minPrice);
-        query.setParameter("maxPrice", maxPrice);
-        try {
-            return query.getResultList();
+            List<Categories> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
         } finally {
             em.close();
         }
@@ -158,7 +124,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public long count() {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Long> query = em.createQuery("SELECT COUNT(p) FROM Product p", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT COUNT(c) FROM Categories c", Long.class);
         try {
             return query.getSingleResult();
         } finally {
@@ -167,9 +133,9 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> findPage(int page, int pageSize) {
+    public List<Categories> findPage(int page, int pageSize) {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p", Product.class);
+        TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c LEFT JOIN FETCH c.products ORDER BY c.categoryID", Categories.class);
         query.setFirstResult((page - 1) * pageSize);
         query.setMaxResults(pageSize);
         try {
@@ -180,10 +146,10 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> findByNamePaginated(String name, int firstResult, int maxResults) {
+    public List<Categories> findByNamePaginated(String name, int firstResult, int maxResults) {
         EntityManager em = JPAConfig.getEntityManager();
-        TypedQuery<Product> query = em.createQuery(
-                "SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(:name) ORDER BY p.productID", Product.class);
+        TypedQuery<Categories> query = em.createQuery(
+                "SELECT c FROM Categories c LEFT JOIN FETCH c.products WHERE LOWER(c.categoryName) LIKE LOWER(:name) ORDER BY c.categoryID", Categories.class);
         query.setParameter("name", "%" + name + "%");
         query.setFirstResult(firstResult);
         query.setMaxResults(maxResults);
@@ -198,7 +164,7 @@ public class ProductDaoImpl implements ProductDao {
     public long countByName(String name) {
         EntityManager em = JPAConfig.getEntityManager();
         TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(p) FROM Product p WHERE LOWER(p.productName) LIKE LOWER(:name)", Long.class);
+                "SELECT COUNT(c) FROM Categories c WHERE LOWER(c.categoryName) LIKE LOWER(:name)", Long.class);
         query.setParameter("name", "%" + name + "%");
         try {
             return query.getSingleResult();
