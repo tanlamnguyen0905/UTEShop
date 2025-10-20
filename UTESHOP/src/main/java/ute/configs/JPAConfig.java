@@ -12,16 +12,21 @@ import java.util.Properties;
 @PersistenceContext
 public class JPAConfig {
     private static final String PERSISTENCE_UNIT_NAME = "UTESHOP";
-    private static EntityManagerFactory emf;
+    private static EntityManagerFactory emf = null;
 
     public static EntityManager getEntityManager() {
-        try {
+    	if (emf == null || !emf.isOpen()) 
+    		createEntityManagerFactory();
+        // Tạo và return EM
+        return emf.createEntityManager();
+    }
+    
+    private static void createEntityManagerFactory() {
+    	try (InputStream is = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("config.properties")) {
             Properties props = new Properties();
-            try (InputStream is = Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("config.properties")) {
-                props.load(is);
-            }
-
+            props.load(is);
+            
             // Tạo overrides cho DB connection
             Map<String, Object> overrides = new HashMap<>();
             String dbUrl = props.getProperty("db.url");
@@ -32,18 +37,11 @@ public class JPAConfig {
             overrides.put("jakarta.persistence.jdbc.user", dbUser);
             overrides.put("jakarta.persistence.jdbc.password", dbPass);
 
-            // Tạo EMF nếu chưa có (với overrides)
-            if (emf == null || !emf.isOpen()) {
-                emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, overrides);
-            }
-
-            // Tạo và return EM
-            return emf.createEntityManager();
-
-        } catch (Exception e) {
+            // Tạo EMF với overrides
+            emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, overrides);
+    	} catch (Exception e) {
             System.err.println("Lỗi khi tạo EntityManager: " + e.getMessage());
             e.printStackTrace();
-            return null;
         }
     }
 

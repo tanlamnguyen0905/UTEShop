@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+<<<<<<< HEAD
     private int categoryID;
 
     @Column(name = "categoryName", columnDefinition = "nvarchar(100)", nullable = false)
@@ -46,3 +47,16 @@ public class Categories {
     @OneToMany(mappedBy = "category")
     private List<Categories> subCategories;
 }
+=======
+    private Long categoryID;
+
+    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
+    private String categoryName; 
+    @Column(columnDefinition = "nvarchar(255)")
+    private String description;
+    private String image;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
+}
+>>>>>>> origin/dev

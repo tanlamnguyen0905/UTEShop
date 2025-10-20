@@ -13,4 +13,6 @@ public interface UserDao {
 	void insert(Users user);
 
 	void update(Users user);
+
+	boolean activateUserByEmail(String email);
 }
