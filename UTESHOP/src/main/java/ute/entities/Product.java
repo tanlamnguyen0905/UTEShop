@@ -17,16 +17,19 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "banners") // 🔥 thêm dòng này
 @Builder
 public class Product {
     @Id
@@ -39,31 +42,44 @@ public class Product {
     private String describe;
     private Double unitPrice;
     private Integer stockQuantity;
-    private Long soldCount;
+    @Builder.Default
+    private Long soldCount=0L;
+    @Builder.Default
+    private Long reviewCount=0L;
+    private LocalDateTime importDate;
+    
+    @PrePersist
+    protected void onCreate() {
+		this.importDate = LocalDateTime.now();
+	}
 
     @ManyToOne
     @JoinColumn(name = "categoryID")
     private Categories category;
 
-    
     @ManyToOne
     @JoinColumn(name = "brandID")
     private Brand brand;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Review> reviews;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Favorite> favorites;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductDiscount> productDiscounts;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Image> images;
-    
+
     @ManyToMany
-    @JoinTable(
-        name = "product_banner",  // tên bảng trung gian
-        joinColumns = @JoinColumn(name = "productID"),       // khóa ngoại trỏ về Product
-        inverseJoinColumns = @JoinColumn(name = "bannerID")  // khóa ngoại trỏ về Banner
+    @JoinTable(name = "product_banner", // tên bảng trung gian
+            joinColumns = @JoinColumn(name = "productID"), // khóa ngoại trỏ về Product
+            inverseJoinColumns = @JoinColumn(name = "bannerID") // khóa ngoại trỏ về Banner
     )
     private Set<Banner> banners = new HashSet<>();
 
@@ -93,4 +109,22 @@ public class Product {
             return unitPrice;
         }
     }
+
+    @Transient
+    public float rating;
+
+    public float getRating() {
+        return (float) reviews.stream()
+                .mapToDouble(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+    
+    
+    @Transient
+    public int favoriteCount;
+    public int getFavoriteCount() {
+		return favorites.size();
+	}
+
 }

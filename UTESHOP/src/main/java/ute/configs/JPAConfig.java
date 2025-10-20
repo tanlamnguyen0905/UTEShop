@@ -33,7 +33,6 @@ public class JPAConfig {
             String dbUser = props.getProperty("db.username");
             String dbPass = props.getProperty("db.password");
 
-
             overrides.put("jakarta.persistence.jdbc.url", dbUrl);
             overrides.put("jakarta.persistence.jdbc.user", dbUser);
             overrides.put("jakarta.persistence.jdbc.password", dbPass);

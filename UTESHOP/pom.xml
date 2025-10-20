@@ -149,6 +149,13 @@
 				<configuration>
 					<source>22</source>
 					<target>22</target>
+										                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>1.18.40</version>
+                    </path>
+                </annotationProcessorPaths>
 					<!-- put your configurations here -->
 				</configuration>
 			</plugin>
