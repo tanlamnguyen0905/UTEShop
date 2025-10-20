@@ -1,11 +1,12 @@
-package ute.dao.inter;
+package ute.service.inter;
 
 import java.util.List;
 
 import ute.entities.Banner;
 import ute.entities.Product;
 
-public interface BannerDao {
+public interface BannerService {
+
 	List<Banner> findAll();
 	List<Product> findByBannerId(int bannerId);
 	List<Product> findProductsByBannerIdinPage(int bannerId, int page, int pageSize);
