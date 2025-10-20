@@ -24,10 +24,9 @@ import lombok.NoArgsConstructor;
 public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-<<<<<<< HEAD
-    private int categoryID;
+    private Long categoryID;
 
-    @Column(name = "categoryName", columnDefinition = "nvarchar(100)", nullable = false)
+    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)", nullable = false)
     private String categoryName;
 
     @Column(name = "description", columnDefinition = "nvarchar(max)")
@@ -36,27 +35,7 @@ public class Categories {
     @Column(name = "image", columnDefinition = "nvarchar(max)")
     private String image;
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
-
-    // Thêm trường parent reference để fix mappedBy
-    @ManyToOne
-    @JoinColumn(name = "parentCategoryID")
-    private Categories category;
-
-    @OneToMany(mappedBy = "category")
-    private List<Categories> subCategories;
-}
-=======
-    private Long categoryID;
-
-    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
-    private String categoryName; 
-    @Column(columnDefinition = "nvarchar(255)")
-    private String description;
-    private String image;
-
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products;
+
 }
->>>>>>> origin/dev
