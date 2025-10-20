@@ -8,4 +8,5 @@ import ute.entities.Product;
 public interface BannerDao {
 	List<Banner> findAll();
 	List<Product> findByBannerId(int bannerId);
+	List<Product> findProductsByBannerIdinPage(int bannerId, int page, int pageSize);
 }

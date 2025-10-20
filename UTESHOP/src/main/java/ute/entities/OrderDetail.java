@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,7 +31,7 @@ public class OrderDetail {
 
     private Integer quantity;
     private Double unitPrice;
-    
+
     private int status;
 
     @ManyToOne
@@ -41,6 +42,4 @@ public class OrderDetail {
     @JoinColumn(name = "productID")
     private Product product;
 
-    @OneToOne(mappedBy = "orderDetail", cascade = CascadeType.ALL)
-    private Review review;
 }

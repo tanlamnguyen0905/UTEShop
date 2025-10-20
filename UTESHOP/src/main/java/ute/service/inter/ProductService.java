@@ -3,8 +3,11 @@ package ute.service.inter;
 import java.util.List;
 
 import ute.entities.Product;
+import ute.utils.ProductFilter;
 
 public interface ProductService {
+
+	
 
     // ======== CRUD cơ bản ========
 
@@ -31,6 +34,9 @@ public interface ProductService {
     // Tìm theo danh mục (category)
     List<Product> findByCategoryId(int categoryId);
     
+    
+    List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
+    
 
     // Lấy các sản phẩm mới nhất (giới hạn n)
     List<Product> findLatest(int limit);
@@ -47,5 +53,18 @@ public interface ProductService {
     // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
     
+    List<Product> findNewProduct(int limit);
+    
+    List<Product> findTopReview(int limit);
+    
+    List<Product> findTopFavorite(int limit);
+    
+    
+    List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize);
+    
+    List<Product> findTopFavoriteinPage(int page, int pageSize);
+    
+    int countProductsByFilter(ProductFilter filter);
+
     
 }

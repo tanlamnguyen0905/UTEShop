@@ -1,274 +1,354 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-<!DOCTYPE html>
-<html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+            <!DOCTYPE html>
+            <html lang="vi">
 
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Danh mục sản phẩm</title>
-</head>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Danh mục sản phẩm</title>
+            </head>
 
-<body class="bg-light py-5">
+            <body class="bg-light py-5">
+                <div class="container">
 
-	<div class="container">
+                    <!-- ====================== SLIDER BANNER ====================== -->
+                    <div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <c:forEach var="banner" items="${listBanner}" varStatus="loop">
+                                <c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
+                                <div class="carousel-item ${loop.first ? 'active' : ''}">
+                                    <a href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}">
+                                        <img src="${imgUrl}" class="d-block w-100 rounded-4" alt="${banner.bannerName}"
+                                            style="height: 400px; object-fit: cover;">
+                                    </a>
+                                </div>
+                            </c:forEach>
+                        </div>
 
+                        <!-- Điều hướng -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                            <span class="visually-hidden">Trước</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                            <span class="visually-hidden">Sau</span>
+                        </button>
+                    </div>
 
+                    <!-- ====================== DANH MỤC ====================== -->
+                    <section class="py-5 text-center">
+                        <div class="text-start mb-4">
+                            <button class="btn btn-dark rounded-pill px-4 fw-bold text-white">Phân loại</button>
+                        </div>
 
-		<!-- ---------------------------------------------Begin Slide -->
-		<!-- ===== HERO SLIDE ===== -->
-		<div id="coolmateCarousel" class="carousel slide"
-			data-bs-ride="carousel">
+                        <div class="row g-4">
+                            <c:forEach var="cate" items="${listCate}" end="5">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <c:url value="/image?fname=${cate.image}" var="imgUrl" />
+                                        <a href="${pageContext.request.contextPath}/filter?category=${cate.categoryID}"
+                                            class="text-decoration-none">
+                                            <img src="${imgUrl}" class="card-img-top rounded-4"
+                                                alt="${cate.categoryName}" style="height: 250px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <h6 class="text-dark text-uppercase">${cate.categoryName}</h6>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
-			<!-- Nút chấm chỉ báo (dưới cùng) -->
-			<div class="carousel-indicators">
-				<button type="button" data-bs-target="#coolmateCarousel"
-					data-bs-slide-to="0" class="active" aria-current="true"
-					aria-label="Slide 1"></button>
-				<button type="button" data-bs-target="#coolmateCarousel"
-					data-bs-slide-to="1" aria-label="Slide 2"></button>
-				<button type="button" data-bs-target="#coolmateCarousel"
-					data-bs-slide-to="2" aria-label="Slide 3"></button>
-			</div>
+                    <!-- ====================== SẢN PHẨM BÁN CHẠY ====================== -->
+                    <section class="py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">SẢN PHẨM BÁN CHẠY</h3>
+                            <a href="${pageContext.request.contextPath}/filter?sortBy=0"
+                                class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
+                        </div>
 
-			<!-- Slide nội dung -->
-			<div class="carousel-inner">
+                        <div class="row g-4">
+                            <c:forEach var="p" items="${listBestSell}" end="5">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <c:choose>
+                                            <c:when test="${not empty p.images}">
+                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
+                                            </c:otherwise>
+                                        </c:choose>
 
-				<!-- Slide 1 -->
-				<c:forEach var="banner" items="${listBanner}" varStatus="loop">
-					<a
-						href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}"
-						class="text-decoration-none"> <img src="${imgUrl}"
-						class="card-img-top rounded-4" alt="${banner.bannerName}"
-						style="height: 300px; object-fit: cover;">
-						<div class="carousel-item ${loop.first ? 'active' : ''}">
-							<c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
-							<img src="${imgUrl}" class="d-block w-100"
-								alt="Coolmate banner ${loop.index + 1}">
-						</div>
-					</a>
-				</c:forEach>
+                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
+                                            class="text-decoration-none">
+                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
+                                                style="height: 250px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <h6 class="text-dark mb-2">${p.productName}</h6>
 
-			</div>
+                                                <c:choose>
+                                                    <c:when test="${p.discountPrice != p.unitPrice}">
+                                                        <c:set var="discountPercent"
+                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+                                                        <div class="d-flex align-items-center py-1">
+                                                            <span
+                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
+                                                            <span class="badge bg-primary text-white">-
+                                                                <fmt:formatNumber value="${discountPercent}"
+                                                                    maxFractionDigits="0" />%
+                                                            </span>
+                                                        </div>
+                                                        <small
+                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
-			<!-- Nút điều hướng -->
-			<button class="carousel-control-prev" type="button"
-				data-bs-target="#coolmateCarousel" data-bs-slide="prev">
-				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-				<span class="visually-hidden">Trước</span>
-			</button>
-			<button class="carousel-control-next" type="button"
-				data-bs-target="#coolmateCarousel" data-bs-slide="next">
-				<span class="carousel-control-next-icon" aria-hidden="true"></span>
-				<span class="visually-hidden">Sau</span>
-			</button>
-		</div>
+                    <!-- ====================== SẢN PHẨM MỚI ====================== -->
+                    <section class="py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">SẢN PHẨM MỚI</h3>
+                            <a href="${pageContext.request.contextPath}/filter?sortBy=1"
+                                class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
+                        </div>
 
-		<!-------begin Category -->
+                        <div class="row g-4">
+                            <c:forEach var="p" items="${listNewProducts}" end="5">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <c:choose>
+                                            <c:when test="${not empty p.images}">
+                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
+                                            </c:otherwise>
+                                        </c:choose>
 
-		<div class="row g-4 text-center py-5">
-			<div class="col-12 mb-4 text-start">
-				<button type="button"
-					class="btn rounded-pill px-4 fw-bold text-white"
-					style="background-color: black;">Phân loại</button>
-			</div>
-			<!-- Lặp qua danh sách listCate -->
-			<c:forEach var="cate" items="${listCate}">
-				<div class="col-6 col-md-4 col-lg-2">
-					<div
-						class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-						<c:url value="/image?fname=${cate.image}" var="imgUrl"></c:url>
-						<%-- <td><img height="150" width="200" src="${imgUrl}" alt="${book.title}" /></td> --%>
-						<a
-							href="${pageContext.request.contextPath}/filter?category=${cate.categoryID}"
-							class="text-decoration-none"> <img src="${imgUrl}"
-							class="card-img-top rounded-4" alt="${cate.categoryName}"
-							style="height: 300px; object-fit: cover;">
-							<div class="card-body p-2">
-								<h6 class="text-dark text-uppercase">${cate.categoryName}</h6>
-							</div>
-						</a>
-					</div>
-				</div>
-			</c:forEach>
-		</div>
+                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
+                                            class="text-decoration-none">
+                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
+                                                style="height: 250px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <h6 class="text-dark mb-2">${p.productName}</h6>
 
-		<!-- End Category -->
-
-		<!-- Begin Sản phẩm bán chạy -->
-
-		<div class="row g-4 text-center py-5">
-			<div class="row align-items-center">
-				<!-- Cột trái -->
-
-				<div class="col">
-					<h3 class="text-start mb-0">SẢN PHẨM BÁN CHẠY</h3>
-				</div>
-
-				<!-- Cột phải -->
-				<div class="col-auto">
-					<a href="#" class="text-decoration-none">
-						<p
-							class="text-end text-dark mb-0 fw-semibold text-decoration-underline">Xem
-							thêm</p>
-					</a>
-				</div>
-			</div>
-
-			<!-- CHỉ nên hiện thị 6 cái sau đó muôn xem thêm thì ấn xem thêm -->
-			<c:forEach var="p" items="${listBestSell}">
-				<div class="col-6 col-md-4 col-lg-2">
-					<div
-						class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-
-						<c:choose>
-							<c:when test="${not empty p.images}">
-								<c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl"></c:url>
-								<a href="#" class="text-decoration-none"> <img
-									src="${imgUrl}" alt="${p.productName}"
-									class="card-img-top rounded-4"
-									style="height: 300px; object-fit: cover;">
-									<div class="card-body p-2">
-										<h6 class="text-dark mb-2">${p.productName}</h6>
-
-										<c:choose>
-											<c:when test="${p.discountPrice != p.unitPrice}">
-												<!-- Giá sau giảm -->
-												<c:set var="discountPercent"
-													value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-												<!-- Giá -->
-												<div class="d-flex align-items-center py-2">
-													<span class="fw-bold fs-6 text-dark me-2 text-center">${p.discountPrice}đ</span>
-													<span
-														class="badge rounded-pill text-white fw-bold px-2 text-center"
-														style="background-color: #2f52ff;">-${discountPercent}%
-													</span>
-												</div>
-
-												<!-- Giá gốc -->
-												<div>
-													<span class="text-muted text-decoration-line-through">${p.discountPrice}</span>
-												</div>
-
-											</c:when>
-											<c:otherwise>
-												<!-- Nếu không có giá giảm, chỉ hiển thị giá gốc -->
-												<span class="fw-bold fs-5 me-2 text-dark">${p.unitPrice}đ</span>
-											</c:otherwise>
-										</c:choose>
-
-
-									</div>
-								</a>
-							</c:when>
-							<c:otherwise>
-								<c:url value="/image?fname=logo.png" var="imgUrl"></c:url>
-								<a href="#" class="text-decoration-none"> <img
-									src="${imgUrl}" alt="${p.productName}"
-									class="card-img-top rounded-4"
-									style="height: 300px; object-fit: cover;">
-									<div class="card-body p-2">
-										<h6 class="text-dark text-uppercase">${p.productName}</h6>
-										<h6 class="text-dark text-uppercase">${p.unitPrice}VND</h6>
-									</div>
-								</a>
-							</c:otherwise>
-						</c:choose>
+                                                <c:choose>
+                                                    <c:when test="${p.discountPrice != p.unitPrice}">
+                                                        <c:set var="discountPercent"
+                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+                                                        <div class="d-flex align-items-center py-1">
+                                                            <span
+                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
+                                                            <span class="badge bg-primary text-white">-
+                                                                <fmt:formatNumber value="${discountPercent}"
+                                                                    maxFractionDigits="0" />%
+                                                            </span>
+                                                        </div>
+                                                        <small
+                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
 
+                    <!-- ====================== SẢN PHẨM TOP Review ====================== -->
+                    <section class="py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">SẢN PHẨM NHIỀU ĐÁNH GIÁ</h3>
+                            <a href="${pageContext.request.contextPath}/filter?sortBy=2"
+                                class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
+                        </div>
 
-					</div>
-				</div>
-			</c:forEach>
+                        <div class="row g-4">
+                            <c:forEach var="p" items="${listTopReviewProducts}" end="5">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <c:choose>
+                                            <c:when test="${not empty p.images}">
+                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
+                                            </c:otherwise>
+                                        </c:choose>
 
-		</div>
+                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
+                                            class="text-decoration-none">
+                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
+                                                style="height: 250px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <h6 class="text-dark mb-2">${p.productName}</h6>
+
+                                                <c:choose>
+                                                    <c:when test="${p.discountPrice != p.unitPrice}">
+                                                        <c:set var="discountPercent"
+                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+                                                        <div class="d-flex align-items-center py-1">
+                                                            <span
+                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
+                                                            <span class="badge bg-primary text-white">-
+                                                                <fmt:formatNumber value="${discountPercent}"
+                                                                    maxFractionDigits="0" />%
+                                                            </span>
+                                                        </div>
+                                                        <small
+                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
 
-		<!-- Begin banner -->
+                    <!-- ====================== SẢN PHẨM TOP Favorite ====================== -->
+                    <section class="py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">SẢN PHẨM NHIỀU YÊU THÍCH</h3>
+                            <a href="${pageContext.request.contextPath}/filter?sortBy=3"
+                                class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
+                        </div>
 
-		<div class="row g-4 text-center py-1">
-			<c:forEach var="banner" items="${listBanner}" varStatus="loop">
+                        <div class="row g-4">
+                            <c:forEach var="p" items="${listTopFavoriteProducts}" end="5">
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <c:choose>
+                                            <c:when test="${not empty p.images}">
+                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
+                                            </c:otherwise>
+                                        </c:choose>
 
-				<!-- URL ảnh banner -->
-				<c:url value="/image?fname=${banner.bannerImage}" var="bannerImgUrl" />
+                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
+                                            class="text-decoration-none">
+                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
+                                                style="height: 250px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <h6 class="text-dark mb-2">${p.productName}</h6>
 
-				<!-- Banner -->
-				<div class="carousel-item ${loop.first ? 'active' : ''}">
-					<a
-						href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}"
-						class="text-decoration-none"> <img src="${bannerImgUrl}"
-						class="d-block w-100 rounded-4" alt="${banner.bannerName}"
-						style="height: 300px; object-fit: cover;">
-					</a>
-				</div>
+                                                <c:choose>
+                                                    <c:when test="${p.discountPrice != p.unitPrice}">
+                                                        <c:set var="discountPercent"
+                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+                                                        <div class="d-flex align-items-center py-1">
+                                                            <span
+                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
+                                                            <span class="badge bg-primary text-white">-
+                                                                <fmt:formatNumber value="${discountPercent}"
+                                                                    maxFractionDigits="0" />%
+                                                            </span>
+                                                        </div>
+                                                        <small
+                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
-				<!-- Tiêu đề sản phẩm -->
-				<div class="row align-items-center mt-3 mb-2">
-					<div class="col">
-						<h3 class="text-start mb-0">Sản phẩm tiêu biểu</h3>
-					</div>
-					<div class="col-auto">
-						<a href="#" class="text-decoration-none">
-							<p
-								class="text-end text-dark mb-0 fw-semibold text-decoration-underline">Xem
-								thêm</p>
-						</a>
-					</div>
-				</div>
+                    <!-- ====================== BANNER + SẢN PHẨM THEO BANNER ====================== -->
+                    <%-- <c:forEach var="banner" items="${listBanner}" end="5">
+                        <c:url value="/image?fname=${banner.bannerImage}" var="bannerImgUrl" />
+                        <section class="py-5">
+                            <a href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}">
+                                <img src="${bannerImgUrl}" class="d-block w-100 rounded-4 mb-3"
+                                    alt="${banner.bannerName}" style="height: 300px; object-fit: cover;">
+                            </a>
 
-				<!-- Danh sách sản phẩm -->
-				<div class="row g-3">
-					<c:forEach var="p" items="${banner.products}" varStatus="pLoop">
-						<div class="col-6 col-md-4 col-lg-2">
-							<div
-								class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-								<c:choose>
-									<c:when test="${not empty p.images}">
-										<c:url value="/image?fname=${p.images[0].dirImage}"
-											var="imgUrl" />
-									</c:when>
-									<c:otherwise>
-										<c:url value="/image?fname=logo.png" var="imgUrl" />
-									</c:otherwise>
-								</c:choose>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="mb-0">${banner.bannerName}</h3>
+                                <a href="#" class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
+                            </div>
 
-								<a href="#" class="text-decoration-none"> <img
-									src="${imgUrl}" alt="${p.productName}"
-									class="card-img-top rounded-4"
-									style="height: 300px; object-fit: cover;">
-									<div class="card-body p-2">
-										<h6 class="text-dark mb-2">${p.productName}</h6>
-										<c:choose>
-											<c:when test="${p.discountPrice != p.unitPrice}">
-												<c:set var="discountPercent"
-													value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-												<div class="d-flex align-items-center py-2">
-													<span class="fw-bold fs-6 text-dark me-2">${p.discountPrice}đ</span>
-													<span class="badge rounded-pill text-white fw-bold px-2"
-														style="background-color: #2f52ff;">-${discountPercent}%</span>
-												</div>
-												<div>
-													<span class="text-muted text-decoration-line-through">${p.unitPrice}đ</span>
-												</div>
-											</c:when>
-											<c:otherwise>
-												<span class="fw-bold fs-5 text-dark">${p.unitPrice}đ</span>
-											</c:otherwise>
-										</c:choose>
-									</div>
-								</a>
-							</div>
-						</div>
-					</c:forEach>
-				</div>
+                            <div class="row g-3">
+                                <c:forEach var="p" items="${banner.products}">
+                                    <div class="col-6 col-md-4 col-lg-2">
+                                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                                            <c:choose>
+                                                <c:when test="${not empty p.images}">
+                                                    <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:url value="/image?fname=logo.png" var="imgUrl" />
+                                                </c:otherwise>
+                                            </c:choose>
 
-			</c:forEach>
-		</div>
+                                            <a href="#" class="text-decoration-none">
+                                                <img src="${imgUrl}" class="card-img-top rounded-4"
+                                                    alt="${p.productName}" style="height: 250px; object-fit: cover;">
+                                                <div class="card-body p-2">
+                                                    <h6 class="text-dark mb-2">${p.productName}</h6>
+                                                    <c:choose>
+                                                        <c:when test="${p.discountPrice != p.unitPrice}">
+                                                            <c:set var="discountPercent"
+                                                                value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
+                                                            <div class="d-flex align-items-center py-1">
+                                                                <span
+                                                                    class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
+                                                                <span class="badge bg-primary text-white">
+                                                                    -
+                                                                    <fmt:formatNumber value="${discountPercent}"
+                                                                        maxFractionDigits="0" />%
+                                                                </span>
+                                                            </div>
+                                                            <small
+                                                                class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="fw-bold text-dark">${p.unitPrice}đ</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </section>
+                        </c:forEach>
+                        --%>
+                </div>
+            </body>
 
-	</div>
-</body>
-
-</html>
+            </html>

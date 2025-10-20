@@ -3,6 +3,7 @@ package ute.dao.inter;
 import java.util.List;
 
 import ute.entities.Product;
+import ute.utils.ProductFilter;
 
 public interface ProductDao {
 	
@@ -32,15 +33,21 @@ public interface ProductDao {
     // Tìm theo danh mục (category)
     List<Product> findByCategoryId(int categoryId);
     
+    List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
+    
 
     // Lấy các sản phẩm mới nhất (giới hạn n)
     List<Product> findLatest(int limit);
 
     // Lấy các sản phẩm bán chạy nhất
     List<Product> findBestSeller(int limit);
+    
+    List<Product> findBestSellerinPage(int limit, int page, int pageSize);
 
     // Lấy các sản phẩm có giá trong khoảng
     List<Product> findByPriceRange(double minPrice, double maxPrice);
+    
+    List<Product> findByPriceRangeinPage(double minPrice, double maxPrice, int page, int pageSize);
 
     // Đếm tổng số sản phẩm
     long count();
@@ -48,7 +55,19 @@ public interface ProductDao {
     // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
     
+    List<Product> findNewProduct(int limit);
     
+    List<Product> findTopReview(int limit);
+    
+    List<Product> findTopFavorite(int limit);
+    
+    List<Product> findTopFavoriteinPage(int page, int pageSize);
+    
+    
+    
+    List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize);
+    
+    int countProductsByFilter(ProductFilter filter);
     
     
 }

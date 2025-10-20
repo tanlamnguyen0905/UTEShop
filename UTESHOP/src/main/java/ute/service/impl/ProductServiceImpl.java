@@ -2,11 +2,13 @@ package ute.service.impl;
 
 import java.util.List;
 
+import ute.dao.impl.ProductDaoImpl;
 import ute.entities.Product;
+import ute.utils.ProductFilter;
 
 public class ProductServiceImpl implements ute.service.inter.ProductService {
 
-	private static ProductServiceImpl instance = new ProductServiceImpl();
+	private static ProductDaoImpl instance = new ProductDaoImpl();
 
 	@Override
 	public void insert(Product product) {
@@ -79,5 +81,48 @@ public class ProductServiceImpl implements ute.service.inter.ProductService {
 		// TODO Auto-generated method stub
 		return instance.findPage(page, pageSize);
 	}
+
+	@Override
+	public List<Product> findNewProduct(int limit) {
+		// TODO Auto-generated method stub
+		return instance.findNewProduct(limit);
+	}
+
+	@Override
+	public List<Product> findTopReview(int limit) {
+		// TODO Auto-generated method stub
+		return instance.findTopReview(limit);
+	}
+
+	@Override
+	public List<Product> findTopFavorite(int limit) {
+		// TODO Auto-generated method stub
+		return instance.findTopFavorite(limit);
+	}
+
+	@Override
+	public List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize) {
+		// TODO Auto-generated method stub
+		return instance.findByCategoryIdinPage(categoryId, page, pageSize);
+	}
+
+	@Override
+	public List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize) {
+		// TODO Auto-generated method stub
+		return instance.findProductsByFilter(filter, page, pageSize);
+	}
+
+	@Override
+	public List<Product> findTopFavoriteinPage(int page, int pageSize) {
+		// TODO Auto-generated method stub
+		return instance.findTopFavoriteinPage(page, pageSize);
+	}
+
+	@Override
+	public int countProductsByFilter(ProductFilter filter) {
+		// TODO Auto-generated method stub
+		return instance.countProductsByFilter(filter);
+	}
+	
 	
 }

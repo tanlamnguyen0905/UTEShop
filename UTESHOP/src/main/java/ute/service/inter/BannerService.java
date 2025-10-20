@@ -9,4 +9,5 @@ public interface BannerService {
 
 	List<Banner> findAll();
 	List<Product> findByBannerId(int bannerId);
+	List<Product> findProductsByBannerIdinPage(int bannerId, int page, int pageSize);
 }

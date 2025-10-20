@@ -1,35 +1,59 @@
 package ute.dao.impl;
-import java.util.List;
 
+// ...existing code...
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
+import java.util.List;
 import ute.entities.Banner;
 import ute.entities.Product;
 import ute.dao.inter.BannerDao;
 
 public class BannerDaoImpl implements BannerDao {
 
-	private EntityManager em =  Persistence.createEntityManagerFactory("UTESHOP").createEntityManager();
+	private static final EntityManagerFactory EMF = Persistence.createEntityManagerFactory("UTESHOP");
+
 	@Override
 	public List<Banner> findAll() {
-		// TODO Auto-generated method stub
-	    try {
-	        String jpql = "SELECT DISTINCT b FROM Banner b LEFT JOIN FETCH b.products p LEFT JOIN FETCH p.images";
-	        return em.createQuery(jpql, Banner.class).getResultList();
-	    } finally {
-	        em.close();
-	    }
-
-//		TypedQuery<Banner> query = em.createQuery("SELECT b FROM Banner b", Banner.class);
-//		return query.getResultList();
+		EntityManager em = EMF.createEntityManager();
+		try {
+			String jpql = "SELECT DISTINCT b FROM Banner b LEFT JOIN FETCH b.products p LEFT JOIN FETCH p.images";
+			TypedQuery<Banner> q = em.createQuery(jpql, Banner.class);
+			return q.getResultList();
+		} finally {
+			em.close();
+		}
 	}
+
 	@Override
 	public List<Product> findByBannerId(int bannerId) {
-		TypedQuery<Product> query = em.createQuery("SELECT p FROM Banner p WHERE p.banner.id = :bannerId", Product.class);
-		query.setParameter("bannerId", bannerId);
-		return query.getResultList();
+		EntityManager em = EMF.createEntityManager();
+		try {
+			String jpql = "SELECT DISTINCT p FROM Product p "
+					+ "JOIN FETCH p.banners b "
+					+ "LEFT JOIN FETCH p.images "
+					+ "WHERE b.bannerID = :bannerId";
+			TypedQuery<Product> query = em.createQuery(jpql, Product.class);
+			query.setParameter("bannerId", (long) bannerId);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
 	}
 
-	
+	@Override
+	public List<Product> findProductsByBannerIdinPage(int bannerId, int page, int pageSize) {
+		// TODO Auto-generated method stub
+		EntityManager em = EMF.createEntityManager();
+	    TypedQuery<Product> query = em.createQuery(
+	            "SELECT p FROM Product p WHERE p.banners.bannerID = :bannerID ORDER BY p.productID DESC",
+	            Product.class
+	        );
+	        query.setParameter("bannerID", bannerId);
+	        query.setFirstResult((page - 1) * pageSize);
+	        query.setMaxResults(pageSize);
+	        return query.getResultList();
+	}
+
 }
