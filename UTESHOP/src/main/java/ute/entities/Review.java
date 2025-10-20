@@ -32,13 +32,6 @@ public class Review {
     private Double rating;
     private LocalDateTime createAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createAt = LocalDateTime.now();
-    }
-
-    private int status;
-
     @ManyToOne
     @JoinColumn(name = "userID")
     private Users user;

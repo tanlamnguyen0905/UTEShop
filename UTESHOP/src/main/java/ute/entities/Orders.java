@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -31,6 +32,9 @@ public class Orders {
 
     private Double amount;
     private LocalDateTime orderDate;
+
+    @Column(nullable = false)
+    private String phoneNumber;
 
     @ManyToOne
     @JoinColumn(name = "userID")
