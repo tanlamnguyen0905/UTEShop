@@ -126,4 +126,5 @@ public class Product {
     public int getFavoriteCount() {
 		return favorites.size();
 	}
+
 }
