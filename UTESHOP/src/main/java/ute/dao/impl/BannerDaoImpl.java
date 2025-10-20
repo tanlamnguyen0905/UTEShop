@@ -7,7 +7,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import ute.entities.Banner;
 import ute.entities.Product;
-import ute.configs.JPAConfig;
+import jakarta.persistence.Persistence;
 import ute.dao.inter.BannerDao;
 
 public class BannerDaoImpl implements BannerDao {
@@ -24,8 +24,8 @@ public class BannerDaoImpl implements BannerDao {
 		} finally {
 			em.close();
 		}
-	}<<<<<<<HEAD
-
+			
+		}
 	@Override
 	public List<Product> findByBannerId(int bannerId) {
 		EntityManager em = EMF.createEntityManager();
@@ -56,6 +56,5 @@ public class BannerDaoImpl implements BannerDao {
 	        return query.getResultList();
 	}
 
-}=======
 
-}>>>>>>>origin/dev
+}
