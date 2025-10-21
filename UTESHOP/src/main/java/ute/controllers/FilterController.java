@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ute.service.impl.ProductServiceImpl;
+import ute.dto.ProductDTO;
 import ute.utils.ProductFilter;
 import ute.utils.loadData;
 import ute.entities.Product;
@@ -38,49 +39,117 @@ public class FilterController extends HttpServlet {
 		ProductServiceImpl productService = new ProductServiceImpl();
 		ProductFilter productFilter = new ProductFilter();
 
-		// Xử lý các tham số filter
-		if (request.getParameter("category") != null && !request.getParameter("category").isEmpty()) {
-			productFilter.setCategoryId(Long.parseLong(request.getParameter("category")));
+		// Xử lý các tham số filter (safely)
+		try {
+			String cat = request.getParameter("category");
+			if (cat != null && !cat.isEmpty())
+				productFilter.setCategoryId(Long.parseLong(cat));
+		} catch (NumberFormatException e) {
+			// ignore invalid param
 		}
-		if (request.getParameter("banner") != null && !request.getParameter("banner").isEmpty()) {
-			productFilter.setBannerId(Long.parseLong(request.getParameter("banner")));
+		try {
+			String ban = request.getParameter("banner");
+			if (ban != null && !ban.isEmpty())
+				productFilter.setBannerId(Long.parseLong(ban));
+		} catch (NumberFormatException e) {
 		}
-		if (request.getParameter("brand") != null && !request.getParameter("brand").isEmpty()) {
-			productFilter.setBrandId(Long.parseLong(request.getParameter("brand")));
+		try {
+			String br = request.getParameter("brand");
+			if (br != null && !br.isEmpty())
+				productFilter.setBrandId(Long.parseLong(br));
+		} catch (NumberFormatException e) {
 		}
-		if (request.getParameter("minPrice") != null && !request.getParameter("minPrice").isEmpty()) {
-			productFilter.setMinPrice(Double.parseDouble(request.getParameter("minPrice")));
+		try {
+			String minP = request.getParameter("minPrice");
+			if (minP != null && !minP.isEmpty())
+				productFilter.setMinPrice(Double.parseDouble(minP));
+		} catch (NumberFormatException e) {
 		}
-		if (request.getParameter("maxPrice") != null && !request.getParameter("maxPrice").isEmpty()) {
-			productFilter.setMaxPrice(Double.parseDouble(request.getParameter("maxPrice")));
+		try {
+			String maxP = request.getParameter("maxPrice");
+			if (maxP != null && !maxP.isEmpty())
+				productFilter.setMaxPrice(Double.parseDouble(maxP));
+		} catch (NumberFormatException e) {
 		}
-		if (request.getParameter("keyword") != null && !request.getParameter("keyword").isEmpty()) {
-			productFilter.setKeyword(request.getParameter("keyword"));
-		}
-		if (request.getParameter("sortBy") != null && !request.getParameter("sortBy").isEmpty()) {
-			productFilter.setSortBy(request.getParameter("sortBy"));
-		} else if (request.getParameter("pageName") != null && !request.getParameter("pageName").isEmpty()) {
-			// Hỗ trợ tham số cũ từ home page
-			productFilter.setSortBy(request.getParameter("pageName"));
+		String kw = request.getParameter("keyword");
+		if (kw != null && !kw.isEmpty())
+			productFilter.setKeyword(kw.trim());
+
+		// sortBy: prefer explicit sortBy param (0..5). If not present, map known
+		// pageName values
+		String sortBy = request.getParameter("sortBy");
+		if (sortBy != null && !sortBy.isEmpty()) {
+			productFilter.setSortBy(sortBy);
+		} else {
+			String pageName = request.getParameter("pageName");
+			if (pageName != null && !pageName.isEmpty()) {
+				// map legacy page names to sort codes
+				switch (pageName.toLowerCase()) {
+					case "banchay":
+					case "bestseller":
+					case "best":
+						productFilter.setSortBy("0");
+						break;
+					case "new":
+					case "moi":
+						productFilter.setSortBy("1");
+						break;
+					case "topreview":
+					case "review":
+						productFilter.setSortBy("2");
+						break;
+					case "favorite":
+					case "yeuthich":
+						productFilter.setSortBy("3");
+						break;
+					case "priceasc":
+					case "giaasc":
+						productFilter.setSortBy("4");
+						break;
+					case "pricedesc":
+					case "giadesc":
+						productFilter.setSortBy("5");
+						break;
+					default:
+						// if pageName is already a numeric code, accept it
+						if (pageName.matches("[0-5]")) {
+							productFilter.setSortBy(pageName);
+						} else {
+							productFilter.setSortBy("1"); // default newest
+						}
+				}
+			} else {
+				productFilter.setSortBy("1"); // default newest
+			}
 		}
 
 		// Xử lý phân trang
 		String currentPageParam = request.getParameter("currentPage");
 		if (currentPageParam == null || currentPageParam.isEmpty())
 			currentPageParam = "1";
-
-		int currentPage = Integer.parseInt(currentPageParam);
+		int currentPage = 1;
+		try {
+			currentPage = Integer.parseInt(currentPageParam);
+			if (currentPage < 1)
+				currentPage = 1;
+		} catch (NumberFormatException e) {
+			currentPage = 1;
+		}
 		int pageSize = 20;
+		// reflect paging into filter (optional)
+		productFilter.setCurrentPage(currentPage);
+		productFilter.setPageSize(pageSize);
 
 		// Lấy danh sách sản phẩm và tổng số
 		List<Product> listPro = productService.findProductsByFilter(productFilter, currentPage, pageSize);
+		List<ProductDTO> listProDTO = productService.MapToProductDTO(listPro);
 		int total = productService.countProductsByFilter(productFilter);
 
 		// Tính toán phân trang
 		int totalPages = (int) Math.ceil((double) total / pageSize);
 
 		// Set attributes cho JSP
-		request.setAttribute("listPro", listPro);
+		request.setAttribute("listPro", listProDTO);
 		request.setAttribute("total", total);
 		request.setAttribute("currentPage", currentPage);
 		request.setAttribute("totalPages", totalPages);

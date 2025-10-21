@@ -31,7 +31,7 @@ public class UserCoupon {
     private LocalDateTime userCouponEnd;
     private Double maxDiscountAmount;
 
-    // @ManyToOne
-    // @JoinColumn(name = "userID")
-    // private Users user;
+//     @ManyToOne
+//     @JoinColumn(name = "userID")
+//     private Users user;
 }

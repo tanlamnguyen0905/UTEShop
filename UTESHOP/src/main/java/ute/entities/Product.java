@@ -1,15 +1,12 @@
 package ute.entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -71,10 +68,6 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<Favorite> favorites;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "productDiscountID", nullable = true)
-    private ProductDiscount productDiscounts;
-
     @OneToMany(mappedBy = "product")
     private List<Image> images;
 
@@ -83,6 +76,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "productID"), // khóa ngoại trỏ về Product
             inverseJoinColumns = @JoinColumn(name = "bannerID") // khóa ngoại trỏ về Banner
     )
+    @Builder.Default
     private Set<Banner> banners = new HashSet<>();
 
     @Transient

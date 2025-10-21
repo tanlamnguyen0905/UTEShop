@@ -1,7 +1,6 @@
 package ute.entities;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;

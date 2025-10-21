@@ -78,8 +78,8 @@
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
                                         <c:choose>
-                                            <c:when test="${not empty p.images}">
-                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            <c:when test="${not empty p.image}">
+                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
                                             </c:when>
                                             <c:otherwise>
                                                 <c:url value="/image?fname=logo.png" var="imgUrl" />
@@ -93,25 +93,10 @@
                                             <div class="card-body p-2">
                                                 <h6 class="text-dark mb-2">${p.productName}</h6>
 
-                                                <c:choose>
-                                                    <c:when test="${p.discountPrice != p.unitPrice}">
-                                                        <c:set var="discountPercent"
-                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-                                                        <div class="d-flex align-items-center py-1">
-                                                            <span
-                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
-                                                            <span class="badge bg-primary text-white">-
-                                                                <fmt:formatNumber value="${discountPercent}"
-                                                                    maxFractionDigits="0" />%
-                                                            </span>
-                                                        </div>
-                                                        <small
-                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                <span class="fw-bold text-dark">
+                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
+                                                        maxFractionDigits="0" />đ
+                                                </span>
                                             </div>
                                         </a>
                                     </div>
@@ -133,8 +118,8 @@
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
                                         <c:choose>
-                                            <c:when test="${not empty p.images}">
-                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            <c:when test="${not empty p.image}">
+                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
                                             </c:when>
                                             <c:otherwise>
                                                 <c:url value="/image?fname=logo.png" var="imgUrl" />
@@ -148,25 +133,10 @@
                                             <div class="card-body p-2">
                                                 <h6 class="text-dark mb-2">${p.productName}</h6>
 
-                                                <c:choose>
-                                                    <c:when test="${p.discountPrice != p.unitPrice}">
-                                                        <c:set var="discountPercent"
-                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-                                                        <div class="d-flex align-items-center py-1">
-                                                            <span
-                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
-                                                            <span class="badge bg-primary text-white">-
-                                                                <fmt:formatNumber value="${discountPercent}"
-                                                                    maxFractionDigits="0" />%
-                                                            </span>
-                                                        </div>
-                                                        <small
-                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                <span class="fw-bold text-dark">
+                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
+                                                        maxFractionDigits="0" />đ
+                                                </span>
                                             </div>
                                         </a>
                                     </div>
@@ -189,8 +159,8 @@
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
                                         <c:choose>
-                                            <c:when test="${not empty p.images}">
-                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            <c:when test="${not empty p.image}">
+                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
                                             </c:when>
                                             <c:otherwise>
                                                 <c:url value="/image?fname=logo.png" var="imgUrl" />
@@ -204,25 +174,10 @@
                                             <div class="card-body p-2">
                                                 <h6 class="text-dark mb-2">${p.productName}</h6>
 
-                                                <c:choose>
-                                                    <c:when test="${p.discountPrice != p.unitPrice}">
-                                                        <c:set var="discountPercent"
-                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-                                                        <div class="d-flex align-items-center py-1">
-                                                            <span
-                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
-                                                            <span class="badge bg-primary text-white">-
-                                                                <fmt:formatNumber value="${discountPercent}"
-                                                                    maxFractionDigits="0" />%
-                                                            </span>
-                                                        </div>
-                                                        <small
-                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                <span class="fw-bold text-dark">
+                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
+                                                        maxFractionDigits="0" />đ
+                                                </span>
                                             </div>
                                         </a>
                                     </div>
@@ -245,8 +200,8 @@
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
                                         <c:choose>
-                                            <c:when test="${not empty p.images}">
-                                                <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
+                                            <c:when test="${not empty p.image}">
+                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
                                             </c:when>
                                             <c:otherwise>
                                                 <c:url value="/image?fname=logo.png" var="imgUrl" />
@@ -260,25 +215,10 @@
                                             <div class="card-body p-2">
                                                 <h6 class="text-dark mb-2">${p.productName}</h6>
 
-                                                <c:choose>
-                                                    <c:when test="${p.discountPrice != p.unitPrice}">
-                                                        <c:set var="discountPercent"
-                                                            value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-                                                        <div class="d-flex align-items-center py-1">
-                                                            <span
-                                                                class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
-                                                            <span class="badge bg-primary text-white">-
-                                                                <fmt:formatNumber value="${discountPercent}"
-                                                                    maxFractionDigits="0" />%
-                                                            </span>
-                                                        </div>
-                                                        <small
-                                                            class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="fw-bold text-dark">${p.unitPrice}đ</span>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                <span class="fw-bold text-dark">
+                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
+                                                        maxFractionDigits="0" />đ
+                                                </span>
                                             </div>
                                         </a>
                                     </div>
@@ -319,26 +259,10 @@
                                                     alt="${p.productName}" style="height: 250px; object-fit: cover;">
                                                 <div class="card-body p-2">
                                                     <h6 class="text-dark mb-2">${p.productName}</h6>
-                                                    <c:choose>
-                                                        <c:when test="${p.discountPrice != p.unitPrice}">
-                                                            <c:set var="discountPercent"
-                                                                value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-                                                            <div class="d-flex align-items-center py-1">
-                                                                <span
-                                                                    class="fw-bold text-dark me-2">${p.discountPrice}đ</span>
-                                                                <span class="badge bg-primary text-white">
-                                                                    -
-                                                                    <fmt:formatNumber value="${discountPercent}"
-                                                                        maxFractionDigits="0" />%
-                                                                </span>
-                                                            </div>
-                                                            <small
-                                                                class="text-muted text-decoration-line-through">${p.unitPrice}đ</small>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="fw-bold text-dark">${p.unitPrice}đ</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                    <span class="fw-bold text-dark">
+                                                        <fmt:formatNumber value="${p.unitPrice}" type="number"
+                                                            maxFractionDigits="0" />đ
+                                                    </span>
                                                 </div>
                                             </a>
                                         </div>
