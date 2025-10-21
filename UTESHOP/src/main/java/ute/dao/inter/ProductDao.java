@@ -34,9 +34,6 @@ public interface ProductDao {
 
     List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
 
-    // Lấy các sản phẩm mới nhất (giới hạn n)
-    List<Product> findLatest(int limit);
-
     // Lấy các sản phẩm bán chạy nhất
     List<Product> findBestSeller(int limit);
 

@@ -209,7 +209,7 @@
 														</c:otherwise>
 													</c:choose>
 
-													<a href="${pageContext.request.contextPath}/detailProduct?productID=${p.id}"
+													<a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
 														class="text-decoration-none">
 														<img src="${imgUrl}" class="card-img-top rounded-4"
 															alt="${p.productName}"

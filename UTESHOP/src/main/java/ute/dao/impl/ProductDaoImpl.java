@@ -108,20 +108,15 @@ public class ProductDaoImpl implements ProductDao {
 			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.category.categoryID = :id",
 					Product.class);
 			query.setParameter("id", (long) categoryId);
-			return query.getResultList();
-		} finally {
-			em.close();
-		}
-	}
-
-	@Override
-	public List<Product> findLatest(int limit) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.productID DESC",
-					Product.class);
-			query.setMaxResults(limit);
-			return query.getResultList();
+			List<Product> cate = query.getResultList();
+			// Initialize collections
+			for (Product p : cate) {
+				if (p.getImages() != null)
+					p.getImages().size();
+				if (p.getFavorites() != null)
+					p.getFavorites().size();
+			}
+			return cate;
 		} finally {
 			em.close();
 		}
@@ -335,55 +330,76 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize) {
-		String jpql = "SELECT DISTINCT p FROM Product p LEFT JOIN p.orderDetails od LEFT JOIN p.favorites f LEFT JOIN p.banners b WHERE 1=1";
+		// Xác định xem cần JOIN bảng nào dựa trên filter và sortBy
+		boolean needOrderDetails = "0".equals(filter.getSortBy()); // Bán chạy
+		boolean needFavorites = "3".equals(filter.getSortBy()); // Yêu thích
+		boolean needBanners = filter.getBannerId() != null; // Chỉ JOIN khi filter theo banner
 
+		// Xây dựng JPQL động - chỉ JOIN khi thực sự cần thiết
+		StringBuilder jpql = new StringBuilder("SELECT DISTINCT p FROM Product p");
+
+		if (needOrderDetails) {
+			jpql.append(" LEFT JOIN p.orderDetails od");
+		}
+		if (needFavorites) {
+			jpql.append(" LEFT JOIN p.favorites f");
+		}
+		if (needBanners) {
+			jpql.append(" LEFT JOIN p.banners b");
+		}
+
+		jpql.append(" WHERE 1=1");
+
+		// Thêm các điều kiện filter
 		if (filter.getCategoryId() != null) {
-			jpql += " AND p.category.categoryID = :categoryId";
+			jpql.append(" AND p.category.categoryID = :categoryId");
 		}
 		if (filter.getBrandId() != null) {
-			jpql += " AND p.brand.brandID = :brandId";
+			jpql.append(" AND p.brand.brandID = :brandId");
 		}
 		if (filter.getBannerId() != null) {
-			jpql += " AND b.bannerID = :bannerId";
+			jpql.append(" AND b.bannerID = :bannerId");
 		}
 		if (filter.getMinPrice() != null) {
-			jpql += " AND p.unitPrice >= :minPrice";
+			jpql.append(" AND p.unitPrice >= :minPrice");
 		}
 		if (filter.getMaxPrice() != null) {
-			jpql += " AND p.unitPrice <= :maxPrice";
+			jpql.append(" AND p.unitPrice <= :maxPrice");
 		}
 		if (filter.getKeyword() != null && !filter.getKeyword().isEmpty()) {
-			jpql += " AND LOWER(p.productName) LIKE :keyword";
+			jpql.append(" AND LOWER(p.productName) LIKE :keyword");
 		}
 
 		// Xử lý sắp xếp
-		if ("0".equals(filter.getSortBy())) {
-			// Bán chạy - sắp xếp theo tổng số lượng bán
-			jpql += " GROUP BY p ORDER BY COALESCE(SUM(od.quantity), 0) DESC";
-		} else if ("1".equals(filter.getSortBy())) {
-			// Mới nhất
-			jpql += " ORDER BY p.productID DESC";
-		} else if ("2".equals(filter.getSortBy())) {
-			// Nhiều đánh giá
-			jpql += " ORDER BY p.reviewCount DESC";
-		} else if ("3".equals(filter.getSortBy())) {
-			// Yêu thích - sắp xếp theo số lượng favorite
-			jpql += " GROUP BY p ORDER BY COUNT(f) DESC";
-		} else if ("4".equals(filter.getSortBy())) {
-			// Giá tăng dần
-			jpql += " ORDER BY p.unitPrice ASC";
-		} else if ("5".equals(filter.getSortBy())) {
-			// Giá giảm dần
-			jpql += " ORDER BY p.unitPrice DESC";
-		} else {
-			// Mặc định: mới nhất
-			jpql += " ORDER BY p.productID DESC";
+		String sortBy = filter.getSortBy() != null ? filter.getSortBy() : "1";
+		switch (sortBy) {
+			case "0": // Bán chạy
+				jpql.append(" GROUP BY p ORDER BY COALESCE(SUM(od.quantity), 0) DESC");
+				break;
+			case "1": // Mới nhất (default)
+				jpql.append(" ORDER BY p.productID DESC");
+				break;
+			case "2": // Nhiều đánh giá
+				jpql.append(" ORDER BY p.reviewCount DESC");
+				break;
+			case "3": // Yêu thích
+				jpql.append(" GROUP BY p ORDER BY COUNT(f) DESC");
+				break;
+			case "4": // Giá tăng dần
+				jpql.append(" ORDER BY p.unitPrice ASC");
+				break;
+			case "5": // Giá giảm dần
+				jpql.append(" ORDER BY p.unitPrice DESC");
+				break;
+			default: // Mặc định: mới nhất
+				jpql.append(" ORDER BY p.productID DESC");
 		}
 
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery(jpql, Product.class);
+			TypedQuery<Product> query = em.createQuery(jpql.toString(), Product.class);
 
+			// Set parameters
 			if (filter.getCategoryId() != null)
 				query.setParameter("categoryId", filter.getCategoryId());
 			if (filter.getBrandId() != null)
@@ -397,10 +413,21 @@ public class ProductDaoImpl implements ProductDao {
 			if (filter.getKeyword() != null && !filter.getKeyword().isEmpty())
 				query.setParameter("keyword", "%" + filter.getKeyword().toLowerCase() + "%");
 
+			// Pagination
 			query.setFirstResult((page - 1) * pageSize);
 			query.setMaxResults(pageSize);
 
-			return query.getResultList();
+			List<Product> products = query.getResultList();
+
+			// Initialize lazy-loaded collections để tránh LazyInitializationException
+			for (Product p : products) {
+				if (p.getImages() != null)
+					p.getImages().size();
+				if (p.getFavorites() != null)
+					p.getFavorites().size();
+			}
+
+			return products;
 		} finally {
 			em.close();
 		}

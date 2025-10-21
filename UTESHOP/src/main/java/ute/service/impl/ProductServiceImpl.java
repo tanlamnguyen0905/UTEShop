@@ -57,12 +57,6 @@ public class ProductServiceImpl implements ute.service.inter.ProductService {
 	}
 
 	@Override
-	public List<Product> findLatest(int limit) {
-		// TODO Auto-generated method stub
-		return instance.findLatest(limit);
-	}
-
-	@Override
 	public List<Product> findBestSeller(int limit) {
 		// TODO Auto-generated method stub
 		return instance.findBestSeller(limit);
