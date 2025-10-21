@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-	<jsp:include page="/WEB-INF/views/auth/login.jsp" />
-	<jsp:include page="/WEB-INF/views/auth/register.jsp" />
+<jsp:include page="/WEB-INF/views/auth/login.jsp" />
+<jsp:include page="/WEB-INF/views/auth/register.jsp" />
+<jsp:include page="/WEB-INF/views/auth/forgot-password.jsp" />
+<jsp:include page="/WEB-INF/views/auth/reset-password.jsp" />
 
 	<!-- ====== HEADER ====== -->
 	<header class="border-bottom bg-white py-3 shadow-sm"

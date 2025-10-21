@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
 		} finally {
 			em.close();
 		}
+
 	}
 
 	@Override
@@ -145,6 +146,20 @@ public class UserDaoImpl implements UserDao {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
             return false;
+        } finally {
+            em.close();
+        }
+	}
+
+	@Override
+	public Users findByEmail(String email) {
+		EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Users> query = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+            query.setParameter("email", email);
+            List<Users> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
         } finally {
             em.close();
         }

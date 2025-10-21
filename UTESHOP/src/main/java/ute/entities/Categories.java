@@ -25,6 +25,7 @@ public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryID;
+    private int categoryID;
 
     @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)", nullable = false)
     private String categoryName;
@@ -34,6 +35,11 @@ public class Categories {
 
     @Column(name = "image", columnDefinition = "nvarchar(max)")
     private String image;
+
+    // Thêm trường parent reference để fix mappedBy
+    @ManyToOne
+    @JoinColumn(name = "parentCategoryID")
+    private Categories category;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products;
