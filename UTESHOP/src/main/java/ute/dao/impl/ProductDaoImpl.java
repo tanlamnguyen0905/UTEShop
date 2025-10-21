@@ -206,7 +206,6 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public List<Product> findTopFavorite(int limit) {
-		// TODO Auto-generated method stub
 		// TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY
 		// p.favoriteCount DESC",
 		// Product.class);
@@ -354,7 +353,6 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public List<Product> findByPriceRangeinPage(double minPrice, double maxPrice, int page, int pageSize) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

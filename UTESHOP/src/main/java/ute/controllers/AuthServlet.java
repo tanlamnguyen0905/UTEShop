@@ -17,7 +17,7 @@ import ute.utils.JwtUtil;
 import ute.utils.OtpUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
-@WebServlet(urlPatterns = { "/auth/register", "/auth/login", "/auth/logout", "/auth/verify-otp", "/auth/forgot-password", "/auth/reset-password" })
+@WebServlet(urlPatterns = { "/auth/register", "/auth/login", "/auth/logout", "/auth/verify-otp", "/auth/forgot-password", "/auth/reset-password", "/auth/check-exist" })
 @MultipartConfig
 public class AuthServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -45,6 +45,8 @@ public class AuthServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
         } else if ("/auth/reset-password".equals(path)) {
             req.getRequestDispatcher("/WEB-INF/views/auth/reset-password.jsp").forward(req, resp);
+        } else if ("/auth/check-exist".equals(path)) {
+            checkUserExist(req, resp);
 		}
 	}
 
@@ -65,15 +67,54 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-	// ===================== 1️ GỬI OTP =====================
+	// ===================== 0️⃣ KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI =====================
+	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		resp.setContentType("application/json;charset=UTF-8");
+		PrintWriter out = resp.getWriter();
+
+		String username = req.getParameter("username");
+		String email = req.getParameter("email");
+
+		try {
+			boolean usernameExists = (username != null && !username.isEmpty()) && userDAO.existsByUsername(username);
+			boolean emailExists = (email != null && !email.isEmpty()) && userDAO.existsByEmail(email);
+
+			if (usernameExists && emailExists) {
+				out.print("{\"success\":false, \"error\":\"Tên đăng nhập và email đã tồn tại!\"}");
+			} else if (usernameExists) {
+				out.print("{\"success\":false, \"error\":\"Tên đăng nhập đã tồn tại!\"}");
+			} else if (emailExists) {
+				out.print("{\"success\":false, \"error\":\"Email đã tồn tại!\"}");
+			} else {
+				out.print("{\"success\":true}");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			out.print("{\"success\":false, \"error\":\"Lỗi hệ thống!\"}");
+		}
+	}
+
+	// ===================== 1️⃣ GỬI OTP =====================
 	private void sendOtp(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
 
 		String email = req.getParameter("email");
+		String username = req.getParameter("username");
+		
 		if (email == null || email.isEmpty()) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			out.print("{\"success\":false, \"error\":\"Email không hợp lệ!\"}");
+			return;
+		}
+
+		// ✅ Kiểm tra username/email trước khi gửi OTP
+		if (username != null && !username.isEmpty() && userDAO.existsByUsername(username)) {
+			out.print("{\"success\":false, \"error\":\"Tên đăng nhập đã tồn tại!\"}");
+			return;
+		}
+		if (userDAO.existsByEmail(email)) {
+			out.print("{\"success\":false, \"error\":\"Email đã tồn tại!\"}");
 			return;
 		}
 

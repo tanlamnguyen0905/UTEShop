@@ -44,7 +44,6 @@ public class BannerDaoImpl implements BannerDao {
 
 	@Override
 	public List<Product> findProductsByBannerIdinPage(int bannerId, int page, int pageSize) {
-		// TODO Auto-generated method stub
 		EntityManager em = EMF.createEntityManager();
 	    TypedQuery<Product> query = em.createQuery(
 	            "SELECT p FROM Product p WHERE p.banners.bannerID = :bannerID ORDER BY p.productID DESC",

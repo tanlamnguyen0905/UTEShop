@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!-- PROFILE HEADER -->
 <div class="profile-header text-center text-white py-5 position-relative"
@@ -12,7 +13,7 @@
         <div class="avatar-glow rounded-circle p-2 position-relative"
              style="background: linear-gradient(135deg, #007bff, #ff4b5c);
                     box-shadow: 0 0 20px rgba(255,75,92,0.5);">
-            <img id="avatarImg" src="${user.avatar != null ? user.avatar : '/images/default-avatar.png'}"
+            <img id="avatarImg" src="${pageContext.request.contextPath}${sessionScope.currentUser.avatar != null && sessionScope.currentUser.avatar != 'default-avatar.png' ? '/uploads/avatar/'.concat(sessionScope.currentUser.avatar) : '/assets/images/avatar/default-avatar.png'}"
                  alt="Avatar"
                  class="rounded-circle border border-4 border-white shadow"
                  style="width: 120px; height: 120px; object-fit: cover; background-color: #fff;">
@@ -25,8 +26,8 @@
     </div>
 
     <!-- Info -->
-    <h3 class="fw-bold mb-1">${user.fullname != null ? user.fullname : user.username}</h3>
-    <p class="mb-2">${user.email}</p>
+    <h3 class="fw-bold mb-1">${sessionScope.currentUser.fullname != null ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}</h3>
+    <p class="mb-2">${sessionScope.currentUser.email}</p>
 
     <!-- Stats -->
     <div class="d-flex justify-content-center gap-5 mt-4">
@@ -89,26 +90,36 @@
                     </button>
                 </div>
 
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${success}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>${error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </c:if>
+
                 <!-- Display Mode -->
                 <div id="infoDisplay">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="fw-semibold text-dark mb-1">Họ và tên:</p>
-                            <p class="text-muted">${user.fullname}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="fw-semibold text-dark mb-1">Ngày sinh:</p>
-                            <p class="text-muted">Chưa cập nhật</p>
+                            <p class="text-muted">${sessionScope.currentUser.fullname}</p>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="fw-semibold text-dark mb-1">Email:</p>
-                            <p class="text-muted">${user.email}</p>
+                            <p class="text-muted">${sessionScope.currentUser.email}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="fw-semibold text-dark mb-1">Số điện thoại:</p>
-                            <p class="text-muted">${user.phone != null ? user.phone : 'Chưa cập nhật'}</p>
+                            <p class="text-muted">${sessionScope.currentUser.phone != null ? sessionScope.currentUser.phone : 'Chưa cập nhật'}</p>
                         </div>
                     </div>
                 </div>
@@ -119,25 +130,22 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Họ và tên:</label>
-                                <input type="text" class="form-control" name="fullname" value="${user.fullname}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Ngày sinh:</label>
-                                <input type="date" class="form-control" name="birthday">
+                                <input type="text" class="form-control" name="fullname" value="${sessionScope.currentUser.fullname}">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Email:</label>
-                                <input type="email" class="form-control" name="email" value="${user.email}">
+                                <input type="email" class="form-control" id="editEmail" name="email" value="${sessionScope.currentUser.email}" data-original-email="${sessionScope.currentUser.email}">
+                                <div id="emailValidationMessage" class="mt-1" style="display: none;"></div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Số điện thoại:</label>
-                                <input type="tel" class="form-control" name="phone" value="${user.phone}">
+                                <input type="tel" class="form-control" name="phone" value="${sessionScope.currentUser.phone}">
                             </div>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-success" id="submitProfileBtn">
                                 <i class="fas fa-check me-1"></i> Xác nhận
                             </button>
                             <button type="button" class="btn btn-secondary" id="cancelEditBtn">
@@ -151,65 +159,133 @@
             <!-- TAB 2: Địa chỉ -->
             <div class="tab-pane fade" id="address">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-gradient"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ</h5>
-                    <div class="d-flex gap-2">
+                    <h5 class="fw-bold text-gradient"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng</h5>
                         <button class="btn btn-gradient shadow-sm" id="addAddressBtn">
-                            <i class="fas fa-plus me-1"></i> Thêm địa chỉ
+                        <i class="fas fa-plus me-1"></i> Thêm địa chỉ mới
                         </button>
-                        <button class="btn btn-outline-primary shadow-sm" id="editAddressBtn">
-                            <i class="fas fa-pen me-1"></i> Chỉnh sửa
-                        </button>
-                    </div>
                 </div>
+                
+                <!-- Success Message -->
+                <c:if test="${not empty param.success}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${param.success}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </c:if>
 
                 <!-- Address List -->
-                <div id="addressList">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="fw-bold">Địa chỉ mặc định</h6>
-                                    <p class="text-muted mb-1">123 Đường ABC, Phường XYZ, Quận 1, TP.HCM</p>
-                                    <p class="text-muted mb-0">Số điện thoại: 0123456789</p>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editAddress(1)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAddress(1)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                <div id="addressListContainer">
+                    <!-- Hiển thị danh sách địa chỉ bằng JSTL -->
+                    <c:choose>
+                        <c:when test="${not empty addresses}">
+                            <div id="addressList">
+                                <c:forEach var="addr" items="${addresses}" varStatus="status">
+                                    <div class="card mb-3 address-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="fw-bold text-primary">
+                                                        <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ ${status.index + 1}
+                                                    </h6>
+                                                    <p class="text-muted mb-1">
+                                                        <i class="fas fa-location-arrow me-2 text-secondary"></i>
+                                                        ${addr.addressDetail}
+                                                    </p>
+                                                    <p class="text-muted mb-0">
+                                                        <i class="fas fa-map-marked me-2 text-secondary"></i>
+                                                        ${addr.ward}, ${addr.district}, ${addr.province}
+                                                    </p>
+                                                </div>
+                                                <div class="d-flex gap-1">
+                                                    <button class="btn btn-sm btn-outline-primary" 
+                                                            onclick="editAddress(${addr.addressID}, '${addr.province}', '${addr.district}', '${addr.ward}', '${addr.addressDetail}')" 
+                                                            title="Sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="${pageContext.request.contextPath}/user/address/delete" 
+                                                          method="post" style="display: inline;" 
+                                                          onsubmit="return confirm('Bạn có chắc muốn xóa địa chỉ này?')">
+                                                        <input type="hidden" name="id" value="${addr.addressID}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div id="noAddressMessage">
+                                <div class="card text-center py-5">
+                                    <div class="card-body">
+                                        <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">Chưa có địa chỉ nào</h5>
+                                        <p class="text-muted">Thêm địa chỉ giao hàng để đặt hàng nhanh chóng hơn!</p>
+                                        <button class="btn btn-primary" onclick="document.getElementById('addAddressBtn').click()">
+                                            <i class="fas fa-plus me-1"></i> Thêm địa chỉ đầu tiên
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <!-- Add/Edit Address Form -->
-                <div id="addressForm" style="display: none;">
-                    <form id="addressFormData" class="card">
+                <div id="addressFormContainer" style="display: none;">
+                    <div class="card">
                         <div class="card-body">
-                            <h6 class="fw-bold mb-3">Thông tin địa chỉ</h6>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Họ tên người nhận:</label>
-                                    <input type="text" class="form-control" name="recipientName" required>
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-map-marked-alt me-2"></i>
+                                <span id="formTitle">Thêm địa chỉ mới</span>
+                            </h6>
+                            
+                            <form id="addressForm" action="${pageContext.request.contextPath}/user/address/add" method="post">
+                                <input type="hidden" id="addressId" name="addressId" value="">
+                                
+                                <!-- Tỉnh/Thành phố -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-city me-1"></i>Tỉnh/Thành phố:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="province" name="province" 
+                                           placeholder="Ví dụ: Thành phố Hồ Chí Minh, Hà Nội..." required>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Số điện thoại:</label>
-                                    <input type="tel" class="form-control" name="phone" required>
+
+                                <!-- Quận/Huyện -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-building me-1"></i>Quận/Huyện:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="district" name="district" 
+                                           placeholder="Ví dụ: Quận 1, Huyện Củ Chi..." required>
                                 </div>
+
+                                <!-- Phường/Xã -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-home me-1"></i>Phường/Xã:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="ward" name="ward" 
+                                           placeholder="Ví dụ: Phường Bến Nghé, Xã Tân An..." required>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-8">
-                                    <label class="form-label">Địa chỉ chi tiết:</label>
-                                    <input type="text" class="form-control" name="address" required>
+
+                                <!-- Địa chỉ chi tiết -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-location-arrow me-1"></i>Địa chỉ chi tiết:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="addressDetail" name="addressDetail" 
+                                              rows="2" placeholder="Số nhà, tên đường..." required></textarea>
                                 </div>
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="isDefault">
-                                <label class="form-check-label">Đặt làm địa chỉ mặc định</label>
-                            </div>
+
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-check me-1"></i> Lưu địa chỉ
@@ -218,8 +294,9 @@
                                     <i class="fas fa-times me-1"></i> Hủy
                                 </button>
                             </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -344,29 +421,37 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Cảnh báo!</strong> Hành động này không thể hoàn tác.
+            <form action="${pageContext.request.contextPath}/user/delete-account" method="post" 
+                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!');">
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Cảnh báo!</strong> Hành động này không thể hoàn tác.
+                    </div>
+                    <p>Bạn có chắc chắn muốn xóa tài khoản của mình? Tất cả dữ liệu sẽ bị mất vĩnh viễn:</p>
+                    <ul>
+                        <li>Thông tin cá nhân</li>
+                        <li>Lịch sử đơn hàng</li>
+                        <li>Địa chỉ giao hàng</li>
+                        <li>Tất cả dữ liệu khác</li>
+                    </ul>
+                    
+                    <div class="mb-3">
+                        <label for="confirmDelete" class="form-label fw-semibold">
+                            Nhập "XÓA TÀI KHOẢN" để xác nhận:
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="confirmDelete" name="confirmText"
+                               placeholder="XÓA TÀI KHOẢN" required>
+                    </div>
                 </div>
-                <p>Bạn có chắc chắn muốn xóa tài khoản của mình? Tất cả dữ liệu sẽ bị mất vĩnh viễn:</p>
-                <ul>
-                    <li>Thông tin cá nhân</li>
-                    <li>Lịch sử đơn hàng</li>
-                    <li>Địa chỉ giao hàng</li>
-                    <li>Tất cả dữ liệu khác</li>
-                </ul>
-                <div class="mb-3">
-                    <label for="confirmDelete" class="form-label">Nhập "XÓA TÀI KHOẢN" để xác nhận:</label>
-                    <input type="text" class="form-control" id="confirmDelete" placeholder="XÓA TÀI KHOẢN">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                        <i class="fas fa-trash-alt me-1"></i> Xóa tài khoản
+                    </button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
-                    <i class="fas fa-trash-alt me-1"></i> Xóa tài khoản
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -466,52 +551,120 @@ document.addEventListener('DOMContentLoaded', function() {
         editInfoBtn.style.display = 'block';
     });
 
-    // Address Management
-    const addAddressBtn = document.getElementById('addAddressBtn');
-    const editAddressBtn = document.getElementById('editAddressBtn');
-    const cancelAddressBtn = document.getElementById('cancelAddressBtn');
-    const addressList = document.getElementById('addressList');
-    const addressForm = document.getElementById('addressForm');
+    // Email Validation Realtime
+    const editEmailInput = document.getElementById('editEmail');
+    const emailValidationMessage = document.getElementById('emailValidationMessage');
+    const submitProfileBtn = document.getElementById('submitProfileBtn');
+    let emailCheckTimeout;
 
-    addAddressBtn.addEventListener('click', () => {
-        addressList.style.display = 'none';
-        addressForm.style.display = 'block';
-        addAddressBtn.style.display = 'none';
-        editAddressBtn.style.display = 'none';
+    if (editEmailInput) {
+        editEmailInput.addEventListener('input', function() {
+            clearTimeout(emailCheckTimeout);
+            const newEmail = this.value.trim();
+            const originalEmail = this.getAttribute('data-original-email');
+
+            // Nếu email không thay đổi, không cần kiểm tra
+            if (newEmail === originalEmail || newEmail === '') {
+                emailValidationMessage.style.display = 'none';
+                submitProfileBtn.disabled = false;
+                return;
+            }
+
+            // Debounce - chờ 500ms sau khi user ngừng gõ
+            emailCheckTimeout = setTimeout(async () => {
+                emailValidationMessage.innerHTML = '<small class="text-info"><i class="fas fa-spinner fa-spin me-1"></i>Đang kiểm tra...</small>';
+                emailValidationMessage.style.display = 'block';
+
+                try {
+                    const response = await fetch('${pageContext.request.contextPath}/auth/check-exist?email=' + encodeURIComponent(newEmail));
+                    const data = await response.json();
+
+                    if (data.success) {
+                        emailValidationMessage.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Email khả dụng</small>';
+                        submitProfileBtn.disabled = false;
+                    } else {
+                        emailValidationMessage.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>' + data.error + '</small>';
+                        submitProfileBtn.disabled = true;
+                    }
+                } catch (error) {
+                    emailValidationMessage.innerHTML = '<small class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Không thể kiểm tra email</small>';
+                    submitProfileBtn.disabled = false;
+                }
+            }, 500);
+        });
+    }
+
+    // ==================== ADDRESS MANAGEMENT (SIMPLIFIED) ====================
+    
+    // Hàm sửa địa chỉ - đơn giản, nhận dữ liệu trực tiếp từ tham số
+    window.editAddress = function(addressId, province, district, ward, addressDetail) {
+        // Điền dữ liệu vào form
+        document.getElementById('formTitle').textContent = 'Chỉnh sửa địa chỉ';
+        document.getElementById('addressId').value = addressId;
+        document.getElementById('province').value = province;
+        document.getElementById('district').value = district;
+        document.getElementById('ward').value = ward;
+        document.getElementById('addressDetail').value = addressDetail;
+        
+        // Thay đổi action của form sang edit
+        document.getElementById('addressForm').action = '${pageContext.request.contextPath}/user/address/edit';
+        
+        // Hiển thị form
+        document.getElementById('addressListContainer').style.display = 'none';
+        document.getElementById('addressFormContainer').style.display = 'block';
+    };
+
+    // Hiển thị form thêm địa chỉ
+    document.getElementById('addAddressBtn').addEventListener('click', () => {
+        // Reset form
+        const form = document.getElementById('addressForm');
+        form.reset();
+        form.action = '${pageContext.request.contextPath}/user/address/add';
+        document.getElementById('addressId').value = '';
+        document.getElementById('formTitle').textContent = 'Thêm địa chỉ mới';
+        
+        // Show form
+        document.getElementById('addressListContainer').style.display = 'none';
+        document.getElementById('addressFormContainer').style.display = 'block';
     });
 
-    editAddressBtn.addEventListener('click', () => {
-        addressList.style.display = 'none';
-        addressForm.style.display = 'block';
-        addAddressBtn.style.display = 'none';
-        editAddressBtn.style.display = 'none';
-    });
+    // Nút hủy - quay lại danh sách địa chỉ
+    const cancelBtn = document.getElementById('cancelAddressBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            document.getElementById('addressFormContainer').style.display = 'none';
+            document.getElementById('addressListContainer').style.display = 'block';
+        });
+    }
 
-    cancelAddressBtn.addEventListener('click', () => {
-        addressList.style.display = 'block';
-        addressForm.style.display = 'none';
-        addAddressBtn.style.display = 'block';
-        editAddressBtn.style.display = 'block';
-    });
+    // Tự động chuyển đến tab address nếu có hash #address trong URL
+    if (window.location.hash === '#address') {
+        const triggerEl = document.querySelector('a[href="#address"]');
+        if (triggerEl) {
+            const tab = new bootstrap.Tab(triggerEl);
+            tab.show();
+        }
+    }
 
-    // Delete Account Confirmation
+    // Delete Account Confirmation - Đơn giản hóa
     const confirmDeleteInput = document.getElementById('confirmDelete');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    confirmDeleteInput.addEventListener('input', function() {
-        if (this.value === 'XÓA TÀI KHOẢN') {
-            confirmDeleteBtn.disabled = false;
-        } else {
-            confirmDeleteBtn.disabled = true;
-        }
-    });
+    // Enable button chỉ khi nhập đúng "XÓA TÀI KHOẢN"
+    if (confirmDeleteInput && confirmDeleteBtn) {
+        confirmDeleteInput.addEventListener('input', function() {
+            confirmDeleteBtn.disabled = (this.value !== 'XÓA TÀI KHOẢN');
+        });
 
-    confirmDeleteBtn.addEventListener('click', function() {
-        if (confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!')) {
-            // Here you can add AJAX to delete the account
-            deleteAccount();
+        // Reset khi đóng modal
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        if (deleteAccountModal) {
+            deleteAccountModal.addEventListener('hidden.bs.modal', function() {
+                confirmDeleteInput.value = '';
+                confirmDeleteBtn.disabled = true;
+            });
         }
-    });
+    }
 });
 
 // Helper Functions
@@ -529,40 +682,6 @@ function uploadAvatar(file) {
             showToast('Cập nhật avatar thành công!', 'success');
         } else {
             showToast('Có lỗi xảy ra khi cập nhật avatar!', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Có lỗi xảy ra!', 'error');
-    });
-}
-
-function editAddress(addressId) {
-    // Show edit form with address data
-    document.getElementById('addressForm').style.display = 'block';
-    document.getElementById('addressList').style.display = 'none';
-}
-
-function deleteAddress(addressId) {
-    if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-        // Here you can add AJAX to delete the address
-        showToast('Đã xóa địa chỉ!', 'success');
-    }
-}
-
-function deleteAccount() {
-    fetch('${pageContext.request.contextPath}/user/delete-account', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast('Tài khoản đã được xóa!', 'success');
-            setTimeout(() => {
-                window.location.href = '${pageContext.request.contextPath}/home';
-            }, 2000);
-        } else {
-            showToast('Có lỗi xảy ra khi xóa tài khoản!', 'error');
         }
     })
     .catch(error => {

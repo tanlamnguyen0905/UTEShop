@@ -47,12 +47,6 @@
 					khẩu hiện tại!</div>
 			</div>
 
-			<div class="form-check mb-3">
-				<input type="checkbox" id="showPassword" class="form-check-input">
-				<label for="showPassword" class="form-check-label">Hiện mật
-					khẩu</label>
-			</div>
-
 			<div class="d-flex gap-3">
 				<button type="submit" class="btn btn-primary px-4">
 					<i class="fa-solid fa-key me-1"></i> Đổi mật khẩu
@@ -78,13 +72,6 @@ setTimeout(() => {
     const form = document.getElementById("changePwdForm");
 
     if (!show) return; // tránh lỗi khi chưa render xong
-    // ✅ Hiện / ẩn mật khẩu	
-    show.addEventListener("change", function () {
-        const type = this.checked ? "text" : "password";
-        currentPwd.type = type;
-        newPwd.type = type;
-        confirmPwd.type = type;
-    });
 
     // ✅ Kiểm tra khớp mật khẩu mới
     confirmPwd.addEventListener("input", function () {

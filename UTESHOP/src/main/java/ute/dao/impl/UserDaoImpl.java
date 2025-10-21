@@ -1,10 +1,8 @@
 package ute.dao.impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import ute.entities.Users;
 import ute.configs.JPAConfig;
@@ -112,6 +110,26 @@ public class UserDaoImpl implements UserDao {
 			if (tx.isActive())
 				tx.rollback();
 			e.printStackTrace();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public void delete(Long userId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin();
+			Users user = em.find(Users.class, userId);
+			if (user != null) {
+				em.remove(user);
+			}
+			tx.commit();
+		} catch (Exception e) {
+			if (tx.isActive()) tx.rollback();
+			e.printStackTrace();
+			throw new RuntimeException("Lỗi khi xóa tài khoản: " + e.getMessage(), e);
 		} finally {
 			em.close();
 		}

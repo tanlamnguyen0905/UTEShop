@@ -16,5 +16,7 @@ public interface UserDao {
 
 	void update(Users user);
 
+	void delete(Long userId);
+
 	boolean activateUserByEmail(String email);
 }
