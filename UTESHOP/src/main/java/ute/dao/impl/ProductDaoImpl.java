@@ -332,18 +332,21 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize) {
 		// Xác định xem cần JOIN bảng nào dựa trên filter và sortBy
 		boolean needOrderDetails = "0".equals(filter.getSortBy()); // Bán chạy
-		boolean needFavorites = "3".equals(filter.getSortBy()); // Yêu thích
 		boolean needBanners = filter.getBannerId() != null; // Chỉ JOIN khi filter theo banner
 
-		// Xây dựng JPQL động - chỉ JOIN khi thực sự cần thiết
-		StringBuilder jpql = new StringBuilder("SELECT DISTINCT p FROM Product p");
+		// Xây dựng JPQL động dựa trên loại sắp xếp
+		StringBuilder jpql = new StringBuilder();
+		String sortBy = filter.getSortBy() != null ? filter.getSortBy() : "1";
 
-		if (needOrderDetails) {
-			jpql.append(" LEFT JOIN p.orderDetails od");
+		if ("3".equals(sortBy)) { // Trường hợp sắp xếp theo yêu thích
+			jpql.append("SELECT p, COUNT(f) as favCount FROM Product p LEFT JOIN p.favorites f");
+		} else {
+			jpql.append("SELECT DISTINCT p FROM Product p");
+			if (needOrderDetails) {
+				jpql.append(" LEFT JOIN p.orderDetails od");
+			}
 		}
-		if (needFavorites) {
-			jpql.append(" LEFT JOIN p.favorites f");
-		}
+
 		if (needBanners) {
 			jpql.append(" LEFT JOIN p.banners b");
 		}
@@ -371,10 +374,9 @@ public class ProductDaoImpl implements ProductDao {
 		}
 
 		// Xử lý sắp xếp
-		String sortBy = filter.getSortBy() != null ? filter.getSortBy() : "1";
 		switch (sortBy) {
 			case "0": // Bán chạy
-				jpql.append(" GROUP BY p ORDER BY COALESCE(SUM(od.quantity), 0) DESC");
+				jpql.append(" ORDER BY p.soldCount DESC");
 				break;
 			case "1": // Mới nhất (default)
 				jpql.append(" ORDER BY p.productID DESC");
@@ -383,7 +385,7 @@ public class ProductDaoImpl implements ProductDao {
 				jpql.append(" ORDER BY p.reviewCount DESC");
 				break;
 			case "3": // Yêu thích
-				jpql.append(" GROUP BY p ORDER BY COUNT(f) DESC");
+				jpql.append(" GROUP BY p ORDER BY favCount DESC");
 				break;
 			case "4": // Giá tăng dần
 				jpql.append(" ORDER BY p.unitPrice ASC");
@@ -397,27 +399,59 @@ public class ProductDaoImpl implements ProductDao {
 
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery(jpql.toString(), Product.class);
+			// Xác định kiểu query dựa trên sortBy
+			List<Product> products;
+			if ("3".equals(filter.getSortBy())) {
+				TypedQuery<Object[]> query = em.createQuery(jpql.toString(), Object[].class);
 
-			// Set parameters
-			if (filter.getCategoryId() != null)
-				query.setParameter("categoryId", filter.getCategoryId());
-			if (filter.getBrandId() != null)
-				query.setParameter("brandId", filter.getBrandId());
-			if (filter.getBannerId() != null)
-				query.setParameter("bannerId", filter.getBannerId());
-			if (filter.getMinPrice() != null)
-				query.setParameter("minPrice", filter.getMinPrice());
-			if (filter.getMaxPrice() != null)
-				query.setParameter("maxPrice", filter.getMaxPrice());
-			if (filter.getKeyword() != null && !filter.getKeyword().isEmpty())
-				query.setParameter("keyword", "%" + filter.getKeyword().toLowerCase() + "%");
+				// Set parameters
+				if (filter.getCategoryId() != null)
+					query.setParameter("categoryId", filter.getCategoryId());
+				if (filter.getBrandId() != null)
+					query.setParameter("brandId", filter.getBrandId());
+				if (filter.getBannerId() != null)
+					query.setParameter("bannerId", filter.getBannerId());
+				if (filter.getMinPrice() != null)
+					query.setParameter("minPrice", filter.getMinPrice());
+				if (filter.getMaxPrice() != null)
+					query.setParameter("maxPrice", filter.getMaxPrice());
+				if (filter.getKeyword() != null && !filter.getKeyword().isEmpty())
+					query.setParameter("keyword", "%" + filter.getKeyword().toLowerCase() + "%");
 
-			// Pagination
-			query.setFirstResult((page - 1) * pageSize);
-			query.setMaxResults(pageSize);
+				// Pagination
+				query.setFirstResult((page - 1) * pageSize);
+				query.setMaxResults(pageSize);
 
-			List<Product> products = query.getResultList();
+				products = query.getResultList().stream()
+						.map(row -> {
+							Product p = (Product) row[0];
+							p.setFavoriteCount(((Long) row[1]).intValue());
+							return p;
+						})
+						.collect(Collectors.toList());
+			} else {
+				TypedQuery<Product> query = em.createQuery(jpql.toString(), Product.class);
+
+				// Set parameters
+				if (filter.getCategoryId() != null)
+					query.setParameter("categoryId", filter.getCategoryId());
+				if (filter.getBrandId() != null)
+					query.setParameter("brandId", filter.getBrandId());
+				if (filter.getBannerId() != null)
+					query.setParameter("bannerId", filter.getBannerId());
+				if (filter.getMinPrice() != null)
+					query.setParameter("minPrice", filter.getMinPrice());
+				if (filter.getMaxPrice() != null)
+					query.setParameter("maxPrice", filter.getMaxPrice());
+				if (filter.getKeyword() != null && !filter.getKeyword().isEmpty())
+					query.setParameter("keyword", "%" + filter.getKeyword().toLowerCase() + "%");
+
+				// Pagination
+				query.setFirstResult((page - 1) * pageSize);
+				query.setMaxResults(pageSize);
+
+				products = query.getResultList();
+			}
 
 			// Initialize lazy-loaded collections để tránh LazyInitializationException
 			for (Product p : products) {
