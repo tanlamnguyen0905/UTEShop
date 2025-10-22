@@ -4,8 +4,6 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.ProductDao;

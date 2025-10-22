@@ -1,0 +1,19 @@
+@charset "UTF-8";
+#searchForm select,
+#searchForm input {
+    min-width: 180px;
+}
+
+#accountsTable tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+#message {
+    font-size: 1.1rem;
+}
+
+.img-thumbnail {
+    border-radius: 10px;
+    background-color: #fdfdfd;
+}
