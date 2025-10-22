@@ -77,14 +77,8 @@
                             <c:forEach var="p" items="${listBestSell}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:choose>
-                                            <c:when test="${not empty p.image}">
-                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
+                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
 
                                         <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
                                             class="text-decoration-none">
@@ -117,14 +111,8 @@
                             <c:forEach var="p" items="${listNewProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:choose>
-                                            <c:when test="${not empty p.image}">
-                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
+                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
 
                                         <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
                                             class="text-decoration-none">
@@ -158,14 +146,8 @@
                             <c:forEach var="p" items="${listTopReviewProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:choose>
-                                            <c:when test="${not empty p.image}">
-                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
+                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
 
                                         <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
                                             class="text-decoration-none">
@@ -199,14 +181,8 @@
                             <c:forEach var="p" items="${listTopFavoriteProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:choose>
-                                            <c:when test="${not empty p.image}">
-                                                <c:url value="/image?fname=${p.image}" var="imgUrl" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:url value="/image?fname=logo.png" var="imgUrl" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
+                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
 
                                         <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
                                             class="text-decoration-none">

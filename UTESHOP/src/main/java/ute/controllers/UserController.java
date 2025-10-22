@@ -1,7 +1,6 @@
 package ute.controllers;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -26,17 +25,17 @@ public class UserController extends HttpServlet {
 		String path = req.getServletPath();
 
 		switch (path) {
-		case "/user/update-profile":
-			req.getRequestDispatcher("/WEB-INF/views/user/edit-profile.jsp").forward(req, resp);
-			break;
+			case "/user/update-profile":
+				req.getRequestDispatcher("/WEB-INF/views/user/edit-profile.jsp").forward(req, resp);
+				break;
 
-		case "/user/change-password":
-			req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
-			break;
+			case "/user/change-password":
+				req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
+				break;
 
-		default: // /user/profile
-			req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-			break;
+			default: // /user/profile
+				req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+				break;
 		}
 	}
 
@@ -46,13 +45,13 @@ public class UserController extends HttpServlet {
 		String path = req.getServletPath();
 
 		switch (path) {
-		case "/user/update-profile":
-			updateProfile(req, resp);
-			break;
+			case "/user/update-profile":
+				updateProfile(req, resp);
+				break;
 
-		case "/user/change-password":
-			changePassword(req, resp);
-			break;
+			case "/user/change-password":
+				changePassword(req, resp);
+				break;
 		}
 	}
 

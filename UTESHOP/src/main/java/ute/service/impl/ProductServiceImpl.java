@@ -27,15 +27,14 @@ public class ProductServiceImpl implements ute.service.inter.ProductService {
 	}
 
 	@Override
-	public void delete(int id) {
-		// TODO Auto-generated method stub
-		instance.delete(id);
+	public void delete(Long id) {
+		// delegate to dao which accepts int in some places - convert if necessary
+		instance.delete(id.intValue());
 	}
 
 	@Override
-	public Product findById(int id) {
-		// TODO Auto-generated method stub
-		return instance.findById(id);
+	public Product findById(Long id) {
+		return instance.findById(id.intValue());
 	}
 
 	@Override

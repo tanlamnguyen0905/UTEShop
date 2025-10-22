@@ -18,10 +18,10 @@ public interface ProductService {
     void update(Product product);
 
     // Xóa sản phẩm theo id
-    void delete(int id);
+    void delete(Long id);
 
     // Tìm sản phẩm theo id
-    Product findById(int id);
+    Product findById(Long id);
 
     // Lấy danh sách tất cả sản phẩm
     List<Product> findAll();

@@ -87,11 +87,13 @@
 
 						<!-- Cart -->
 						<div class="position-relative">
-							<a href="#" class="btn btn-light rounded-circle"> <i
+							<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle"> <i
 									class="bi bi-bag-fill fs-4 text-dark"></i>
-							</a> <span
-								class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-								20 </span>
+							</a>
+							<!-- cart count badge -->
+							<span id="cartCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+								<c:out value="${sessionScope.cartCount != null ? sessionScope.cartCount : 0}"/>
+							</span>
 						</div>
 					</div>
 				</div>

@@ -71,7 +71,29 @@ public class ProductDaoImpl implements ProductDao {
 	public Product findById(int id) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			return em.find(Product.class, Long.valueOf(id));
+			// Fetch product with images first
+			TypedQuery<Product> queryWithImages = em.createQuery(
+					"SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.productID = :id",
+					Product.class);
+			queryWithImages.setParameter("id", Long.valueOf(id));
+			Product product = queryWithImages.getSingleResult();
+
+			// Then fetch favorites in a separate query
+			TypedQuery<Product> queryWithFavorites = em.createQuery(
+					"SELECT p FROM Product p LEFT JOIN FETCH p.favorites WHERE p.productID = :id",
+					Product.class);
+			queryWithFavorites.setParameter("id", Long.valueOf(id));
+			product = queryWithFavorites.getSingleResult();
+
+			// Force initialize collections
+			if (product.getImages() != null) {
+				product.getImages().size();
+			}
+			if (product.getFavorites() != null) {
+				product.getFavorites().size();
+			}
+
+			return product;
 		} finally {
 			em.close();
 		}

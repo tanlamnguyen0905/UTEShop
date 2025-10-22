@@ -27,5 +27,6 @@ public class Banner {
     private String bannerImage;
 
     @ManyToMany(mappedBy = "banners")
+    @Builder.Default
     private Set<Product> products = new HashSet<>();
 }

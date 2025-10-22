@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Data
@@ -21,13 +19,17 @@ public class Cart {
     private Long cartID;
 
     @Transient
+    @Builder.Default
     private Double totalPrice = 0D;
 
     public Double getTotalPrice() {
-        for (CartDetail cartDetail : cartDetails) {
-            totalPrice += cartDetail.getTotalPrice();
+        double total = 0D;
+        if (cartDetails != null) {
+            for (CartDetail cartDetail : cartDetails) {
+                total += cartDetail.getTotalPrice();
+            }
         }
-        return totalPrice;
+        return total;
     }
 
     @OneToOne
