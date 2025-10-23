@@ -1,232 +1,357 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
-<div class="container py-5">
-
-    <div class="row g-5">
-        <!-- 🖼️ Ảnh sản phẩm -->
-        <div class="col-lg-6">
-            <div class="product-gallery text-center">
+<!-- Main Content -->
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <!-- Product Images Section -->
+        <div class="col-md-6">
+            <div class="product-gallery">
                 <c:set var="mainImage" value="${empty productDTO.images ? 'logo.png' : productDTO.images[0]}" />
-                <img id="mainImage" 
-                     src="${pageContext.request.contextPath}/image?fname=${mainImage}" 
-                     alt="${productDTO.productName}" 
-                     class="img-fluid rounded shadow-sm mb-3 main-product-img" 
-                     onerror="this.src='${pageContext.request.contextPath}/assets/images/default.png';">
-
-                <div class="d-flex flex-wrap justify-content-center gap-2">
+                <img src="${pageContext.request.contextPath}/image?fname=${mainImage}" id="mainImage" class="img-fluid mb-3" alt="${productDTO.productName}">
+                <div class="thumbnail-images d-flex flex-wrap">
                     <c:forEach items="${productDTO.images}" var="imageUrl">
-                        <img src="${pageContext.request.contextPath}/image?fname=${imageUrl}"
-                             class="thumbnail-img ${imageUrl eq mainImage ? 'active' : ''}"
-                             onclick="changeMainImage('${pageContext.request.contextPath}/image?fname=${imageUrl}', this)"
-                             alt="Thumbnail"
-                             loading="lazy">
+                        <img src="${pageContext.request.contextPath}/image?fname=${imageUrl}" 
+                             onclick="changeMainImage('${pageContext.request.contextPath}/image?fname=${imageUrl}')" 
+                             class="thumbnail ${imageUrl eq mainImage ? 'active' : ''}" 
+                             alt="Product thumbnail">
                     </c:forEach>
                 </div>
             </div>
         </div>
 
-        <!-- 🧾 Thông tin sản phẩm -->
-        <div class="col-lg-6">
-            <h1 class="fw-bold mb-3">${productDTO.productName}</h1>
-
-            <!-- ⭐ Đánh giá -->
-            <div class="d-flex align-items-center mb-3">
-                <div>
+        <!-- Product Info Section -->
+        <div class="col-md-6">
+            <h1 class="mb-3">${productDTO.productName}</h1>
+            
+            <!-- Rating Summary -->
+            <div class="rating-summary mb-3">
+                <div class="rating-stars">
                     <c:forEach begin="1" end="5" var="i">
-                        <i class="fas fa-star ${i <= averageRating ? 'text-warning' : 'text-muted'}"></i>
+                        <i class="fas fa-star ${i <= averageRating ? 'text-warning' : 'text-secondary'}"></i>
                     </c:forEach>
-                    <span class="ms-2 small text-muted">(${reviewCount} đánh giá)</span>
+                    <span class="ml-2">(${reviewCount} đánh giá)</span>
                 </div>
-                <div class="ms-auto fw-semibold">${averageRating}/5</div>
+                <div class="average-rating">
+                    <span class="h4">${averageRating}/5</span>
+                </div>
             </div>
 
-            <!-- 💰 Giá -->
-            <div class="price h3 text-danger mb-4">
+            <!-- Price -->
+            <div class="price-tag mb-4">
                 <fmt:formatNumber value="${productDTO.unitPrice}" type="currency" currencySymbol="₫"/>
+                <%-- <c:if test="${productDTO.discountPrice > 0}">
+                    <span class="original-price text-muted ml-2">
+                        <del><fmt:formatNumber value="${productDTO.originalPrice}" type="currency" currencySymbol="₫"/></del>
+                    </span>
+                </c:if> --%>
             </div>
 
-            <!-- 🛒 Form giỏ hàng -->
+            <!-- Add to Cart Form -->
             <form id="addToCartForm" class="mb-4">
                 <input type="hidden" name="productId" value="${productDTO.productID}">
-                <div class="mb-3 d-flex align-items-center gap-2">
-                    <label for="quantity" class="fw-semibold">Số lượng:</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="${productDTO.stockQuantity}" class="form-control w-auto">
+                <div class="form-group">
+                    <label for="quantity">Số lượng:</label>
+                    <input type="number" 
+                           class="form-control quantity-input" 
+                           id="quantity" 
+                           name="quantity" 
+                           value="1" 
+                           min="1" 
+                           max="${productDTO.stockQuantity}">
                 </div>
-                <div class="d-flex gap-2">
-                    <button type="button" onclick="addToCart()" class="btn btn-primary flex-fill">
-                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ hàng
+                <div class="action-buttons">
+                    <button type="button" id="addCartBtn" onclick="addToCart()" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
                     </button>
-                    <button type="button" onclick="addToWishlist(${productDTO.productID})" id="wishlistBtn"
-                            class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}">
-                        <i id="wishlistIcon" class="fas fa-heart ${isFavorite ? 'text-white' : ''}"></i>
+                    <button type="button" id="wishlistBtn" onclick="addToWishlist(${product.id})" class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}">
+                        <i id="wishlistIcon" class="fas ${isFavorite ? 'fa-heart' : 'fa-heart'} ${isFavorite ? 'text-white' : ''}"></i>
                         <span id="wishlistText">${isFavorite ? 'Đã yêu thích' : 'Yêu thích'}</span>
                     </button>
                 </div>
             </form>
 
-            <!-- 📋 Chi tiết sản phẩm -->
-            <div class="border-top pt-3">
-                <h4 class="fw-semibold mb-3">Thông tin sản phẩm</h4>
+            <!-- Product Details -->
+            <div class="product-details mt-4">
+                <h4>Thông tin sản phẩm</h4>
                 <p>${productDTO.description}</p>
-                <table class="table table-sm table-bordered align-middle">
+                <table class="table table-bordered">
                     <c:if test="${not empty productDTO.brand}">
-                        <tr><th>Thương hiệu</th><td>${productDTO.brand}</td></tr>
+                        <tr>
+                            <td>Thương hiệu</td>
+                            <td>${productDTO.brand}</td>
+                        </tr>
                     </c:if>
-                    <tr><th>Tình trạng</th><td>${productDTO.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}</td></tr>
-                    <tr><th>Danh mục</th><td>${productDTO.category}</td></tr>
+                    <tr>
+                        <td>Tình trạng</td>
+                        <td>${productDTO.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}</td>
+                    </tr>
+                    <tr>
+                        <td>Danh mục</td>
+                        <td>${productDTO.category}</td>
+                    </tr>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- 💬 Đánh giá -->
-    <div class="mt-5">
-        <h3 class="fw-semibold mb-4">Đánh giá sản phẩm</h3>
-
-        <div class="review-list">
+    <!-- Reviews Section -->
+    <div class="reviews-section mt-5">
+        <h3>Đánh giá sản phẩm</h3>
+        
+        <!-- Review List -->
+        <div class="review-list mt-4">
             <c:forEach items="${reviews}" var="review">
-                <div class="border-bottom pb-3 mb-3">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <strong>${review.user.fullname}</strong>
-                            <div>
+                <div class="review-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="user-info">
+                            <h5 class="mb-0">${review.user.fullname}</h5>
+                            <div class="rating-stars">
                                 <c:forEach begin="1" end="5" var="i">
-                                    <i class="fas fa-star ${i <= review.rating ? 'text-warning' : 'text-muted'}"></i>
+                                    <i class="fas fa-star ${i <= review.rating ? 'text-warning' : 'text-secondary'}"></i>
                                 </c:forEach>
                             </div>
                         </div>
-                        <small class="text-muted"><fmt:formatDate value="${review.createdAt}" pattern="dd/MM/yyyy"/></small>
+                        <small class="text-muted">
+                            <fmt:formatDate value="${review.createdAt}" pattern="dd/MM/yyyy"/>
+                        </small>
                     </div>
-                    <p class="mb-0 mt-2">${review.content}</p>
+                    <p class="mt-2 mb-0">${review.content}</p>
                 </div>
             </c:forEach>
         </div>
 
-        <c:if test="${not empty sessionScope.currentUser}">
-            <div class="mt-4">
-                <h4 class="fw-semibold">Thêm đánh giá của bạn</h4>
+        <!-- Add Review Form -->
+        <c:if test="${not empty sessionScope.user}">
+            <div class="add-review-form mt-4">
+                <h4>Thêm đánh giá của bạn</h4>
                 <form id="reviewForm" class="mt-3">
-                    <input type="hidden" name="productId" value="${productDTO.productID}">
-                    <div class="rating-input mb-3">
-                        <c:forEach begin="5" end="1" step="-1" var="i">
-                            <input type="radio" id="star${i}" name="rating" value="${i}">
-                            <label for="star${i}" title="${i} sao"><i class="fas fa-star"></i></label>
-                        </c:forEach>
+                    <input type="hidden" name="productId" value="${product.productID}">
+                    <div class="form-group">
+                        <label>Đánh giá:</label>
+                        <div class="rating-input">
+                            <c:forEach begin="5" end="1" step="-1" var="i">
+                                <input type="radio" id="star${i}" name="rating" value="${i}">
+                                <label for="star${i}"><i class="fas fa-star"></i></label>
+                            </c:forEach>
+                        </div>
                     </div>
-                    <textarea name="comment" class="form-control mb-3" rows="3" placeholder="Viết nhận xét của bạn..." required></textarea>
-                    <button type="button" onclick="submitReview()" class="btn btn-primary">Gửi đánh giá</button>
+                    <div class="form-group">
+                        <label for="comment">Nhận xét của bạn:</label>
+                        <textarea class="form-control" 
+                                  id="comment" 
+                                  name="comment" 
+                                  rows="3" 
+                                  required></textarea>
+                    </div>
+                    <button type="button" onclick="submitReview()" class="btn btn-primary">
+                        Gửi đánh giá
+                    </button>
                 </form>
             </div>
         </c:if>
     </div>
 </div>
 
-<!-- 🌈 CSS -->
+<!-- CSS -->
 <style>
-.main-product-img { transition: transform 0.3s ease; cursor: zoom-in; }
-.main-product-img:hover { transform: scale(1.05); }
-.thumbnail-img { width: 80px; height: 80px; object-fit: cover; border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: transform 0.2s; }
-.thumbnail-img:hover { transform: scale(1.1); border-color: #007bff; }
-.thumbnail-img.active { border-color: #007bff; }
-.rating-input { display: inline-flex; flex-direction: row-reverse; }
-.rating-input input { display: none; }
-.rating-input label { color: #ccc; font-size: 24px; cursor: pointer; }
-.rating-input input:checked ~ label,
-.rating-input label:hover,
-.rating-input label:hover ~ label { color: #ffc107; }
+    .product-gallery img {
+        max-width: 100%;
+        height: auto;
+    }
+    .thumbnail-images img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        margin: 5px;
+        border: 2px solid transparent;
+    }
+    .thumbnail-images img.active {
+        border-color: #007bff;
+    }
+    .rating-stars i {
+        color: #ffc107;
+    }
+    .rating-input {
+        display: inline-flex;
+        flex-direction: row-reverse;
+    }
+    .rating-input input {
+        display: none;
+    }
+    .rating-input label {
+        cursor: pointer;
+        color: #ddd;
+        font-size: 24px;
+        padding: 0 2px;
+    }
+    .rating-input input:checked ~ label,
+    .rating-input label:hover,
+    .rating-input label:hover ~ label {
+        color: #ffc107;
+    }
+    .review-item {
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+    }
+    .quantity-input {
+        width: 100px;
+    }
+    .price-tag {
+        font-size: 24px;
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .action-buttons .btn {
+        margin-right: 10px;
+    }
 </style>
 
-<!-- ⚙️ JS -->
+<!-- JavaScript -->
 <script>
-function changeMainImage(url, el) {
-    document.getElementById("mainImage").src = url;
-    document.querySelectorAll(".thumbnail-img").forEach(i => i.classList.remove("active"));
-    el.classList.add("active");
-}
-
-function checkLogin() {
-    if (${empty sessionScope.currentUser}) {
-        showToast("Thông báo", "Vui lòng đăng nhập để tiếp tục", "warning");
-        setTimeout(() => {
-            window.location.href = '${pageContext.request.contextPath}/auth/login?redirect=' + encodeURIComponent(window.location.href);
-        }, 1000);
-        return false;
-    }
-    return true;
-}
-
-async function postRequest(url, data) {
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams(data)
-        });
-        return await res.json();
-    } catch {
-        showToast("Lỗi", "Không thể kết nối đến máy chủ", "danger");
-        return { success: false };
-    }
-}
-
-async function addToCart() {
-    if (!checkLogin()) return;
-    const data = await postRequest('${pageContext.request.contextPath}/cart/add', {
-        productId: document.querySelector('input[name="productId"]').value,
-        quantity: document.getElementById('quantity').value
+function changeMainImage(imageUrl) {
+    document.getElementById('mainImage').src = imageUrl;
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.classList.remove('active');
+        if(thumb.src === imageUrl) {
+            thumb.classList.add('active');
+        }
     });
-    if (data.success) handleAddToCartSuccess(data);
-    else showToast("Lỗi", data.message || "Không thể thêm giỏ hàng", "danger");
 }
 
-async function addToWishlist(productId) {
-    if (!checkLogin()) return;
-    const data = await postRequest('${pageContext.request.contextPath}/wishlist/add', { productId });
-    if (data.success) {
-        const btn = document.getElementById('wishlistBtn');
-        const icon = document.getElementById('wishlistIcon');
-        const text = document.getElementById('wishlistText');
-        const added = data.action === "added";
-        btn.classList.toggle("btn-danger", added);
-        btn.classList.toggle("btn-outline-danger", !added);
-        icon.classList.toggle("text-white", added);
-        text.textContent = added ? "Đã yêu thích" : "Yêu thích";
-        showToast("Thành công", added ? "Đã thêm vào danh sách yêu thích" : "Đã gỡ khỏi danh sách", added ? "success" : "info");
-    } else showToast("Lỗi", data.message || "Có lỗi xảy ra", "danger");
+function addToCart() {
+    const quantity = document.getElementById('quantity').value;
+    const productId = document.querySelector('input[name="productId"]').value;
+
+    fetch('${pageContext.request.contextPath}/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `productId=${productId}&quantity=${quantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            handleAddToCartSuccess(data);
+        } else {
+            showToast('Lỗi', data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Lỗi', 'Có lỗi xảy ra khi thêm vào giỏ hàng', 'danger');
+    });
 }
 
-async function submitReview() {
-    const form = document.getElementById("reviewForm");
-    const data = Object.fromEntries(new FormData(form).entries());
-    const res = await postRequest('${pageContext.request.contextPath}/review/add', data);
-    if (res.success) {
-        showToast("Cảm ơn", "Cảm ơn bạn đã đánh giá!", "success");
-        setTimeout(() => location.reload(), 800);
-    } else showToast("Lỗi", res.message || "Không gửi được đánh giá", "danger");
+function addToWishlist(productId) {
+    fetch('${pageContext.request.contextPath}/wishlist/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `productId=${productId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            // Toggle UI state
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            const wishlistIcon = document.getElementById('wishlistIcon');
+            const wishlistText = document.getElementById('wishlistText');
+            if(data.action === 'added') {
+                wishlistBtn.classList.remove('btn-outline-danger');
+                wishlistBtn.classList.add('btn-danger');
+                wishlistIcon.classList.add('text-white');
+                wishlistText.textContent = 'Đã yêu thích';
+                showToast('Thành công', 'Đã thêm vào danh sách yêu thích', 'success');
+            } else if(data.action === 'removed') {
+                wishlistBtn.classList.remove('btn-danger');
+                wishlistBtn.classList.add('btn-outline-danger');
+                wishlistIcon.classList.remove('text-white');
+                wishlistText.textContent = 'Yêu thích';
+                showToast('Đã gỡ', 'Đã gỡ khỏi danh sách yêu thích', 'info');
+            } else {
+                showToast('Thành công', data.message || 'Hành động yêu thích hoàn tất', 'success');
+            }
+        } else {
+            showToast('Lưu ý', data.message || 'Vui lòng đăng nhập để thêm vào danh sách yêu thích', 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Lỗi', 'Có lỗi xảy ra khi thêm vào danh sách yêu thích', 'danger');
+    });
 }
 
-function handleAddToCartSuccess(data) {
-    if (data.cartCount) updateCartBadge(data.cartCount);
-    showToast("Thành công", "Đã thêm vào giỏ hàng!", "success");
+function submitReview() {
+    const form = document.getElementById('reviewForm');
+    const formData = new FormData(form);
+
+    fetch('${pageContext.request.contextPath}/review/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            showToast('Cảm ơn', 'Cảm ơn bạn đã đánh giá sản phẩm!', 'success');
+            setTimeout(() => location.reload(), 800);
+        } else {
+            alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi gửi đánh giá');
+    });
 }
+
+// Helper to show bootstrap toasts (requires bootstrap 5)
+function showToast(title, message, type = 'info') {
+    // Create toast element
+    const toastId = 'toast' + Date.now();
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `\
+        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">\
+            <div class="d-flex">\
+                <div class="toast-body">\
+                    <strong class="me-1">${title}</strong> ${message}\
+                </div>\
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>\
+            </div>\
+        </div>`;
+    const container = document.getElementById('toastContainer');
+    container.appendChild(wrapper);
+    const toastEl = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+    // Remove after hidden
+    toastEl.addEventListener('hidden.bs.toast', () => wrapper.remove());
+}
+
+// Update cart badge helper
 function updateCartBadge(count) {
-    const badge = document.getElementById("cartCountBadge");
-    if (badge) badge.textContent = count;
+    const badge = document.getElementById('cartCountBadge');
+    if(badge) {
+        badge.textContent = count;
+    }
 }
-function showToast(title, message, type="info") {
-    const toast = document.createElement("div");
-    toast.className = `toast align-items-center text-bg-${type} border-0 show`;
-    toast.innerHTML = `
-      <div class="d-flex">
-        <div class="toast-body"><strong>${title}</strong> ${message}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>`;
-    const container = document.getElementById("toastContainer");
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
+
+// After add to cart success, update header badge if returned
+function handleAddToCartSuccess(data) {
+    if(data.cartCount !== undefined) {
+        updateCartBadge(data.cartCount);
+    }
+    showToast('Thành công', 'Sản phẩm đã được thêm vào giỏ hàng!', 'success');
 }
 </script>
 
+<!-- Toast container -->
 <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>

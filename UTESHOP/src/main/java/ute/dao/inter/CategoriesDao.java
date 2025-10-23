@@ -41,4 +41,5 @@ public interface CategoriesDao {
 
     // Đếm số danh mục với tìm kiếm theo tên
     long countByName(String name);
+    
 }

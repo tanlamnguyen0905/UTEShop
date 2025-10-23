@@ -3,10 +3,8 @@
 <!-- Sidebar -->
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-
         <div class="sb-sidenav-menu">
             <div class="nav">
-
                 <div class="sb-sidenav-menu-heading">Core</div>
                 <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -19,9 +17,14 @@
                     Người dùng
                 </a>
 
-                <a class="nav-link" href="${pageContext.request.contextPath}/admin/products">
+                <a class="nav-link" href="${pageContext.request.contextPath}/admin/products/searchpaginated">
                     <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                     Sản phẩm
+                </a>
+
+                <a class="nav-link" href="${pageContext.request.contextPath}/admin/categories/searchpaginated">
+                    <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                    Danh mục
                 </a>
 
                 <a class="nav-link" href="${pageContext.request.contextPath}/admin/orders">
@@ -36,4 +39,9 @@
             </div>
         </div>
 
-        <div class="sb-sidenav-footer
+        <div class="sb-sidenav-footer">
+            <div class="small">Đăng nhập với:</div>
+            Administrator
+        </div>
+    </nav>
+</div>

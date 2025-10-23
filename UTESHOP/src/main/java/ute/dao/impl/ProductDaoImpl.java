@@ -256,14 +256,15 @@ public class ProductDaoImpl implements ProductDao {
 		// Product.class);
 		// return query.getResultList();
 		EntityManager em = JPAConfig.getEntityManager();
-		TypedQuery<Object[]> query = em.createQuery(
+		try {
+			TypedQuery<Object[]> query = em.createQuery(
 				"SELECT p, COUNT(f) as favCount " +
 						"FROM Product p LEFT JOIN p.favorites f " +
 						"GROUP BY p " +
 						"ORDER BY favCount DESC",
 				Object[].class);
 
-		List<Object[]> result = query.getResultList();
+			List<Object[]> result = query.getResultList();
 
 		// map lại thành Product + favoriteCount và initialize collections
 		List<Product> products = result.stream()
@@ -278,7 +279,10 @@ public class ProductDaoImpl implements ProductDao {
 				})
 				.collect(Collectors.toList());
 
-		return products.subList(0, Math.min(limit, products.size()));
+			return products.subList(0, Math.min(limit, products.size()));
+		} finally {
+			em.close();
+		}
 	}
 
 	@Override
@@ -291,16 +295,16 @@ public class ProductDaoImpl implements ProductDao {
 						"ORDER BY favCount DESC",
 				Object[].class);
 
-		List<Object[]> result = query.getResultList();
+			List<Object[]> result = query.getResultList();
 
-		// map lại thành Product + favoriteCount
-		List<Product> products = result.stream()
-				.map(arr -> {
-					Product p = (Product) arr[0];
-					p.setFavoriteCount(((Long) arr[1]).intValue());
-					return p;
-				})
-				.collect(Collectors.toList());
+			// map lại thành Product + favoriteCount
+			List<Product> products = result.stream()
+					.map(arr -> {
+						Product p = (Product) arr[0];
+						p.setFavoriteCount(((Long) arr[1]).intValue());
+						return p;
+					})
+					.collect(Collectors.toList());
 
 		int start = (page - 1) * pageSize;
 		if (start >= products.size() || start < 0) {

@@ -13,11 +13,19 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void addAddress(Addresses address) {
+        // Nếu địa chỉ này được set làm default, bỏ default của các địa chỉ khác
+        if (address.getIsDefault() != null && address.getIsDefault()) {
+            addressDao.unsetDefaultForUser(address.getUser().getUserID());
+        }
         addressDao.insert(address);
     }
 
     @Override
     public void updateAddress(Addresses address) {
+        // Nếu địa chỉ này được set làm default, bỏ default của các địa chỉ khác
+        if (address.getIsDefault() != null && address.getIsDefault()) {
+            addressDao.unsetDefaultForUser(address.getUser().getUserID());
+        }
         addressDao.update(address);
     }
 

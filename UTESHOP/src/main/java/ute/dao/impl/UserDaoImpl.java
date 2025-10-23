@@ -194,4 +194,14 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+	@Override
+	public Users findById(Long userId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.find(Users.class, userId);
+		} finally {
+			em.close();
+		}
+	}
+
 }

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- PROFILE HEADER -->
 <div class="profile-header text-center text-white py-5 position-relative"
@@ -26,22 +27,22 @@
     </div>
 
     <!-- Info -->
-    <h3 class="fw-bold mb-1">${sessionScope.currentUser.fullname != null ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}</h3>
-    <p class="mb-2">${sessionScope.currentUser.email}</p>
+    <h3 class="fw-bold mb-1" style="color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
+        ${sessionScope.currentUser.fullname != null ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}
+    </h3>
+    <p class="mb-2" style="color: #fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.2);">
+        ${sessionScope.currentUser.email}
+    </p>
 
     <!-- Stats -->
     <div class="d-flex justify-content-center gap-5 mt-4">
-        <div>
-            <h5 class="fw-bold mb-0">0</h5>
-            <span>Đơn hàng</span>
+        <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
+            <h4 class="fw-bold mb-1">0</h4>
+            <span class="small">Đơn hàng</span>
         </div>
-        <div>
-            <h5 class="fw-bold mb-0">0 ₫</h5>
-            <span>Đã mua</span>
-        </div>
-        <div>
-            <h5 class="fw-bold mb-0">Chưa cập nhật</h5>
-            <span>Thành viên từ</span>
+        <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
+            <h4 class="fw-bold mb-1">0 ₫</h4>
+            <span class="small">Tổng chi tiêu</span>
         </div>
     </div>
 </div>
@@ -180,13 +181,21 @@
                         <c:when test="${not empty addresses}">
                             <div id="addressList">
                                 <c:forEach var="addr" items="${addresses}" varStatus="status">
-                                    <div class="card mb-3 address-card">
+                                    <div class="card mb-3 address-card ${addr.isDefault ? 'border-primary' : ''}">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h6 class="fw-bold text-primary">
-                                                        <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ ${status.index + 1}
-                                                    </h6>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                        <h6 class="fw-bold text-primary mb-0">
+                                                            <i class="fas fa-user me-2"></i>${addr.name}
+                                                        </h6>
+                                                        <c:if test="${addr.isDefault}">
+                                                            <span class="badge bg-primary">Mặc định</span>
+                                                        </c:if>
+                                                    </div>
+                                                    <p class="text-muted mb-1">
+                                                        <i class="fas fa-phone me-2 text-secondary"></i>${addr.phone}
+                                                    </p>
                                                     <p class="text-muted mb-1">
                                                         <i class="fas fa-location-arrow me-2 text-secondary"></i>
                                                         ${addr.addressDetail}
@@ -196,20 +205,28 @@
                                                         ${addr.ward}, ${addr.district}, ${addr.province}
                                                     </p>
                                                 </div>
-                                                <div class="d-flex gap-1">
+                                                <div class="d-flex flex-column gap-1">
                                                     <button class="btn btn-sm btn-outline-primary" 
-                                                            onclick="editAddress(${addr.addressID}, '${addr.province}', '${addr.district}', '${addr.ward}', '${addr.addressDetail}')" 
+                                                            onclick="editAddressBtn(this)"
+                                                            data-id="${addr.addressID}"
+                                                            data-name="${fn:escapeXml(addr.name)}"
+                                                            data-phone="${fn:escapeXml(addr.phone)}"
+                                                            data-province="${fn:escapeXml(addr.province)}"
+                                                            data-district="${fn:escapeXml(addr.district)}"
+                                                            data-ward="${fn:escapeXml(addr.ward)}"
+                                                            data-detail="${fn:escapeXml(addr.addressDetail)}"
+                                                            data-default="${addr.isDefault}"
                                                             title="Sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <form action="${pageContext.request.contextPath}/user/address/delete" 
-                                                          method="post" style="display: inline;" 
-                                                          onsubmit="return confirm('Bạn có chắc muốn xóa địa chỉ này?')">
-                                                        <input type="hidden" name="id" value="${addr.addressID}">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                    <c:if test="${!addr.isDefault}">
+                                                        <button class="btn btn-sm btn-outline-danger" 
+                                                                onclick="deleteAddress(this.dataset.id)" 
+                                                                data-id="${addr.addressID}"
+                                                                title="Xóa">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
-                                                    </form>
+                                                    </c:if>
                                                 </div>
                                             </div>
                                         </div>
@@ -243,9 +260,29 @@
                                 <span id="formTitle">Thêm địa chỉ mới</span>
                             </h6>
                             
-                            <form id="addressForm" action="${pageContext.request.contextPath}/user/address/add" method="post">
-                                <input type="hidden" id="addressId" name="addressId" value="">
+                            <form id="addressForm">
+                                <input type="hidden" id="addressId" value="">
                                 
+                                <!-- Tên người nhận -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-user me-1"></i>Tên người nhận:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           placeholder="Nhập tên người nhận" required>
+                                </div>
+
+                                <!-- Số điện thoại -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-phone me-1"></i>Số điện thoại:
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           placeholder="Nhập số điện thoại" pattern="[0-9]{10,11}" required>
+                                </div>
+
                                 <!-- Tỉnh/Thành phố -->
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">
@@ -274,7 +311,7 @@
                                     </label>
                                     <input type="text" class="form-control" id="ward" name="ward" 
                                            placeholder="Ví dụ: Phường Bến Nghé, Xã Tân An..." required>
-                            </div>
+                                </div>
 
                                 <!-- Địa chỉ chi tiết -->
                                 <div class="mb-3">
@@ -286,14 +323,22 @@
                                               rows="2" placeholder="Số nhà, tên đường..." required></textarea>
                                 </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-check me-1"></i> Lưu địa chỉ
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="cancelAddressBtn">
-                                    <i class="fas fa-times me-1"></i> Hủy
-                                </button>
-                            </div>
+                                <!-- Đặt làm mặc định -->
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="isDefault" name="isDefault" value="true">
+                                    <label class="form-check-label" for="isDefault">
+                                        Đặt làm địa chỉ mặc định
+                                    </label>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check me-1"></i> Lưu địa chỉ
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="cancelAddressBtn">
+                                        <i class="fas fa-times me-1"></i> Hủy
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -594,32 +639,136 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==================== ADDRESS MANAGEMENT (SIMPLIFIED) ====================
+    // ==================== ADDRESS MANAGEMENT (AJAX) ====================
     
-    // Hàm sửa địa chỉ - đơn giản, nhận dữ liệu trực tiếp từ tham số
-    window.editAddress = function(addressId, province, district, ward, addressDetail) {
+    // Wrapper function for onclick
+    window.editAddressBtn = function(btn) {
+        editAddress(
+            btn.dataset.id,
+            btn.dataset.name,
+            btn.dataset.phone,
+            btn.dataset.province,
+            btn.dataset.district,
+            btn.dataset.ward,
+            btn.dataset.detail,
+            btn.dataset.default === 'true'
+        );
+    };
+    
+    // Hàm sửa địa chỉ
+    window.editAddress = function(addressId, name, phone, province, district, ward, addressDetail, isDefault) {
         // Điền dữ liệu vào form
         document.getElementById('formTitle').textContent = 'Chỉnh sửa địa chỉ';
         document.getElementById('addressId').value = addressId;
+        document.getElementById('name').value = name;
+        document.getElementById('phone').value = phone;
         document.getElementById('province').value = province;
         document.getElementById('district').value = district;
         document.getElementById('ward').value = ward;
         document.getElementById('addressDetail').value = addressDetail;
-        
-        // Thay đổi action của form sang edit
-        document.getElementById('addressForm').action = '${pageContext.request.contextPath}/user/address/edit';
+        document.getElementById('isDefault').checked = isDefault;
         
         // Hiển thị form
         document.getElementById('addressListContainer').style.display = 'none';
         document.getElementById('addressFormContainer').style.display = 'block';
     };
+    
+    // Hàm xóa địa chỉ (AJAX)
+    window.deleteAddress = async function(addressId) {
+        if (!confirm('Bạn có chắc muốn xóa địa chỉ này?')) {
+            return;
+        }
+        
+        try {
+            // ✅ Get token from localStorage
+            const token = localStorage.getItem('authToken');
+            
+            const response = await fetch('${pageContext.request.contextPath}/api/user/addresses/' + addressId, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token // ✅ Send token
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Success - reload page
+                window.location.href = '${pageContext.request.contextPath}/user/profile?success=' + 
+                    encodeURIComponent(result.message) + '#address';
+            } else {
+                alert('Lỗi: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi xóa địa chỉ!');
+        }
+    };
 
+    // ==================== ADDRESS FORM SUBMIT (AJAX) ====================
+    
+    const addressForm = document.getElementById('addressForm');
+    if (addressForm) {
+        addressForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const addressId = document.getElementById('addressId').value;
+            const isEdit = addressId && addressId.trim() !== '';
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                province: document.getElementById('province').value,
+                district: document.getElementById('district').value,
+                ward: document.getElementById('ward').value,
+                addressDetail: document.getElementById('addressDetail').value,
+                isDefault: document.getElementById('isDefault').checked
+            };
+            
+            try {
+                let url = '${pageContext.request.contextPath}/api/user/addresses';
+                let method = 'POST';
+                
+                if (isEdit) {
+                    url += '/' + addressId;
+                    method = 'PUT';
+                }
+                
+                // ✅ Get token from localStorage
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token // ✅ Send token
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Success - reload page để hiển thị địa chỉ mới
+                    window.location.href = '${pageContext.request.contextPath}/user/profile?success=' + 
+                        encodeURIComponent(result.message) + '#address';
+                } else {
+                    alert('Lỗi: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi lưu địa chỉ!');
+            }
+        });
+    }
+    
     // Hiển thị form thêm địa chỉ
     document.getElementById('addAddressBtn').addEventListener('click', () => {
         // Reset form
         const form = document.getElementById('addressForm');
         form.reset();
-        form.action = '${pageContext.request.contextPath}/user/address/add';
         document.getElementById('addressId').value = '';
         document.getElementById('formTitle').textContent = 'Thêm địa chỉ mới';
         

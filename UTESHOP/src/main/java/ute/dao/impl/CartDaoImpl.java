@@ -1,6 +1,10 @@
 package ute.dao.impl;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.CartDao;
@@ -8,56 +12,214 @@ import ute.entities.Cart;
 import ute.entities.CartDetail;
 
 public class CartDaoImpl implements CartDao {
-    private EntityManager em;
-
-    public CartDaoImpl() {
-        this.em = JPAConfig.getEntityManager();
-    }
 
     @Override
-    public Cart findByUserId(Long userId) {
-        TypedQuery<Cart> q = em.createQuery("SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class);
-        q.setParameter("userId", userId);
-        return q.getResultStream().findFirst().orElse(null);
-    }
-
-    @Override
-    public Cart createCart(Cart cart) {
+    public Cart findCartByUserId(Long userId) {
+        EntityManager em = JPAConfig.getEntityManager();
         try {
-            em.getTransaction().begin();
-            em.persist(cart);
-            em.getTransaction().commit();
-            return cart;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
+            TypedQuery<Cart> query = em.createQuery(
+                "SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class);
+            query.setParameter("userId", userId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
         }
     }
 
     @Override
-    public CartDetail addOrUpdateCartDetail(CartDetail detail) {
+    public void createCart(Cart cart) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
         try {
-            em.getTransaction().begin();
-            // if exists (by cart and product) update quantity
-            TypedQuery<CartDetail> q = em.createQuery(
-                    "SELECT cd FROM CartDetail cd WHERE cd.cart.cartID = :cartId AND cd.product.productID = :productId",
-                    CartDetail.class);
-            q.setParameter("cartId", detail.getCart().getCartID());
-            q.setParameter("productId", detail.getProduct().getProductID());
-            CartDetail existing = q.getResultStream().findFirst().orElse(null);
-            if (existing != null) {
-                existing.setQuantity(existing.getQuantity() + detail.getQuantity());
-                existing.setUnitPrice(detail.getUnitPrice());
-                em.merge(existing);
-                em.getTransaction().commit();
-                return existing;
-            }
-            em.persist(detail);
-            em.getTransaction().commit();
-            return detail;
+            trans.begin();
+            em.persist(cart);
+            trans.commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (trans.isActive()) {
+                trans.rollback();
+            }
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void updateCart(Cart cart) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            em.merge(cart);
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void deleteCart(Long cartId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            Cart cart = em.find(Cart.class, cartId);
+            if (cart != null) {
+                em.remove(cart);
+            }
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public CartDetail findCartDetailById(Long cartDetailId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            return em.find(CartDetail.class, cartDetailId);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<CartDetail> findCartDetailsByCartId(Long cartId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<CartDetail> query = em.createQuery(
+                "SELECT cd FROM CartDetail cd " +
+                "JOIN FETCH cd.product p " +
+                "LEFT JOIN FETCH p.images " +
+                "LEFT JOIN FETCH p.productDiscounts " +
+                "WHERE cd.cart.cartID = :cartId", 
+                CartDetail.class);
+            query.setParameter("cartId", cartId);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public CartDetail findCartDetailByCartAndProduct(Long cartId, Long productId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<CartDetail> query = em.createQuery(
+                "SELECT cd FROM CartDetail cd WHERE cd.cart.cartID = :cartId " +
+                "AND cd.product.productID = :productId", 
+                CartDetail.class);
+            query.setParameter("cartId", cartId);
+            query.setParameter("productId", productId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void addCartDetail(CartDetail cartDetail) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            em.persist(cartDetail);
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void updateCartDetail(CartDetail cartDetail) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            em.merge(cartDetail);
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void deleteCartDetail(Long cartDetailId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            CartDetail cartDetail = em.find(CartDetail.class, cartDetailId);
+            if (cartDetail != null) {
+                em.remove(cartDetail);
+            }
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void clearCart(Long cartId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            em.createQuery("DELETE FROM CartDetail cd WHERE cd.cart.cartID = :cartId")
+              .setParameter("cartId", cartId)
+              .executeUpdate();
+            trans.commit();
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int getTotalItemsInCart(Long cartId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                "SELECT SUM(cd.quantity) FROM CartDetail cd WHERE cd.cart.cartID = :cartId", 
+                Long.class);
+            query.setParameter("cartId", cartId);
+            Long result = query.getSingleResult();
+            return result != null ? result.intValue() : 0;
+        } finally {
+            em.close();
         }
     }
 }
