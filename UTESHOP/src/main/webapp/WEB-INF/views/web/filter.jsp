@@ -37,6 +37,10 @@
 									<c:if test="${productFilter.keyword != null}">
 										<input type="hidden" name="keyword" value="${productFilter.keyword}">
 									</c:if>
+									<!-- preserve current sorting when applying filters -->
+									<c:if test="${productFilter.sortBy != null}">
+										<input type="hidden" name="sortBy" value="${productFilter.sortBy}">
+									</c:if>
 
 									<!-- Accordion Bootstrap cho bộ lọc -->
 									<div class="accordion" id="filterAccordion">
@@ -196,17 +200,10 @@
 										<c:forEach var="p" items="${listPro}">
 											<div class="col-6 col-md-4 col-lg-3">
 												<div class="card border-0 shadow-sm rounded-4 h-100">
-													<c:choose>
-														<c:when test="${not empty p.images}">
-															<c:url value="/image?fname=${p.images[0].dirImage}"
-																var="imgUrl" />
-														</c:when>
-														<c:otherwise>
-															<c:url value="/image?fname=logo.png" var="imgUrl" />
-														</c:otherwise>
-													</c:choose>
+													<c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
+													<c:url value="/image?fname=${productImage}" var="imgUrl" />
 
-													<a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
+													<a href="${pageContext.request.contextPath}/detailProduct?id=${p.productID}"
 														class="text-decoration-none">
 														<img src="${imgUrl}" class="card-img-top rounded-4"
 															alt="${p.productName}"
@@ -214,33 +211,10 @@
 														<div class="card-body p-3">
 															<h6 class="text-dark mb-2">${p.productName}</h6>
 
-															<c:choose>
-																<c:when test="${p.discountPrice != p.unitPrice}">
-																	<c:set var="discountPercent"
-																		value="${(p.unitPrice - p.discountPrice) * 100 / p.unitPrice}" />
-																	<div class="d-flex align-items-center py-1">
-																		<span class="fw-bold text-dark me-2">
-																			<fmt:formatNumber value="${p.discountPrice}"
-																				type="number" maxFractionDigits="0" />đ
-																		</span>
-																		<span class="badge bg-primary text-white">-
-																			<fmt:formatNumber value="${discountPercent}"
-																				maxFractionDigits="0" />%
-																		</span>
-																	</div>
-																	<small
-																		class="text-muted text-decoration-line-through">
-																		<fmt:formatNumber value="${p.unitPrice}"
-																			type="number" maxFractionDigits="0" />đ
-																	</small>
-																</c:when>
-																<c:otherwise>
-																	<span class="fw-bold text-dark">
-																		<fmt:formatNumber value="${p.unitPrice}"
-																			type="number" maxFractionDigits="0" />đ
-																	</span>
-																</c:otherwise>
-															</c:choose>
+															<span class="fw-bold text-dark">
+																<fmt:formatNumber value="${p.unitPrice}" type="number"
+																	maxFractionDigits="0" />đ
+															</span>
 														</div>
 													</a>
 												</div>
