@@ -32,7 +32,8 @@ public class Addresses {
 
     @Column(columnDefinition = "NVARCHAR(255)")
     private String addressDetail;
-
+    
+    @Column(nullable = true)
     private boolean isDefault;
 
 

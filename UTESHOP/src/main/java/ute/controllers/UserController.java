@@ -150,7 +150,6 @@ public class UserController extends HttpServlet {
 
 	// ======================= XÓA TÀI KHOẢN =======================
 	private void deleteAccount(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-
 		HttpSession session = req.getSession();
 		Users currentUser = (Users) session.getAttribute("currentUser");
 

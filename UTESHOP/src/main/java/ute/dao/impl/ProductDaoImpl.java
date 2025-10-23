@@ -148,8 +148,8 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findBestSeller(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
 		TypedQuery<Product> query = em.createQuery(
-				"SELECT p FROM OrderDetail od " +
-						"RIGHT JOIN od.product p " +
+				"SELECT p FROM Product p " +
+						"left join p.images i left JOIN p.orderDetails od " +
 						"GROUP BY p " +
 						"ORDER BY SUM(od.quantity) DESC",
 				Product.class);
@@ -158,12 +158,11 @@ public class ProductDaoImpl implements ProductDao {
 		List<Product> bestSellers;
 		try {
 			bestSellers = query.getResultList();
+			for (Product p : bestSellers) {
+				p.getImages().size(); // activate lazy loading of images
+			}
 		} finally {
 			em.close();
-		}
-
-		for (Product p : bestSellers) {
-			p.getImages().size(); // activate lazy loading of images
 		}
 
 		return bestSellers;
