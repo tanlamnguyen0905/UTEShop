@@ -3,7 +3,7 @@
 <!-- Top Navigation -->
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Logo / Brand -->
-    <a class="navbar-brand ps-3" href="${pageContext.request.contextPath}/admin/dashboard">
+    <a class="navbar-brand ps-3" href="${pageContext.request.contextPath}/admin/home/dashboard">
         Admin Panel
     </a>
 
