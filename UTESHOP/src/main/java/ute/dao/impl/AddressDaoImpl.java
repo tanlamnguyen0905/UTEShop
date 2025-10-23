@@ -34,7 +34,21 @@ public class AddressDaoImpl implements AddressDao {
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            em.merge(address);
+            
+            // Tìm entity hiện tại trong DB
+            Addresses existing = em.find(Addresses.class, address.getAddressID());
+            if (existing != null) {
+                // Update từng field một để đảm bảo không bị mất dữ liệu
+                existing.setName(address.getName());
+                existing.setPhone(address.getPhone());
+                existing.setProvince(address.getProvince());
+                existing.setDistrict(address.getDistrict());
+                existing.setWard(address.getWard());
+                existing.setAddressDetail(address.getAddressDetail());
+                existing.setIsDefault(address.getIsDefault());
+                // User không thay đổi nên không cần set
+            }
+            
             trans.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,6 +110,26 @@ public class AddressDaoImpl implements AddressDao {
             TypedQuery<Long> query = em.createQuery(jpql, Long.class);
             query.setParameter("userID", userID);
             return query.getSingleResult().intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void unsetDefaultForUser(Long userID) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            String jpql = "UPDATE Addresses a SET a.isDefault = false WHERE a.user.userID = :userID";
+            em.createQuery(jpql)
+              .setParameter("userID", userID)
+              .executeUpdate();
+            trans.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            trans.rollback();
+            throw e;
         } finally {
             em.close();
         }

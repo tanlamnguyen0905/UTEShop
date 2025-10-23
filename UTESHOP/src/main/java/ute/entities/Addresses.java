@@ -24,16 +24,25 @@ public class Addresses {
     private Long addressID;
 
     @Column(columnDefinition = "NVARCHAR(255)")
+    private String name; // Tên người nhận
+
+    @Column(columnDefinition = "NVARCHAR(20)")
+    private String phone; // Số điện thoại người nhận
+
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String province; // Tỉnh / Thành phố
+    
     @Column(columnDefinition = "NVARCHAR(255)")
     private String district; // Quận / Huyện
+    
     @Column(columnDefinition = "NVARCHAR(255)")
     private String ward; // Phường / Xã
 
     @Column(columnDefinition = "NVARCHAR(255)")
     private String addressDetail;
     
-    private boolean isDefault;
+    @Builder.Default
+    private Boolean isDefault = false;
 
     @ManyToOne
     @JoinColumn(name = "userID")

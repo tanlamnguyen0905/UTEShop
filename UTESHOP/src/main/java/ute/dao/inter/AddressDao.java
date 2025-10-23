@@ -10,5 +10,6 @@ public interface AddressDao {
     Addresses findById(Long addressID);
     List<Addresses> findByUserId(Long userID);
     int countByUserId(Long userID);
+    void unsetDefaultForUser(Long userID);
 }
 

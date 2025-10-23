@@ -7,6 +7,10 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gson.Gson;
 
 import ute.dao.inter.UserDao;
 import ute.dao.impl.UserDaoImpl;
@@ -22,6 +26,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class AuthServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final UserDao userDAO = new UserDaoImpl();
+	private final Gson gson = new Gson();
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,7 +45,7 @@ public class AuthServlet extends HttpServlet {
 			HttpSession session = req.getSession(false);
 			if (session != null)
 				session.invalidate();
-			resp.sendRedirect(req.getContextPath() + "/home");
+			resp.sendRedirect(req.getContextPath() + "/");
         } else if ("/auth/forgot-password".equals(path)) {
             req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
         } else if ("/auth/reset-password".equals(path)) {
@@ -238,17 +243,23 @@ public class AuthServlet extends HttpServlet {
 				return;
 			}
 
-			user.setLastLoginAt(LocalDateTime.now());
-			userDAO.update(user);
+		user.setLastLoginAt(LocalDateTime.now());
+		userDAO.update(user);
 
-			HttpSession session = req.getSession();
-			session.setAttribute("currentUser", user);
+		HttpSession session = req.getSession();
+		session.setAttribute("currentUser", user);
 
-			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-			session.setAttribute("token", token);
+		// Generate JWT token
+		String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
+		session.setAttribute("token", token);
 
-			out.print(String.format("{\"success\":true, \"username\":\"%s\", \"role\":\"%s\"}", user.getUsername(),
-					user.getRole()));
+		// Return token to client
+		Map<String, Object> response = new HashMap<>();
+		response.put("success", true);
+		response.put("username", user.getUsername());
+		response.put("role", user.getRole());
+		response.put("token", token); // ✅ Trả token về client
+		out.print(gson.toJson(response));
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("{\"success\":false, \"error\":\"Lỗi máy chủ: " + e.getMessage() + "\"}");
