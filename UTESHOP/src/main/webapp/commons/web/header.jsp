@@ -65,19 +65,6 @@
 								<div class="dropdown">
 									<a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
 										id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-										<!-- Avatar hoặc icon -->
-										<c:choose>
-											<c:when test="${not empty sessionScope.currentUser.avatar}">
-												<img src="${sessionScope.currentUser.avatar}" alt="Avatar" 
-													class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
-											</c:when>
-											<c:otherwise>
-												<div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
-													style="width: 35px; height: 35px; font-weight: bold;">
-													${sessionScope.currentUser.fullname.substring(0,1).toUpperCase()}
-												</div>
-											</c:otherwise>
-										</c:choose>
 										<!-- Tên người dùng -->
 										<span class="fw-semibold text-dark">${sessionScope.currentUser.fullname}</span>
 									</a>
@@ -270,15 +257,6 @@
 		.dropdown-item i {
 			width: 20px;
 			text-align: center;
-		}
-
-		/* Avatar circle hover effect */
-		.rounded-circle {
-			transition: transform 0.2s ease;
-		}
-
-		.dropdown:hover .rounded-circle {
-			transform: scale(1.05);
 		}
 
 		/* Badge styling */
