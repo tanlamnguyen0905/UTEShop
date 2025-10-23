@@ -107,7 +107,7 @@
                 <div class="review-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="user-info">
-                            <h5 class="mb-0">${review.user.fullName}</h5>
+                            <h5 class="mb-0">${review.user.fullname}</h5>
                             <div class="rating-stars">
                                 <c:forEach begin="1" end="5" var="i">
                                     <i class="fas fa-star ${i <= review.rating ? 'text-warning' : 'text-secondary'}"></i>
@@ -118,7 +118,7 @@
                             <fmt:formatDate value="${review.createdAt}" pattern="dd/MM/yyyy"/>
                         </small>
                     </div>
-                    <p class="mt-2 mb-0">${review.comment}</p>
+                    <p class="mt-2 mb-0">${review.content}</p>
                 </div>
             </c:forEach>
         </div>
