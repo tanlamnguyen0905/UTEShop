@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import ute.entities.Banner;
 import ute.entities.Product;
+import jakarta.persistence.Persistence;
 import ute.configs.JPAConfig;
 import ute.dao.inter.BannerDao;
 

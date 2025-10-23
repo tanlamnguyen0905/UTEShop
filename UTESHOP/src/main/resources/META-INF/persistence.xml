@@ -14,6 +14,7 @@
         <class>ute.entities.Brand</class>
         <class>ute.entities.Cart</class>
         <class>ute.entities.CartDetail</class>
+        <class>ute.entities.CartProduct</class>
         <class>ute.entities.Categories</class>
         <class>ute.entities.Favorite</class>
         <class>ute.entities.Image</class>

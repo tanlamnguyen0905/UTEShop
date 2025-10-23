@@ -32,7 +32,7 @@ public class Orders {
     private Double amount;
     private LocalDateTime orderDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String phoneNumber;
 
     @ManyToOne

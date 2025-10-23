@@ -124,6 +124,27 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public void delete(Long userId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Users user = em.find(Users.class, userId);
+            if (user != null) {
+                em.remove(user);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi xóa tài khoản: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public boolean activateUserByEmail(String email) {
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -154,6 +175,20 @@ public class UserDaoImpl implements UserDao {
                 tx.rollback();
             e.printStackTrace();
             return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Users findByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Users> query = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+            query.setParameter("email", email);
+            List<Users> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
         } finally {
             em.close();
         }

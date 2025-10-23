@@ -28,24 +28,18 @@ public interface ProductService {
 
     // ======== Các hàm mở rộng thường dùng ========
 
-    // Tìm theo tên (gần đúng)
     List<Product> findByName(String name);
 
-    // Tìm theo danh mục (category)
     List<Product> findByCategoryId(int categoryId);
 
     List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
 
-    // Lấy các sản phẩm bán chạy nhất
     List<Product> findBestSeller(int limit);
 
-    // Lấy các sản phẩm có giá trong khoảng
     List<Product> findByPriceRange(double minPrice, double maxPrice);
 
-    // Đếm tổng số sản phẩm
     long count();
 
-    // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
 
     List<Product> findNewProduct(int limit);
@@ -60,7 +54,6 @@ public interface ProductService {
 
     int countProductsByFilter(ProductFilter filter);
 
-    // Convenience: return products + pagination metadata
     ProductPage getProductsPageByFilter(ProductFilter filter);
 
     List<ProductDTO> MapToProductDTO(List<Product> products);

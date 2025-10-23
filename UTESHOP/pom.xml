@@ -25,7 +25,11 @@
 			<artifactId>jakarta.transaction-api</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
 		<!-- Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -105,7 +109,7 @@
 		<dependency>
 			<groupId>org.sitemesh</groupId>
 			<artifactId>sitemesh</artifactId>
-			<version>3.2.2</version>
+			<version>3.2.1</version>
 		</dependency>
 
 		<!--
@@ -137,6 +141,7 @@
 			<artifactId>jakarta.mail</artifactId>
 			<version>2.0.2</version>
 		</dependency>
+		
 
 	</dependencies>
 

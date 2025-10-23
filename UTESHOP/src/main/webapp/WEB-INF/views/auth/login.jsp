@@ -95,8 +95,10 @@ h3 {
 						</button>
 
 						<div class="text-center mt-3">
-							<a href="#" class="text-muted">Quên mật khẩu?</a><br> Chưa
-							có tài khoản? <a href="#" data-bs-toggle="modal"
+							<a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">
+    Quên mật khẩu?
+</a><br> Chưa
+							có tài khoản? <a href="#forgot-password" data-bs-toggle="modal"
 								data-bs-target="#registerModal" data-bs-dismiss="modal">
 								Đăng ký </a>
 						</div>
