@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "banners") // 🔥 thêm dòng này
+@EqualsAndHashCode(exclude = "banners")
 @Builder
 public class Product {
     @Id
@@ -43,15 +43,15 @@ public class Product {
     private Double unitPrice;
     private Integer stockQuantity;
     @Builder.Default
-    private Long soldCount=0L;
+    private Long soldCount = 0L;
     @Builder.Default
-    private Long reviewCount=0L;
+    private Long reviewCount = 0L;
     private LocalDateTime importDate;
-    
+
     @PrePersist
     protected void onCreate() {
-		this.importDate = LocalDateTime.now();
-	}
+        this.importDate = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "categoryID")
@@ -61,19 +61,19 @@ public class Product {
     @JoinColumn(name = "brandID")
     private Brand brand;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
     private List<Review> reviews;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
-    
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "product")
     private List<Favorite> favorites;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductDiscount> productDiscounts;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "productDiscountID", nullable = true)
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
     private List<Image> images;
 
     @ManyToMany
@@ -84,47 +84,22 @@ public class Product {
     private Set<Banner> banners = new HashSet<>();
 
     @Transient
-    private Double discountPrice;
-
-    public Double getDiscountPrice() {
-        if (productDiscounts == null || productDiscounts.isEmpty()) {
-            return unitPrice;
-        }
-
-        LocalDateTime today = LocalDateTime.now();
-        double maxDiscount = 0;
-
-        // Lọc ra các giảm giá đang còn hiệu lực
-        for (ProductDiscount pd : productDiscounts) {
-            if (pd.getDiscountStart() != null && pd.getDiscountEnd() != null) {
-                if (!today.isBefore(pd.getDiscountStart()) && !today.isAfter(pd.getDiscountEnd())) {
-                    maxDiscount = Math.max(maxDiscount, pd.getDiscountPercent());
-                }
-            }
-        }
-
-        if (maxDiscount > 0) {
-            return unitPrice * (1 - maxDiscount / 100.0);
-        } else {
-            return unitPrice;
-        }
-    }
-
-    @Transient
     public float rating;
 
     public float getRating() {
+        if (reviews == null || reviews.isEmpty())
+            return 0f;
         return (float) reviews.stream()
                 .mapToDouble(Review::getRating)
                 .average()
                 .orElse(0.0);
     }
-    
-    
+
     @Transient
     public int favoriteCount;
+
     public int getFavoriteCount() {
-		return favorites.size();
-	}
+        return favorites.size();
+    }
 
 }

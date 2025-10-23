@@ -6,9 +6,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,9 +18,17 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartID;
 
-    private Double totalPrice;
+    @Transient
+    private Double totalPrice = 0D;
 
-    @ManyToOne
+    public Double getTotalPrice() {
+        for (CartDetail cartDetail : cartDetails) {
+            totalPrice += cartDetail.getTotalPrice();
+        }
+        return totalPrice;
+    }
+
+    @OneToOne
     @JoinColumn(name = "userID")
     private Users user;
 
