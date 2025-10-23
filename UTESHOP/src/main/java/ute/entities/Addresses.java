@@ -23,8 +23,19 @@ public class Addresses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressID;
 
-    @Column(name = "address", columnDefinition = "NVARCHAR(255)")
-    private String address;
+    @Column(columnDefinition = "NVARCHAR(255)")
+    private String province; // Tỉnh / Thành phố
+    @Column(columnDefinition = "NVARCHAR(255)")
+    private String district; // Quận / Huyện
+    @Column(columnDefinition = "NVARCHAR(255)")
+    private String ward; // Phường / Xã
+
+    @Column(columnDefinition = "NVARCHAR(255)")
+    private String addressDetail;
+    
+    @Column(nullable = true)
+    private boolean isDefault;
+
 
     @ManyToOne
     @JoinColumn(name = "userID")

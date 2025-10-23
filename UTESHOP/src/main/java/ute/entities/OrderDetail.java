@@ -1,23 +1,18 @@
 package ute.entities;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+// unused imports removed
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,7 +25,14 @@ public class OrderDetail {
 
     private Integer quantity;
     private Double unitPrice;
-    
+
+    @Transient
+    private Double totalPrice;
+
+    public Double getTotalPrice() {
+        return quantity * unitPrice;
+    }
+
     private int status;
 
     @ManyToOne
@@ -41,6 +43,4 @@ public class OrderDetail {
     @JoinColumn(name = "productID")
     private Product product;
 
-    @OneToOne(mappedBy = "orderDetail", cascade = CascadeType.ALL)
-    private Review review;
 }

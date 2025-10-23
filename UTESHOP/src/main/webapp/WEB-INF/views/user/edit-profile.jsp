@@ -22,7 +22,7 @@
 			<!-- Avatar -->
 			<div class="text-center mb-4">
 				<img
-					src="${pageContext.request.contextPath}/uploads/avatar/${sessionScope.currentUser.avatar != null ? sessionScope.currentUser.avatar : 'default.png'}"
+					src="${pageContext.request.contextPath}${sessionScope.currentUser.avatar != null && sessionScope.currentUser.avatar != 'default-avatar.png' ? '/uploads/avatar/'.concat(sessionScope.currentUser.avatar) : '/assets/images/avatar/default-avatar.png'}"
 					alt="Avatar" class="rounded-circle shadow-sm mb-3"
 					style="width: 150px; height: 150px; object-fit: cover; background-color: #f8f9fa;">
 				<div>

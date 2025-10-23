@@ -1,10 +1,8 @@
 package ute.dao.impl;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import ute.entities.Users;
 import ute.configs.JPAConfig;
@@ -15,120 +13,150 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao {
 
-	@Override
-	public Users findByUsername(String username) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
+    @Override
+    public Users findByUsername(String username) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
             TypedQuery<Users> query = em.createQuery(
                     "SELECT u FROM Users u WHERE u.username = :username", Users.class);
             query.setParameter("username", username);
             List<Users> result = query.getResultList();
             return result.isEmpty() ? null : result.get(0);
-		} finally {
-			em.close();
-		}
-	}
+        } finally {
+            em.close();
+        }
+    }
 
-	@Override
-	public boolean existsByUsername(String username) {
-		EntityManager em = JPAConfig.getEntityManager();
+    @Override
+    public boolean existsByUsername(String username) {
+        EntityManager em = JPAConfig.getEntityManager();
         try {
             Long count = em.createQuery(
-                "SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
-                .setParameter("username", username)
-                .getSingleResult();
+                    "SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
             return count > 0;
         } finally {
             em.close();
         }
-	}
+    }
 
-	@Override
-	public boolean existsByEmail(String email) {
-		EntityManager em = JPAConfig.getEntityManager();
+    @Override
+    public boolean existsByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
         try {
             Long count = em.createQuery(
-                "SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class)
-                .setParameter("email", email)
-                .getSingleResult();
+                    "SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
             return count > 0;
         } finally {
             em.close();
         }
-	}
+    }
 
-	@Override
-	public void insert(Users user) {
-		EntityManager em = JPAConfig.getEntityManager();
+    @Override
+    public void insert(Users user) {
+        EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
             em.persist(user);
             tx.commit();
         } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
+            if (tx.isActive())
+                tx.rollback();
             e.printStackTrace();
         } finally {
             em.close();
         }
-	}
+    }
 
-	@Override
-	public void update(Users user) {
-		EntityManager em = JPAConfig.getEntityManager();
+    @Override
+    public void update(Users user) {
+        EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction tx = em.getTransaction();
-		try {
-			tx.begin();
+        try {
+            tx.begin();
 
-			// Tìm user hiện có trong DB
-			Users existingUser = em.find(Users.class, user.getUserID());
+            // Tìm user hiện có trong DB
+            Users existingUser = em.find(Users.class, user.getUserID());
             if (existingUser == null)
                 throw new IllegalArgumentException("Không tìm thấy người dùng với ID: " + user.getUserID());
 
-			// Cập nhật các thông tin cho phép thay đổi
-			// (giữ nguyên các quan hệ và dữ liệu hệ thống như createAt, role, status nếu
-			// bạn muốn)
+            // Cập nhật các thông tin cho phép thay đổi
+            // (giữ nguyên các quan hệ và dữ liệu hệ thống như createAt, role, status nếu
+            // bạn muốn)
 
-			if (user.getFullname() != null) existingUser.setFullname(user.getFullname());
-			if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
-			if (user.getPhone() != null) existingUser.setPhone(user.getPhone());
-			if (user.getAvatar() != null) existingUser.setAvatar(user.getAvatar());
+            if (user.getFullname() != null)
+                existingUser.setFullname(user.getFullname());
+            if (user.getEmail() != null)
+                existingUser.setEmail(user.getEmail());
+            if (user.getPhone() != null)
+                existingUser.setPhone(user.getPhone());
+            if (user.getAvatar() != null)
+                existingUser.setAvatar(user.getAvatar());
 
-			// Nếu có cập nhật mật khẩu (đã mã hóa sẵn trước khi truyền vào)
-			if (user.getPassword() != null && !user.getPassword().isEmpty()) existingUser.setPassword(user.getPassword());
+            // Nếu có cập nhật mật khẩu (đã mã hóa sẵn trước khi truyền vào)
+            if (user.getPassword() != null && !user.getPassword().isEmpty())
+                existingUser.setPassword(user.getPassword());
 
-			// Nếu có cập nhật trạng thái hoặc quyền
-			if (user.getStatus() != null) existingUser.setStatus(user.getStatus());
-			if (user.getRole() != null) existingUser.setRole(user.getRole());
+            // Nếu có cập nhật trạng thái hoặc quyền
+            if (user.getStatus() != null)
+                existingUser.setStatus(user.getStatus());
+            if (user.getRole() != null)
+                existingUser.setRole(user.getRole());
 
-			// Cập nhật thời gian đăng nhập gần nhất (nếu có)
-			if (user.getLastLoginAt() != null) existingUser.setLastLoginAt(user.getLastLoginAt());
+            // Cập nhật thời gian đăng nhập gần nhất (nếu có)
+            if (user.getLastLoginAt() != null)
+                existingUser.setLastLoginAt(user.getLastLoginAt());
 
-			em.merge(existingUser);
-			tx.commit();
+            em.merge(existingUser);
+            tx.commit();
 
-		} catch (Exception e) {
-			if (tx.isActive())
-				tx.rollback();
-			e.printStackTrace();
-		} finally {
-			em.close();
-		}
-	}
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
 
-	@Override
-	public boolean activateUserByEmail(String email) {
-		EntityManager em = JPAConfig.getEntityManager();
+    @Override
+    public void delete(Long userId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Users user = em.find(Users.class, userId);
+            if (user != null) {
+                em.remove(user);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi xóa tài khoản: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean activateUserByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            
-			// Tìm user theo email
+
+            // Tìm user theo email
             Users user = em.createQuery(
-                "SELECT u FROM Users u WHERE u.email = :email", Users.class)
-                .setParameter("email", email)
-                .getSingleResult();
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
 
             if (user != null) {
                 user.setStatus("ACTIVE");
@@ -139,15 +167,31 @@ public class UserDaoImpl implements UserDao {
             tx.commit();
             return true;
         } catch (NoResultException e) {
-            if (tx.isActive()) tx.rollback();
+            if (tx.isActive())
+                tx.rollback();
             return false;
         } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
+            if (tx.isActive())
+                tx.rollback();
             e.printStackTrace();
             return false;
         } finally {
             em.close();
         }
-	}
+    }
+
+    @Override
+    public Users findByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Users> query = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+            query.setParameter("email", email);
+            List<Users> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
+        } finally {
+            em.close();
+        }
+    }
 
 }

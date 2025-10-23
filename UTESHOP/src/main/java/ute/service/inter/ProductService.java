@@ -1,26 +1,68 @@
 package ute.service.inter;
 
-import ute.entities.Product;
-
 import java.util.List;
 
+import ute.dto.ProductDTO;
+import ute.entities.Product;
+import ute.utils.ProductFilter;
+import ute.utils.ProductPage;
+
 public interface ProductService {
-    List<Product> findAll();
-    Product findById(Long id);
-    void save(Product product);
-    void delete(Long productID);
+
+    // ======== CRUD cơ bản ========
+
+    // Thêm sản phẩm mới
+    void insert(Product product);
+
+    // Cập nhật sản phẩm
     void update(Product product);
 
-    // Các phương thức mở rộng
+    // Xóa sản phẩm theo id
+    void delete(Long id);
+
+    // Tìm sản phẩm theo id
+    Product findById(Long id);
+
+    // Lấy danh sách tất cả sản phẩm
+    List<Product> findAll();
+
+    // ======== Các hàm mở rộng thường dùng ========
+
+    // Tìm theo tên (gần đúng)
     List<Product> findByName(String name);
-    List<Product> findByCategoryId(Long categoryId);
-    List<Product> findLatest(int limit);
+
+    // Tìm theo danh mục (category)
+    List<Product> findByCategoryId(int categoryId);
+
+    List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
+
+    // Lấy các sản phẩm bán chạy nhất
     List<Product> findBestSeller(int limit);
+
+    // Lấy các sản phẩm có giá trong khoảng
     List<Product> findByPriceRange(double minPrice, double maxPrice);
+
+    // Đếm tổng số sản phẩm
     long count();
+
+    // Phân trang (page, pageSize)
     List<Product> findPage(int page, int pageSize);
 
-    // Phân trang với tìm kiếm theo tên
-    List<Product> findByNamePaginated(String name, int firstResult, int maxResults);
-    long countByName(String name);
+    List<Product> findNewProduct(int limit);
+
+    List<Product> findTopReview(int limit);
+
+    List<Product> findTopFavorite(int limit);
+
+    List<Product> findProductsByFilter(ProductFilter filter, int page, int pageSize);
+
+    List<Product> findTopFavoriteinPage(int page, int pageSize);
+
+    int countProductsByFilter(ProductFilter filter);
+
+    // Convenience: return products + pagination metadata
+    ProductPage getProductsPageByFilter(ProductFilter filter);
+
+    List<ProductDTO> MapToProductDTO(List<Product> products);
+
 }

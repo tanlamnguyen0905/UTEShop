@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,12 +26,21 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryID;
 
-    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)")
-    private String categoryName; 
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)", nullable = false)
+    private String categoryName;
+
+    @Column(name = "description", columnDefinition = "nvarchar(max)")
     private String description;
+
+    @Column(name = "image", columnDefinition = "nvarchar(max)")
     private String image;
+
+    // Thêm trường parent reference để fix mappedBy
+    @ManyToOne
+    @JoinColumn(name = "parentCategoryID")
+    private Categories category;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products;
+
 }

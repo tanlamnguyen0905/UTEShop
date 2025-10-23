@@ -17,10 +17,8 @@ public class Users {
 
     private String username;
     private String password;
-
     @Column(name = "fullname", columnDefinition = "NVARCHAR(100)")
     private String fullname;
-
     private String email;
     private String phone;
     private String avatar;
@@ -35,11 +33,8 @@ public class Users {
     private List<Addresses> addresses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Cart> carts;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Orders> orders;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserCoupon> userCoupons;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<UserCoupon> userCoupons;
 }
