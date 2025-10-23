@@ -33,6 +33,9 @@ public class Addresses {
     @Column(columnDefinition = "NVARCHAR(255)")
     private String addressDetail;
 
+    private boolean isDefault;
+
+
     @ManyToOne
     @JoinColumn(name = "userID")
     private Users user;
