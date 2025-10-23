@@ -198,8 +198,14 @@ public class AuthServlet extends HttpServlet {
 			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
 			session.setAttribute("token", token);
 
-			out.print(String.format("{\"success\":true, \"username\":\"%s\", \"role\":\"%s\"}", user.getUsername(),
-					user.getRole()));
+			String redirect = req.getParameter("redirect");
+			String response = String.format("{\"success\":true, \"username\":\"%s\", \"role\":\"%s\"",
+					user.getUsername(), user.getRole());
+			if (redirect != null && !redirect.isEmpty()) {
+				response += String.format(", \"redirect\":\"%s\"", redirect);
+			}
+			response += "}";
+			out.print(response);
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("{\"success\":false, \"error\":\"Lỗi máy chủ: " + e.getMessage() + "\"}");

@@ -55,7 +55,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
     @Override
     public List<Review> findByProductId(Long productId) {
-        String jpql = "SELECT r FROM Review r WHERE r.product.productID = :productId ORDER BY r.createAt DESC";
+        String jpql = "SELECT r FROM Review r WHERE r.product.productID = :productId ORDER BY r.createdAt DESC";
         TypedQuery<Review> query = em.createQuery(jpql, Review.class);
         query.setParameter("productId", productId);
         return query.getResultList();
