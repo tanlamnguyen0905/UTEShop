@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +21,15 @@ public class CartDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartDetailID;
-
     private Integer quantity;
+    private Double unitPrice;
+
+    @Transient
+    private Double totalPrice;
+
+    public Double getTotalPrice() {
+        return quantity * unitPrice;
+    }
 
     @ManyToOne
     @JoinColumn(name = "cartID")
