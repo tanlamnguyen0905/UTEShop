@@ -67,6 +67,7 @@ public class Product {
     private List<OrderDetail> orderDetails;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
+
     private List<Favorite> favorites;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")

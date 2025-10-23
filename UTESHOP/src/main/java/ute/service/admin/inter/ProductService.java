@@ -1,4 +1,4 @@
-package ute.service.inter;
+package ute.service.admin.inter;
 
 import java.util.List;
 
@@ -58,4 +58,7 @@ public interface ProductService {
 
     List<ProductDTO> MapToProductDTO(List<Product> products);
 
+    // Pagination by name
+    List<Product> findByNamePaginated(String name, int firstResult, int maxResults);
+    long countByName(String name);
 }
