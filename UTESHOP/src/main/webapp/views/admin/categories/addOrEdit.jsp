@@ -42,7 +42,9 @@
                     <input type="file" name="image" class="form-control" accept="image/*">
                     <c:if test="${not empty category.image}">
                         <div class="mt-2">
-                            <img src="${category.image}" alt="Current Image" width="100" class="img-thumbnail">
+                            <img src="${pageContext.request.contextPath}/assets/${category.image}"
+                                 alt="${category.categoryName}"
+                                 width="50" height="50" class="img-thumbnail">
                             <small>Hình ảnh hiện tại</small>
                         </div>
                     </c:if>

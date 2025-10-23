@@ -3,19 +3,20 @@ package ute.controllers.admin.category;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-
-import ute.entities.Categories;
-import ute.service.inter.CategoriesService;
-import ute.service.impl.CategoriesServiceImpl;
-
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import ute.entities.Categories;
+import ute.service.inter.CategoriesService;
+import ute.service.impl.CategoriesServiceImpl;
 
 @WebServlet(urlPatterns = { "/admin/categories/searchpaginated", "/admin/categories/saveOrUpdate",
         "/admin/categories/delete", "/admin/categories/view" })
+@MultipartConfig
 public class CategoriesController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -48,7 +49,6 @@ public class CategoriesController extends HttpServlet {
                 searchKeyword = null;
             }
 
-            // Tính offset (vị trí bắt đầu)
             int firstResult = (page - 1) * size;
 
             List<Categories> categoryList;
@@ -73,7 +73,6 @@ public class CategoriesController extends HttpServlet {
         } else if (uri.contains("/admin/categories/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
-                // dang o che do edit -> nguoc lai la add
                 Categories category = categoriesService.findById(Long.parseLong(idStr));
                 req.setAttribute("category", category);
             }
@@ -92,45 +91,61 @@ public class CategoriesController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         String uri = req.getRequestURI();
 
         if (uri.contains("/admin/categories/saveOrUpdate")) {
             Categories category = new Categories();
 
+            // Get text parameters from the multipart form
             String idStr = req.getParameter("id");
             String categoryName = req.getParameter("categoryName");
             String description = req.getParameter("description");
-            String image = req.getParameter("image"); // Note: For file upload, need multipart handling
 
-            // Nếu có id -> update
             Long id = null;
             if (idStr != null && !idStr.isEmpty()) {
                 id = Long.parseLong(idStr);
                 category = categoriesService.findById(id);
             }
 
-            // Gán giá trị tạm thời để giữ lại form nếu lỗi
-            category.setCategoryName(categoryName);
-            category.setDescription(description);
-            category.setImage(image); // For now, assume text; for file, need upload logic
-
-            // Kiểm tra tên trùng
-            Categories existing = categoriesService.findByNameExact(categoryName);
-            if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
-                req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
-            }
-
-            // forward lại form nếu lỗi
-            if (req.getAttribute("error") != null) {
+            // Validate required fields
+            if (categoryName == null || categoryName.trim().isEmpty()) {
+                req.setAttribute("error", "Tên danh mục không được để trống!");
                 req.setAttribute("category", category);
                 req.getRequestDispatcher("/views/admin/categories/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
-            //Lưu danh mục vào db nếu không lỗi
+            category.setCategoryName(categoryName.trim());
+            category.setDescription(description != null ? description.trim() : null);
+
+            // Handle file upload
+            Part filePart = req.getPart("image"); // Get the file part
+            String image = null;
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = filePart.getSubmittedFileName();
+                // Save the file to a directory (e.g., /assets/uploads/)
+                String uploadPath = getServletContext().getRealPath("/assets/uploads");
+                String filePath = uploadPath + "/" + fileName;
+                filePart.write(filePath);
+                image = "uploads/" + fileName; // Store relative path in the database
+            } else if (id != null) {
+                // If no new image is uploaded, keep the existing image
+                image = category.getImage();
+            }
+
+            category.setImage(image);
+
+            // Check for duplicate category name
+            Categories existing = categoriesService.findByNameExact(categoryName);
+            if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
+                req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
+                req.setAttribute("category", category);
+                req.getRequestDispatcher("/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                return;
+            }
+
             String message;
-            if (idStr != null && !idStr.isEmpty()) {
+            if (id != null) {
                 categoriesService.update(category);
                 message = "Category is Edited!";
             } else {

@@ -74,7 +74,10 @@
                                 <td>${category.description}</td>
                                 <td>
                                     <c:if test="${not empty category.image}">
-                                        <img src="${category.image}" alt="Image" width="50" height="50" class="img-thumbnail">
+                                        <img src="${pageContext.request.contextPath}/assets/${category.image}"
+                                             alt="${category.categoryName}"
+                                             width="50" height="50" class="img-thumbnail">
+
                                     </c:if>
                                 </td>
                                 <td>${category.products != null ? category.products.size() : 0}</td>

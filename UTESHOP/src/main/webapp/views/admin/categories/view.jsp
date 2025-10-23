@@ -20,17 +20,33 @@
             <p><strong>ID:</strong> ${category.categoryID}</p>
             <p><strong>Tên danh mục:</strong> ${category.categoryName}</p>
             <p><strong>Mô tả:</strong> ${category.description}</p>
+
             <c:if test="${not empty category.image}">
-                <p><strong>Hình ảnh:</strong><br><img src="${category.image}" alt="Image" width="200" class="img-thumbnail"></p>
+                <p>
+                    <strong>Hình ảnh:</strong><br>
+                    <img src="${pageContext.request.contextPath}/assets/${category.image}"
+                         alt="${category.categoryName}"
+                         width="200"
+                         class="img-thumbnail">
+                </p>
             </c:if>
-            <p><strong>Số sản phẩm:</strong> ${category.products != null ? category.products.size() : 0}</p>
+
+            <p><strong>Số sản phẩm:</strong>
+                ${category.products != null ? category.products.size() : 0}
+            </p>
         </div>
     </div>
 
     <div class="mb-3">
-        <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated" class="btn btn-primary">Quay lại danh sách</a>
-        <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate?id=${category.categoryID}" class="btn btn-warning">Sửa</a>
-        <a href="${pageContext.request.contextPath}/admin/categories/delete?id=${category.categoryID}" class="btn btn-danger" onclick="return confirm('Xóa danh mục này?')">Xóa</a>
+        <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated"
+           class="btn btn-primary">Quay lại danh sách</a>
+
+        <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate?id=${category.categoryID}"
+           class="btn btn-warning">Sửa</a>
+
+        <a href="${pageContext.request.contextPath}/admin/categories/delete?id=${category.categoryID}"
+           class="btn btn-danger"
+           onclick="return confirm('Xóa danh mục này?')">Xóa</a>
     </div>
 </div>
 </body>

@@ -35,7 +35,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productID;
 
-    @Column(name = "productName", columnDefinition = "NVARCHAR(255)")
+    @Column(name = "productName", columnDefinition = "nvarchar(255)")
     private String productName;
     @Column(columnDefinition = "nvarchar(255)")
     private String describe;
@@ -67,6 +67,7 @@ public class Product {
     private List<OrderDetail> orderDetails;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
+
     private List<Favorite> favorites;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
