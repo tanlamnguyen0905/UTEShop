@@ -26,22 +26,22 @@
     </div>
 
     <!-- Info -->
-    <h3 class="fw-bold mb-1">${sessionScope.currentUser.fullname != null ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}</h3>
-    <p class="mb-2">${sessionScope.currentUser.email}</p>
+    <h3 class="fw-bold mb-1" style="color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
+        ${sessionScope.currentUser.fullname != null ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}
+    </h3>
+    <p class="mb-2" style="color: #fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.2);">
+        ${sessionScope.currentUser.email}
+    </p>
 
     <!-- Stats -->
     <div class="d-flex justify-content-center gap-5 mt-4">
-        <div>
-            <h5 class="fw-bold mb-0">0</h5>
-            <span>Đơn hàng</span>
+        <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
+            <h4 class="fw-bold mb-1">0</h4>
+            <span class="small">Đơn hàng</span>
         </div>
-        <div>
-            <h5 class="fw-bold mb-0">0 ₫</h5>
-            <span>Đã mua</span>
-        </div>
-        <div>
-            <h5 class="fw-bold mb-0">Chưa cập nhật</h5>
-            <span>Thành viên từ</span>
+        <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
+            <h4 class="fw-bold mb-1">0 ₫</h4>
+            <span class="small">Tổng chi tiêu</span>
         </div>
     </div>
 </div>

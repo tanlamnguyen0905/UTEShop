@@ -7,6 +7,8 @@ public interface UserDao {
 	Users findByUsername(String username);
 
 	Users findByEmail(String email);
+	
+	Users findById(Long userId);
 
 	boolean existsByUsername(String username);
 

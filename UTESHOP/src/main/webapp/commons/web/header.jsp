@@ -166,6 +166,7 @@
 							</c:otherwise>
 						</c:choose>
 
+<<<<<<< HEAD
 						<!-- Cart -->
 						<div class="position-relative">
 							<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle"> <i
@@ -176,6 +177,30 @@
 								<c:out value="${sessionScope.cartCount != null ? sessionScope.cartCount : 0}"/>
 							</span>
 						</div>
+=======
+					<!-- Cart -->
+					<div class="position-relative">
+						<c:choose>
+							<c:when test="${empty sessionScope.currentUser}">
+								<!-- Chưa đăng nhập: Click để hiển thị modal -->
+								<a href="#" class="btn btn-light rounded-circle" title="Giỏ hàng" 
+								   onclick="event.preventDefault(); showLoginModal();">
+									<i class="bi bi-bag-fill fs-4 text-dark"></i>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<!-- Đã đăng nhập: Link đến trang giỏ hàng -->
+								<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle" title="Giỏ hàng">
+									<i class="bi bi-bag-fill fs-4 text-dark"></i>
+								</a>
+							</c:otherwise>
+						</c:choose>
+						<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" 
+							  id="cart-count">
+							0
+						</span>
+					</div>
+>>>>>>> d2ca387 (thêm trang giỏ hàng, chỉnh sửa giao diện)
 					</div>
 				</div>
 			</div>
@@ -267,6 +292,9 @@
 		}
 	</style>
 
+	<!-- ====== Cart JS ====== -->
+	<script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
+
 	<!-- ====== Hiệu ứng mờ khi cuộn ====== -->
 	<script>
 		window.addEventListener('scroll', function () {
@@ -279,4 +307,29 @@
 				header.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
 			}
 		});
+		
+		// Tự động hiển thị modal đăng nhập nếu có parameter showLogin
+		document.addEventListener('DOMContentLoaded', function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.get('showLogin') === 'true') {
+				const loginModal = document.getElementById('loginModal');
+				if (loginModal) {
+					const modal = new bootstrap.Modal(loginModal);
+					modal.show();
+					
+					// Xóa parameter khỏi URL sau khi hiển thị modal
+					const newUrl = window.location.pathname;
+					window.history.replaceState({}, document.title, newUrl);
+				}
+			}
+		});
+		
+		// Global function để hiển thị modal đăng nhập (fallback nếu cart.js chưa load)
+		function showLoginModal() {
+			const loginModal = document.getElementById('loginModal');
+			if (loginModal) {
+				const modal = new bootstrap.Modal(loginModal);
+				modal.show();
+			}
+		}
 	</script>
