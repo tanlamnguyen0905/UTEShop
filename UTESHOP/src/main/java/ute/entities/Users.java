@@ -33,11 +33,8 @@ public class Users {
     private List<Addresses> addresses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Cart> carts;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Orders> orders;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserCoupon> userCoupons;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<UserCoupon> userCoupons;
 }

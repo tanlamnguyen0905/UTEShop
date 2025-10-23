@@ -21,10 +21,6 @@ import ute.entities.Users;
 import ute.service.impl.AddressServiceImpl;
 import ute.service.inter.AddressService;
 
-/**
- * REST API Controller cho Address với /api/ prefix
- * Sử dụng DTO thay vì Entity để bảo mật
- */
 @WebServlet(urlPatterns = {"/api/user/addresses", "/api/user/addresses/*"})
 public class AddressApiController extends HttpServlet {
     private static final long serialVersionUID = 1L;

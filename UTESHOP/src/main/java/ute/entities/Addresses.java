@@ -40,7 +40,7 @@ public class Addresses {
 
     @Column(columnDefinition = "NVARCHAR(255)")
     private String addressDetail;
-    
+ 
     @Builder.Default
     private Boolean isDefault = false;
 

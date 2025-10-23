@@ -29,11 +29,6 @@ import ute.service.impl.UserServiceImpl;
 import ute.service.inter.AddressService;
 import ute.service.inter.UserService;
 
-/**
- * Unified User Controller - xử lý cả API endpoints và View endpoints
- * - API endpoints: /api/user/* - trả về JSON
- * - View endpoints: /user/* - forward tới JSP
- */
 @WebServlet({ 
     // View endpoints
     "/user/profile", "/user/update-profile", "/user/change-password", "/user/delete-account",

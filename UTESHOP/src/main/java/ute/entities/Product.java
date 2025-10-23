@@ -66,10 +66,11 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
+
     private List<Favorite> favorites;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
     private List<Image> images;
 
     @ManyToMany
@@ -97,15 +98,6 @@ public class Product {
 
     public int getFavoriteCount() {
         return favorites.size();
-    }
-
-    @Transient
-    public Double discountPrice;
-
-    public Double getDiscountPrice() {
-        // Trả về unitPrice nếu không có discount
-        // Bạn có thể mở rộng logic này nếu có bảng ProductDiscount
-        return unitPrice;
     }
 
 }

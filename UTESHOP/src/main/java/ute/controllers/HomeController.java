@@ -1,4 +1,5 @@
 package ute.controllers;
+
 import ute.utils.loadData;
 
 import jakarta.servlet.ServletException;
@@ -17,7 +18,7 @@ public class HomeController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		loadData.loadCategories(request, response);
-//		loadProducts(request, response);
+		// loadProducts(request, response);
 		loadData.loadProductBestSeller(request, response);
 		loadData.loadBanner(request, response);
 		loadData.loadNewProduct(request, response);
@@ -30,7 +31,5 @@ public class HomeController extends HttpServlet {
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
-
-
 
 }

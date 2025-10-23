@@ -25,7 +25,11 @@
 			<artifactId>jakarta.transaction-api</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
 		<!-- Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -131,12 +135,13 @@
 			<version>2.1.4</version>
 		</dependency>
 
-	<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
-	<dependency>
-		<groupId>com.sun.mail</groupId>
-		<artifactId>jakarta.mail</artifactId>
-		<version>2.0.2</version>
-	</dependency>
+		<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+		
 
 	<!-- Gson for JSON serialization -->
 	<dependency>
@@ -156,7 +161,7 @@
 				<configuration>
 					<source>22</source>
 					<target>22</target>
-										                <annotationProcessorPaths>
+				<annotationProcessorPaths>
                     <path>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>

@@ -354,4 +354,8 @@ function handleAddToCartSuccess(data) {
 </script>
 
 <!-- Toast container -->
+<<<<<<< HEAD
 <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>
+=======
+<div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>
+>>>>>>> 168adb26b1ab2c8f21b87286975d764bc5ebd3a6

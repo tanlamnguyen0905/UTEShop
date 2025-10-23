@@ -86,14 +86,13 @@ public class CartServiceImpl implements CartService {
             existingDetail.setQuantity(newQuantity);
             cartDao.updateCartDetail(existingDetail);
         } else {
-            // Thêm mới cart detail
-            Double unitPrice = product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getUnitPrice();
+            
             
             CartDetail cartDetail = CartDetail.builder()
                     .cart(cart)
                     .product(product)
                     .quantity(quantity)
-                    .unitPrice(unitPrice)
+                    .unitPrice(product.getUnitPrice())
                     .build();
             
             cartDao.addCartDetail(cartDetail);
@@ -200,4 +199,3 @@ public class CartServiceImpl implements CartService {
         }
     }
 }
-

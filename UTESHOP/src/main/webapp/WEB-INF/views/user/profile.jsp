@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- PROFILE HEADER -->
 <div class="profile-header text-center text-white py-5 position-relative"
@@ -206,13 +207,22 @@
                                                 </div>
                                                 <div class="d-flex flex-column gap-1">
                                                     <button class="btn btn-sm btn-outline-primary" 
-                                                            onclick="editAddress(${addr.addressID}, '${addr.name}', '${addr.phone}', '${addr.province}', '${addr.district}', '${addr.ward}', '${addr.addressDetail}', ${addr.isDefault})" 
+                                                            onclick="editAddressBtn(this)"
+                                                            data-id="${addr.addressID}"
+                                                            data-name="${fn:escapeXml(addr.name)}"
+                                                            data-phone="${fn:escapeXml(addr.phone)}"
+                                                            data-province="${fn:escapeXml(addr.province)}"
+                                                            data-district="${fn:escapeXml(addr.district)}"
+                                                            data-ward="${fn:escapeXml(addr.ward)}"
+                                                            data-detail="${fn:escapeXml(addr.addressDetail)}"
+                                                            data-default="${addr.isDefault}"
                                                             title="Sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <c:if test="${!addr.isDefault}">
                                                         <button class="btn btn-sm btn-outline-danger" 
-                                                                onclick="deleteAddress(${addr.addressID})" 
+                                                                onclick="deleteAddress(this.dataset.id)" 
+                                                                data-id="${addr.addressID}"
                                                                 title="Xóa">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
@@ -630,6 +640,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==================== ADDRESS MANAGEMENT (AJAX) ====================
+    
+    // Wrapper function for onclick
+    window.editAddressBtn = function(btn) {
+        editAddress(
+            btn.dataset.id,
+            btn.dataset.name,
+            btn.dataset.phone,
+            btn.dataset.province,
+            btn.dataset.district,
+            btn.dataset.ward,
+            btn.dataset.detail,
+            btn.dataset.default === 'true'
+        );
+    };
     
     // Hàm sửa địa chỉ
     window.editAddress = function(addressId, name, phone, province, district, ward, addressDetail, isDefault) {

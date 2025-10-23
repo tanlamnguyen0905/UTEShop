@@ -166,28 +166,16 @@
 							</c:otherwise>
 						</c:choose>
 
-					<!-- Cart -->
-					<div class="position-relative">
-						<c:choose>
-							<c:when test="${empty sessionScope.currentUser}">
-								<!-- Chưa đăng nhập: Click để hiển thị modal -->
-								<a href="#" class="btn btn-light rounded-circle" title="Giỏ hàng" 
-								   onclick="event.preventDefault(); showLoginModal();">
-									<i class="bi bi-bag-fill fs-4 text-dark"></i>
-								</a>
-							</c:when>
-							<c:otherwise>
-								<!-- Đã đăng nhập: Link đến trang giỏ hàng -->
-								<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle" title="Giỏ hàng">
-									<i class="bi bi-bag-fill fs-4 text-dark"></i>
-								</a>
-							</c:otherwise>
-						</c:choose>
-						<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" 
-							  id="cart-count">
-							0
-						</span>
-					</div>
+						<!-- Cart -->
+						<div class="position-relative">
+							<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle"> <i
+									class="bi bi-bag-fill fs-4 text-dark"></i>
+							</a>
+							<!-- cart count badge -->
+							<span id="cartCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+								<c:out value="${sessionScope.cartCount != null ? sessionScope.cartCount : 0}"/>
+							</span>
+						</div>
 					</div>
 				</div>
 			</div>
