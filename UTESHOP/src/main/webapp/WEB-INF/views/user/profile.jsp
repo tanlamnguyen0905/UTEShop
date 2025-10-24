@@ -289,7 +289,7 @@
                                         <i class="fas fa-phone me-1"></i>Số điện thoại:
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                    <input type="tel" class="form-control" id="inputPhone" name="inputPhone" 
                                            placeholder="Nhập số điện thoại (VD: 0912345678)" 
                                            minlength="10" maxlength="15" required>
                                     <small class="text-muted">Nhập số điện thoại từ 10-15 chữ số</small>
@@ -919,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('formTitle').textContent = 'Chỉnh sửa địa chỉ';
             document.getElementById('addressId').value = addressId || '';
             document.getElementById('name').value = name || '';
-            document.getElementById('phone').value = phone || '';
+            document.getElementById('inputPhone').value = phone || '';
             document.getElementById('province').value = province || '';
             document.getElementById('district').value = district || '';
             document.getElementById('ward').value = ward || '';
@@ -1029,9 +1029,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Collect form data
             const formData = (function() {
                 const name = document.getElementById('name').value || '';
-                const phoneRaw = document.getElementById('phone').value || '';
+                const phone = document.getElementById('inputPhone').value || '';
                 // Keep original phone string but also provide digits-only for stricter systems
-                const phone = phoneRaw.trim();
+                // const phone = phoneRaw.trim();
                 const province = document.getElementById('province').value || '';
                 const district = document.getElementById('district').value || '';
                 const ward = document.getElementById('ward').value || '';
@@ -1128,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Clear all inputs explicitly
                 document.getElementById('name').value = '';
-                document.getElementById('phone').value = '';
+                document.getElementById('inputPhone').value = '';
                 document.getElementById('province').value = '';
                 document.getElementById('district').value = '';
                 document.getElementById('ward').value = '';
