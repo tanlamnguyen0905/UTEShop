@@ -47,6 +47,7 @@ public class UserController extends HttpServlet {
     private final UserService userService = new UserServiceImpl();
     private final UserDao userDao = new UserDaoImpl();
     private final AddressService addressService = new AddressServiceImpl();
+    private final ute.service.impl.OrderServiceImpl orderService = new ute.service.impl.OrderServiceImpl();
     private final Gson gson = new Gson();
 
     @Override
@@ -182,7 +183,9 @@ public class UserController extends HttpServlet {
             break;
         default: // /user/profile
             List<Addresses> addresses = addressService.getAddressesByUserId(currentUser.getUserID());
+            List<ute.entities.Orders> orders = orderService.findByUserId(currentUser.getUserID());
             req.setAttribute("addresses", addresses);
+            req.setAttribute("orders", orders);
             req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
             break;
         }

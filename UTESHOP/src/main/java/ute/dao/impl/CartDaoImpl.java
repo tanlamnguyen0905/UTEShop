@@ -17,10 +17,22 @@ public class CartDaoImpl implements CartDao {
     public Cart findCartByUserId(Long userId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
+            // Fetch cart with cartDetails to avoid LazyInitializationException
             TypedQuery<Cart> query = em.createQuery(
-                "SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class);
+                "SELECT c FROM Cart c " +
+                "LEFT JOIN FETCH c.cartDetails cd " +
+                "LEFT JOIN FETCH cd.product " +
+                "WHERE c.user.userID = :userId", 
+                Cart.class);
             query.setParameter("userId", userId);
-            return query.getSingleResult();
+            Cart cart = query.getSingleResult();
+            
+            // Initialize collection to ensure it's loaded
+            if (cart != null && cart.getCartDetails() != null) {
+                cart.getCartDetails().size();
+            }
+            
+            return cart;
         } catch (NoResultException e) {
             return null;
         } finally {
