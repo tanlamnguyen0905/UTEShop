@@ -1,35 +1,54 @@
 package ute.entities;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Data
+@Getter
+@Setter
+
+@Table(name = "UserCoupon")
 public class UserCoupon {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userCouponID;
-
-    @Column(name = "description", columnDefinition = "NVARCHAR(MAX)")
-    private String description;
-    private Double discountPercent;
-    private LocalDateTime userCouponStart;
-    private LocalDateTime userCouponEnd;
-    private Double maxDiscountAmount;
-
-    // @ManyToOne
-    // @JoinColumn(name = "userID")
-    // private Users user;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int userCouponID;
+	
+	@Column(name = "couponCode", columnDefinition = "nvarchar(max)", nullable = false)
+	private String couponCode;
+	
+	@Column(name = "used", nullable = false)
+	private boolean used;
+	
+	@Column(name = "couponCreateAt", nullable = false)
+	private Date couponCreateAt;
+	
+	@Column(name = "couponEnd", nullable = false)
+	private Date couponEnd;
+	
+	@Column(name = "discountPercent", nullable = false)
+	private BigDecimal discountPercent;
+	
+	@Column(name = "maxDiscountAmount", nullable = false)
+	private BigDecimal maxDiscountAmount;
+	
+	@ManyToOne
+	@JoinColumn(name = "userID", nullable = false)
+	private Users user;
 }
