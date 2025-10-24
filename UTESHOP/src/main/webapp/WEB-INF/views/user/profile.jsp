@@ -1,6 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<%
+    // Create DateTimeFormatter for use in page
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    pageContext.setAttribute("dateFormatter", dateFormatter);
+%>
 
 <!-- PROFILE HEADER -->
 <div class="profile-header text-center text-white py-5 position-relative"
@@ -35,13 +42,18 @@
     </p>
 
     <!-- Stats -->
+    <c:set var="totalSpent" value="0" />
+    <c:forEach var="order" items="${orders}">
+        <c:set var="totalSpent" value="${totalSpent + order.amount}" />
+    </c:forEach>
+    
     <div class="d-flex justify-content-center gap-5 mt-4">
         <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-            <h4 class="fw-bold mb-1">0</h4>
+            <h4 class="fw-bold mb-1">${not empty orders ? orders.size() : 0}</h4>
             <span class="small">Đơn hàng</span>
         </div>
         <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-            <h4 class="fw-bold mb-1">0 ₫</h4>
+            <h4 class="fw-bold mb-1"><fmt:formatNumber value="${totalSpent}" type="number" maxFractionDigits="0" /> ₫</h4>
             <span class="small">Tổng chi tiêu</span>
         </div>
     </div>
@@ -355,11 +367,32 @@
                 </div>
 
                 <!-- Order Statistics -->
+                <c:set var="pendingCount" value="0" />
+                <c:set var="shippingCount" value="0" />
+                <c:set var="deliveredCount" value="0" />
+                <c:set var="canceledCount" value="0" />
+                <c:forEach var="order" items="${orders}">
+                    <c:choose>
+                        <c:when test="${order.orderStatus eq 'PENDING'}">
+                            <c:set var="pendingCount" value="${pendingCount + 1}" />
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'SHIPPED' or order.orderStatus eq 'PROCESSING'}">
+                            <c:set var="shippingCount" value="${shippingCount + 1}" />
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'DELIVERED'}">
+                            <c:set var="deliveredCount" value="${deliveredCount + 1}" />
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'CANCELED'}">
+                            <c:set var="canceledCount" value="${canceledCount + 1}" />
+                        </c:when>
+                    </c:choose>
+                </c:forEach>
+                
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <h5 class="text-primary">0</h5>
+                                <h5 class="text-primary">${pendingCount}</h5>
                                 <small class="text-muted">Chờ xác nhận</small>
                             </div>
                         </div>
@@ -367,7 +400,7 @@
                     <div class="col-md-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <h5 class="text-warning">0</h5>
+                                <h5 class="text-warning">${shippingCount}</h5>
                                 <small class="text-muted">Đang giao</small>
                             </div>
                         </div>
@@ -375,7 +408,7 @@
                     <div class="col-md-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <h5 class="text-success">0</h5>
+                                <h5 class="text-success">${deliveredCount}</h5>
                                 <small class="text-muted">Đã giao</small>
                             </div>
                         </div>
@@ -383,7 +416,7 @@
                     <div class="col-md-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <h5 class="text-danger">0</h5>
+                                <h5 class="text-danger">${canceledCount}</h5>
                                 <small class="text-muted">Đã hủy</small>
                             </div>
                         </div>
@@ -391,18 +424,126 @@
                 </div>
 
                 <!-- Order List -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="text-center py-5">
-                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Chưa có đơn hàng nào</h5>
-                            <p class="text-muted">Hãy mua sắm để tạo đơn hàng đầu tiên của bạn!</p>
-                            <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/home'">
-                                <i class="fas fa-shopping-bag me-1"></i> Mua sắm ngay
-                            </button>
+                <c:choose>
+                    <c:when test="${empty orders}">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">Chưa có đơn hàng nào</h5>
+                                    <p class="text-muted">Hãy mua sắm để tạo đơn hàng đầu tiên của bạn!</p>
+                                    <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/home'">
+                                        <i class="fas fa-shopping-bag me-1"></i> Mua sắm ngay
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach var="order" items="${orders}">
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-receipt me-2"></i>Đơn hàng #${order.orderID}
+                                            </h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                ${order.orderDate.format(dateFormatter)}
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <c:choose>
+                                                <c:when test="${order.orderStatus eq 'PENDING'}">
+                                                    <span class="badge bg-primary">Chờ xác nhận</span>
+                                                </c:when>
+                                                <c:when test="${order.orderStatus eq 'PROCESSING'}">
+                                                    <span class="badge bg-info">Đang xử lý</span>
+                                                </c:when>
+                                                <c:when test="${order.orderStatus eq 'SHIPPED'}">
+                                                    <span class="badge bg-warning">Đang giao</span>
+                                                </c:when>
+                                                <c:when test="${order.orderStatus eq 'DELIVERED'}">
+                                                    <span class="badge bg-success">Đã giao</span>
+                                                </c:when>
+                                                <c:when test="${order.orderStatus eq 'CANCELED'}">
+                                                    <span class="badge bg-danger">Đã hủy</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-secondary">${order.orderStatus}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border-top pt-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-1">
+                                                    <i class="fas fa-user me-2 text-muted"></i>
+                                                    <strong>Người nhận:</strong> ${order.recipientName}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="fas fa-phone me-2 text-muted"></i>
+                                                    <strong>SĐT:</strong> ${order.phoneNumber}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                                                    <strong>Địa chỉ:</strong> ${order.address.addressDetail}, ${order.address.ward}, ${order.address.district}, ${order.address.province}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <p class="mb-1">
+                                                    <strong>Phương thức thanh toán:</strong> ${order.paymentMethod.name}
+                                                </p>
+                                                <p class="mb-1">
+                                                    <strong>Tổng tiền:</strong>
+                                                    <span class="text-danger fs-5">
+                                                        <fmt:formatNumber value="${order.amount}" type="number" maxFractionDigits="0" />₫
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border-top pt-3 mt-3">
+                                        <h6 class="mb-2">Sản phẩm:</h6>
+                                        <c:forEach var="detail" items="${order.orderDetails}" varStatus="status">
+                                            <c:if test="${status.index < 3}">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <c:choose>
+                                                        <c:when test="${not empty detail.product.images and not empty detail.product.images[0]}">
+                                                            <img src="${pageContext.request.contextPath}/image?fname=${detail.product.images[0].dirImage}"
+                                                                 alt="${detail.product.productName}"
+                                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                                                 class="me-3">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <img src="${pageContext.request.contextPath}/assets/images/logo.png"
+                                                                 alt="No image"
+                                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                                                 class="me-3">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <div class="flex-grow-1">
+                                                        <div>${detail.product.productName}</div>
+                                                        <small class="text-muted">
+                                                            <fmt:formatNumber value="${detail.unitPrice}" type="number" maxFractionDigits="0" />₫ x ${detail.quantity}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                        <c:if test="${order.orderDetails.size() > 3}">
+                                            <small class="text-muted">... và ${order.orderDetails.size() - 3} sản phẩm khác</small>
+                                        </c:if>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <!-- TAB 4: Cài đặt -->
