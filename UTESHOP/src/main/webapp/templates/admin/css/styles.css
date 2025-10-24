@@ -11241,3 +11241,38 @@ body {
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
 }
+
+/* Sidebar Collapse Styles */
+.sb-sidenav-collapse-arrow {
+  display: inline-block;
+  margin-left: auto;
+  transition: all 0.3s ease;
+}
+
+.sb-sidenav-collapse-arrow i {
+  transition: all 0.3s ease;
+}
+
+.sb-sidenav-menu-nested {
+  padding-left: 1rem;
+}
+
+.sb-sidenav-menu-nested .nav-link {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.sb-sidenav-menu-nested .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+/* Collapse animation */
+.collapse {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.collapse.show {
+  max-height: 500px;
+}

@@ -88,7 +88,21 @@ public class AddressApiController extends HttpServlet {
         
         try {
             // POST /api/user/addresses - Tạo địa chỉ mới
-            AddressDTO dto = gson.fromJson(req.getReader(), AddressDTO.class);
+            // Read raw request body first (helpful to debug JSON/form issues)
+            StringBuilder sb = new StringBuilder();
+            req.getReader().lines().forEach(line -> sb.append(line).append('\n'));
+            String rawBody = sb.toString().trim();
+            System.out.println("=== RAW REQUEST BODY (CREATE) ===");
+            System.out.println(rawBody);
+            System.out.println("=================================");
+            AddressDTO dto = gson.fromJson(rawBody, AddressDTO.class);
+            
+            // Debug log
+            System.out.println("=== DEBUG ADDRESS CREATE ===");
+            System.out.println("Name: " + (dto != null ? dto.getName() : "null"));
+            System.out.println("Phone: " + (dto != null ? dto.getPhone() : "null"));
+            System.out.println("Province: " + (dto != null ? dto.getProvince() : "null"));
+            System.out.println("===========================");
             
             // Validation
             if (dto == null || dto.getName() == null || dto.getPhone() == null ||
@@ -157,6 +171,14 @@ public class AddressApiController extends HttpServlet {
             // Parse DTO từ request
             AddressDTO dto = gson.fromJson(req.getReader(), AddressDTO.class);
             dto.setAddressID(addressId); // Ensure correct ID
+            
+            // Debug log
+            System.out.println("=== DEBUG ADDRESS UPDATE ===");
+            System.out.println("AddressID: " + addressId);
+            System.out.println("Name: " + (dto != null ? dto.getName() : "null"));
+            System.out.println("Phone: " + (dto != null ? dto.getPhone() : "null"));
+            System.out.println("Province: " + (dto != null ? dto.getProvince() : "null"));
+            System.out.println("===========================");
             
             // Validation
             if (dto.getName() == null || dto.getPhone() == null ||
@@ -290,4 +312,3 @@ public class AddressApiController extends HttpServlet {
         out.print(gson.toJson(response));
     }
 }
-

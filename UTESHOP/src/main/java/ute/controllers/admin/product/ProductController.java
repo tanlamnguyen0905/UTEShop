@@ -143,7 +143,7 @@ public class ProductController extends HttpServlet {
             req.setAttribute("size", size);
             req.setAttribute("searchKeyword", searchKeyword);
 
-            req.getRequestDispatcher("/views/admin/products/searchpaginated.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/admin/products/searchpaginated.jsp").forward(req, resp);
 
         } else if (uri.contains("/admin/products/saveOrUpdate")) {
             String idStr = req.getParameter("id");
@@ -159,12 +159,12 @@ public class ProductController extends HttpServlet {
             req.setAttribute("categoriesList", categoriesList);
             req.setAttribute("brandsList", brandsList);
 
-            req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/admin/products/view")) {
             String idStr = req.getParameter("id");
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
-            req.getRequestDispatcher("/views/admin/products/view.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
@@ -207,7 +207,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Tên sản phẩm không được để trống!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -215,7 +215,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Giá sản phẩm không được để trống!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -223,7 +223,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Số lượng tồn kho không được để trống!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -231,7 +231,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Vui lòng chọn danh mục!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -239,7 +239,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Vui lòng chọn thương hiệu!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -252,7 +252,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Giá và số lượng phải là số hợp lệ!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -260,7 +260,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Giá sản phẩm phải lớn hơn 0!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -268,7 +268,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Số lượng tồn kho không được âm!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -278,7 +278,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Danh mục không tồn tại!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -288,7 +288,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Thương hiệu không tồn tại!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -312,7 +312,7 @@ public class ProductController extends HttpServlet {
                 req.setAttribute("error", "Tên sản phẩm đã tồn tại! Vui lòng nhập tên khác!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 

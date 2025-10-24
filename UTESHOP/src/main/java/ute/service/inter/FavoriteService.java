@@ -11,8 +11,4 @@ public interface FavoriteService {
     boolean isFavorite(Long userId, Long productId);
 
     List<Favorite> getUserFavorites(Long userId);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 37d6c9e (update)

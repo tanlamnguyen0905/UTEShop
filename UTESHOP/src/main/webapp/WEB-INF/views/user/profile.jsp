@@ -205,14 +205,21 @@
                                                     </p>
                                                 </div>
                                                 <div class="d-flex flex-column gap-1">
-                                                    <button class="btn btn-sm btn-outline-primary" 
-                                                            onclick="editAddress(${addr.addressID}, '${addr.name}', '${addr.phone}', '${addr.province}', '${addr.district}', '${addr.ward}', '${addr.addressDetail}', ${addr.isDefault})" 
+                                                    <button class="btn btn-sm btn-outline-primary edit-addr-btn" 
+                                                            data-id="${addr.addressID}"
+                                                            data-name="${addr.name}"
+                                                            data-phone="${addr.phone}"
+                                                            data-province="${addr.province}"
+                                                            data-district="${addr.district}"
+                                                            data-ward="${addr.ward}"
+                                                            data-detail="${addr.addressDetail}"
+                                                            data-default="${addr.isDefault}"
                                                             title="Sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <c:if test="${!addr.isDefault}">
-                                                        <button class="btn btn-sm btn-outline-danger" 
-                                                                onclick="deleteAddress(${addr.addressID})" 
+                                                        <button class="btn btn-sm btn-outline-danger delete-addr-btn" 
+                                                                data-id="${addr.addressID}"
                                                                 title="Xóa">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
@@ -270,7 +277,9 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="tel" class="form-control" id="phone" name="phone" 
-                                           placeholder="Nhập số điện thoại" pattern="[0-9]{10,11}" required>
+                                           placeholder="Nhập số điện thoại (VD: 0912345678)" 
+                                           minlength="10" maxlength="15" required>
+                                    <small class="text-muted">Nhập số điện thoại từ 10-15 chữ số</small>
                                 </div>
 
                                 <!-- Tỉnh/Thành phố -->
@@ -631,26 +640,166 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== ADDRESS MANAGEMENT (AJAX) ====================
     
+    // Attach event listeners to edit/delete buttons
+    document.addEventListener('click', function(e) {
+        // Edit button
+        if (e.target.closest('.edit-addr-btn')) {
+            const btn = e.target.closest('.edit-addr-btn');
+            editAddress(
+                btn.dataset.id,
+                btn.dataset.name,
+                btn.dataset.phone,
+                btn.dataset.province,
+                btn.dataset.district,
+                btn.dataset.ward,
+                btn.dataset.detail,
+                btn.dataset.default === 'true'
+            );
+        }
+        // Delete button
+        if (e.target.closest('.delete-addr-btn')) {
+            const btn = e.target.closest('.delete-addr-btn');
+            deleteAddress(btn.dataset.id);
+        }
+    });
+    
+    // Hàm load danh sách địa chỉ từ API (không cần reload trang)
+    async function loadAddresses() {
+        console.log('Loading addresses from API...');
+        
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('${pageContext.request.contextPath}/api/user/addresses', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                console.log('Loaded addresses:', result.data.length);
+                renderAddresses(result.data);
+            } else {
+                console.error('Failed to load addresses:', result.error);
+            }
+        } catch (error) {
+            console.error('Error loading addresses:', error);
+        }
+    }
+    
+    // Hàm render danh sách địa chỉ
+    function renderAddresses(addresses) {
+        const addressListDiv = document.getElementById('addressList');
+        
+        if (!addresses || addresses.length === 0) {
+            addressListDiv.innerHTML = 
+                '<div class="card text-center py-5">' +
+                    '<div class="card-body">' +
+                        '<i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>' +
+                        '<h5 class="text-muted">Chưa có địa chỉ nào</h5>' +
+                        '<p class="text-muted">Thêm địa chỉ giao hàng để đặt hàng nhanh chóng hơn!</p>' +
+                        '<button class="btn btn-primary" onclick="document.getElementById(\'addAddressBtn\').click()">' +
+                            '<i class="fas fa-plus me-1"></i> Thêm địa chỉ đầu tiên' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            return;
+        }
+        
+        let html = '';
+        addresses.forEach(function(addr) {
+            const isDefault = addr.isDefault === true;
+            const borderClass = isDefault ? 'border-primary' : '';
+            const defaultBadge = isDefault ? '<span class="badge bg-primary">Mặc định</span>' : '';
+            
+            html += '<div class="card mb-3 address-card ' + borderClass + '">' +
+                '<div class="card-body">' +
+                    '<div class="d-flex justify-content-between align-items-start">' +
+                        '<div class="flex-grow-1">' +
+                            '<div class="d-flex align-items-center gap-2 mb-2">' +
+                                '<h6 class="fw-bold text-primary mb-0">' +
+                                    '<i class="fas fa-user me-2"></i>' + escapeHtml(addr.name || '') +
+                                '</h6>' +
+                                defaultBadge +
+                            '</div>' +
+                            '<p class="text-muted mb-1">' +
+                                '<i class="fas fa-phone me-2 text-secondary"></i>' + escapeHtml(addr.phone || '') +
+                            '</p>' +
+                            '<p class="text-muted mb-1">' +
+                                '<i class="fas fa-location-arrow me-2 text-secondary"></i>' +
+                                escapeHtml(addr.addressDetail || '') +
+                            '</p>' +
+                            '<p class="text-muted mb-0">' +
+                                '<i class="fas fa-map-marked me-2 text-secondary"></i>' +
+                                escapeHtml(addr.ward || '') + ', ' + escapeHtml(addr.district || '') + ', ' + escapeHtml(addr.province || '') +
+                            '</p>' +
+                        '</div>' +
+                        '<div class="d-flex flex-column gap-1">' +
+                            '<button class="btn btn-sm btn-outline-primary" ' +
+                                    'onclick="editAddress(' + addr.addressID + ', \'' + escapeHtml(addr.name || '') + '\', \'' + escapeHtml(addr.phone || '') + '\', \'' + escapeHtml(addr.province || '') + '\', \'' + escapeHtml(addr.district || '') + '\', \'' + escapeHtml(addr.ward || '') + '\', \'' + escapeHtml(addr.addressDetail || '') + '\', ' + isDefault + ')" ' +
+                                    'title="Sửa">' +
+                                '<i class="fas fa-edit"></i>' +
+                            '</button>';
+            
+            if (!isDefault) {
+                html += '<button class="btn btn-sm btn-outline-danger" ' +
+                            'onclick="deleteAddress(' + addr.addressID + ')" ' +
+                            'title="Xóa">' +
+                            '<i class="fas fa-trash"></i>' +
+                        '</button>';
+            }
+            
+            html += '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+        
+        addressListDiv.innerHTML = html;
+    }
+    
+    // Helper function để escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
     // Hàm sửa địa chỉ
     window.editAddress = function(addressId, name, phone, province, district, ward, addressDetail, isDefault) {
-        // Điền dữ liệu vào form
-        document.getElementById('formTitle').textContent = 'Chỉnh sửa địa chỉ';
-        document.getElementById('addressId').value = addressId;
-        document.getElementById('name').value = name;
-        document.getElementById('phone').value = phone;
-        document.getElementById('province').value = province;
-        document.getElementById('district').value = district;
-        document.getElementById('ward').value = ward;
-        document.getElementById('addressDetail').value = addressDetail;
-        document.getElementById('isDefault').checked = isDefault;
+        console.log('Editing address:', addressId, {name, phone, province});
         
-        // Hiển thị form
-        document.getElementById('addressListContainer').style.display = 'none';
-        document.getElementById('addressFormContainer').style.display = 'block';
+        try {
+            // Điền dữ liệu vào form
+            document.getElementById('formTitle').textContent = 'Chỉnh sửa địa chỉ';
+            document.getElementById('addressId').value = addressId || '';
+            document.getElementById('name').value = name || '';
+            document.getElementById('phone').value = phone || '';
+            document.getElementById('province').value = province || '';
+            document.getElementById('district').value = district || '';
+            document.getElementById('ward').value = ward || '';
+            document.getElementById('addressDetail').value = addressDetail || '';
+            document.getElementById('isDefault').checked = isDefault === true || isDefault === 'true';
+            
+            // Hiển thị form
+            document.getElementById('addressListContainer').style.display = 'none';
+            document.getElementById('addressFormContainer').style.display = 'block';
+            
+            // Scroll to form
+            document.getElementById('addressFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+            console.error('Error in editAddress:', error);
+            alert('Có lỗi khi mở form sửa địa chỉ!');
+        }
     };
     
     // Hàm xóa địa chỉ (AJAX)
     window.deleteAddress = async function(addressId) {
+        console.log('Deleting address:', addressId);
+        
         if (!confirm('Bạn có chắc muốn xóa địa chỉ này?')) {
             return;
         }
@@ -669,9 +818,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             
             if (result.success) {
-                // Success - reload page
-                window.location.href = '${pageContext.request.contextPath}/user/profile?success=' + 
-                    encodeURIComponent(result.message) + '#address';
+                console.log('Address deleted successfully');
+                showToast(result.message || 'Xóa địa chỉ thành công!', 'success');
+                
+                // Reload danh sách địa chỉ không cần reload trang
+                await loadAddresses();
             } else {
                 alert('Lỗi: ' + result.error);
             }
@@ -685,22 +836,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const addressForm = document.getElementById('addressForm');
     if (addressForm) {
-        addressForm.addEventListener('submit', async (e) => {
+        // Remove any existing listeners to prevent duplicates
+        addressForm.replaceWith(addressForm.cloneNode(true));
+        const newAddressForm = document.getElementById('addressForm');
+        
+        newAddressForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Disable submit button to prevent double submission
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang xử lý...';
             
             const addressId = document.getElementById('addressId').value;
             const isEdit = addressId && addressId.trim() !== '';
             
             // Collect form data
-            const formData = {
-                name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
-                province: document.getElementById('province').value,
-                district: document.getElementById('district').value,
-                ward: document.getElementById('ward').value,
-                addressDetail: document.getElementById('addressDetail').value,
-                isDefault: document.getElementById('isDefault').checked
-            };
+            const formData = (function() {
+                const name = document.getElementById('name').value || '';
+                const phoneRaw = document.getElementById('phone').value || '';
+                // Keep original phone string but also provide digits-only for stricter systems
+                const phone = phoneRaw.trim();
+                const province = document.getElementById('province').value || '';
+                const district = document.getElementById('district').value || '';
+                const ward = document.getElementById('ward').value || '';
+                const addressDetail = document.getElementById('addressDetail').value || '';
+                const isDefault = !!document.getElementById('isDefault').checked;
+
+                // Debug: log payload to console before sending
+                const payload = { name, phone, province, district, ward, addressDetail, isDefault };
+                console.log('Sending address payload:', payload);
+                return payload;
+            })();
+             
+             console.log('=== FORM SUBMIT DEBUG ===');
+             console.log('Is Edit:', isEdit);
+             console.log('Form Data:', formData);
+             console.log('Phone value:', formData.phone);
+             console.log('Phone length:', formData.phone?.length);
+             console.log('=========================');
             
             try {
                 let url = '${pageContext.request.contextPath}/api/user/addresses';
@@ -726,37 +901,90 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Success - reload page để hiển thị địa chỉ mới
-                    window.location.href = '${pageContext.request.contextPath}/user/profile?success=' + 
-                        encodeURIComponent(result.message) + '#address';
+                    // Success - không reload, chỉ cập nhật danh sách
+                    console.log('Address saved successfully:', result.data);
+                    showToast(result.message || 'Lưu địa chỉ thành công!', 'success');
+                    
+                    // Reset form
+                    newAddressForm.reset();
+                    document.getElementById('addressId').value = '';
+                    
+                    // Hide form, show list
+                    document.getElementById('addressFormContainer').style.display = 'none';
+                    document.getElementById('addressListContainer').style.display = 'block';
+                    
+                    // Reload danh sách địa chỉ không cần reload trang
+                    await loadAddresses();
+                    
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
                 } else {
                     alert('Lỗi: ' + result.error);
+                    // Re-enable button on error
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra khi lưu địa chỉ!');
+                // Re-enable button on error
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         });
     }
     
-    // Hiển thị form thêm địa chỉ
-    document.getElementById('addAddressBtn').addEventListener('click', () => {
-        // Reset form
-        const form = document.getElementById('addressForm');
-        form.reset();
-        document.getElementById('addressId').value = '';
-        document.getElementById('formTitle').textContent = 'Thêm địa chỉ mới';
+    // Hiển thị form thêm địa chỉ - Use onclick to prevent duplicate listeners
+    const addAddressBtn = document.getElementById('addAddressBtn');
+    if (addAddressBtn) {
+        // Remove old listener by cloning
+        const newAddBtn = addAddressBtn.cloneNode(true);
+        addAddressBtn.parentNode.replaceChild(newAddBtn, addAddressBtn);
         
-        // Show form
-        document.getElementById('addressListContainer').style.display = 'none';
-        document.getElementById('addressFormContainer').style.display = 'block';
-    });
+        newAddBtn.addEventListener('click', () => {
+            console.log('Opening add address form');
+            // Reset form completely
+            const form = document.getElementById('addressForm');
+            if (form) {
+                form.reset();
+                document.getElementById('addressId').value = '';
+                document.getElementById('formTitle').textContent = 'Thêm địa chỉ mới';
+                
+                // Clear all inputs explicitly
+                document.getElementById('name').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('province').value = '';
+                document.getElementById('district').value = '';
+                document.getElementById('ward').value = '';
+                document.getElementById('addressDetail').value = '';
+                document.getElementById('isDefault').checked = false;
+                
+                // Show form
+                document.getElementById('addressListContainer').style.display = 'none';
+                document.getElementById('addressFormContainer').style.display = 'block';
+            }
+        });
+    }
 
     // Nút hủy - quay lại danh sách địa chỉ
     const cancelBtn = document.getElementById('cancelAddressBtn');
     if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
+        // Remove old listener by cloning
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        newCancelBtn.addEventListener('click', () => {
+            console.log('Canceling address form');
+            // Reset form
+            const form = document.getElementById('addressForm');
+            if (form) {
+                form.reset();
+                document.getElementById('addressId').value = '';
+            }
+            
+            // Hide form, show list
             document.getElementById('addressFormContainer').style.display = 'none';
             document.getElementById('addressListContainer').style.display = 'block';
         });
@@ -770,6 +998,47 @@ document.addEventListener('DOMContentLoaded', function() {
             tab.show();
         }
     }
+    
+    // ==================== PHONE VALIDATION (REAL-TIME) ====================
+    
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            const value = e.target.value;
+            
+            // Remove non-digits for validation (but keep original value)
+            const digitsOnly = value.replace(/\D/g, '');
+            
+            console.log('Phone input changed:', value, '| Digits:', digitsOnly);
+            
+            // Visual feedback
+            if (digitsOnly.length >= 10 && digitsOnly.length <= 15) {
+                phoneInput.classList.remove('is-invalid');
+                phoneInput.classList.add('is-valid');
+            } else if (digitsOnly.length > 0) {
+                phoneInput.classList.remove('is-valid');
+                phoneInput.classList.add('is-invalid');
+            } else {
+                phoneInput.classList.remove('is-valid', 'is-invalid');
+            }
+        });
+        
+        // Validation on blur
+        phoneInput.addEventListener('blur', function(e) {
+            const value = e.target.value;
+            const digitsOnly = value.replace(/\D/g, '');
+            
+            if (digitsOnly.length < 10) {
+                console.warn('⚠️ Phone too short:', digitsOnly.length, 'digits');
+            } else if (digitsOnly.length > 15) {
+                console.warn('⚠️ Phone too long:', digitsOnly.length, 'digits');
+            } else {
+                console.log('✅ Phone valid:', digitsOnly);
+            }
+        });
+    }
+    
+    console.log('✅ Phone validation initialized');
 
     // Delete Account Confirmation - Đơn giản hóa
     const confirmDeleteInput = document.getElementById('confirmDelete');

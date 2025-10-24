@@ -17,8 +17,18 @@ public class AddressDaoImpl implements AddressDao {
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
+            
+            // Debug log
+            System.out.println("=== DAO INSERT ADDRESS ===");
+            System.out.println("Name: " + address.getName());
+            System.out.println("Phone: " + address.getPhone());
+            System.out.println("Province: " + address.getProvince());
+            System.out.println("==========================");
+            
             em.persist(address);
             trans.commit();
+            
+            System.out.println("Address inserted with ID: " + address.getAddressID());
         } catch (Exception e) {
             e.printStackTrace();
             trans.rollback();
@@ -38,6 +48,12 @@ public class AddressDaoImpl implements AddressDao {
             // Tìm entity hiện tại trong DB
             Addresses existing = em.find(Addresses.class, address.getAddressID());
             if (existing != null) {
+                // Debug log - Before update
+                System.out.println("=== DAO UPDATE ADDRESS ===");
+                System.out.println("AddressID: " + address.getAddressID());
+                System.out.println("Old Phone: " + existing.getPhone());
+                System.out.println("New Phone: " + address.getPhone());
+                
                 // Update từng field một để đảm bảo không bị mất dữ liệu
                 existing.setName(address.getName());
                 existing.setPhone(address.getPhone());
@@ -47,6 +63,9 @@ public class AddressDaoImpl implements AddressDao {
                 existing.setAddressDetail(address.getAddressDetail());
                 existing.setIsDefault(address.getIsDefault());
                 // User không thay đổi nên không cần set
+                
+                System.out.println("Updated Phone: " + existing.getPhone());
+                System.out.println("==========================");
             }
             
             trans.commit();

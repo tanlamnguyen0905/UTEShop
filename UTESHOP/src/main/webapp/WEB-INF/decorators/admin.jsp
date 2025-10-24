@@ -7,7 +7,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
 
-    <title><c:out value="${title}" default="Admin Panel"/></title>
+    <title><sitemesh:write property="title" default="Admin Panel" /></title>
 
     <!-- Bootstrap core CSS -->
     <link href="${pageContext.request.contextPath}/templates/admin/assets/css/bootstrap.min.css" rel="stylesheet" />
@@ -15,7 +15,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
     <!-- Head content từ trang con -->
-    <c:out value="${head}" escapeXml="false" />
+    <sitemesh:write property="head" />
 </head>
 
 <body class="sb-nav-fixed">
@@ -32,25 +32,17 @@
         <div id="layoutSidenav_content">
             <main class="p-4">
                 <!-- Nội dung trang con sẽ được SiteMesh 3 inject vào đây -->
-                <c:out value="${body}" escapeXml="false" />
+                <sitemesh:write property="body" />
             </main>
 
             <!-- Footer -->
             <jsp:include page="/commons/admin/footer.jsp" />
         </div>
     </div>
-    <div class="container">
-        <div class="page-inner">
-            <sitemesh:write property="body" />
-        </div>
-    </div>
 </div>
 
-<!-- Core JS -->
-<script src="${pageContext.request.contextPath}/templates/admin/assets/js/bootstrap.bundle.min.js"></script>
+<!-- Core JS - Load từ CDN vì local không có file -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/templates/admin/js/scripts.js"></script>
-
-<!-- Script từ trang con -->
-<c:out value="${script}" escapeXml="false" />
 </body>
 </html>

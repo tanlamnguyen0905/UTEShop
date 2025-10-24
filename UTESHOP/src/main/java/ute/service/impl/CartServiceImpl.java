@@ -1,15 +1,10 @@
 package ute.service.impl;
 
-<<<<<<< HEAD
-import ute.dao.impl.CartDaoImpl;
-import ute.dao.inter.CartDao;
-=======
 import java.util.List;
 
 import ute.dao.impl.CartDaoImpl;
 import ute.dao.impl.ProductDaoImpl;
 import ute.dao.impl.UserDaoImpl;
->>>>>>> d2ca387 (thêm trang giỏ hàng, chỉnh sửa giao diện)
 import ute.entities.Cart;
 import ute.entities.CartDetail;
 import ute.entities.Product;
@@ -17,22 +12,6 @@ import ute.entities.Users;
 import ute.service.inter.CartService;
 
 public class CartServiceImpl implements CartService {
-<<<<<<< HEAD
-    private CartDao cartDao;
-    private ProductServiceImpl productService = new ProductServiceImpl();
-
-    public CartServiceImpl() {
-        this.cartDao = new CartDaoImpl();
-    }
-
-    @Override
-    public Cart getOrCreateCartForUser(Long userId) {
-        Cart cart = cartDao.findByUserId(userId);
-        if (cart == null) {
-            cart = Cart.builder().user(Users.builder().userID(userId).build()).build();
-            cart = cartDao.createCart(cart);
-        }
-=======
 
     private final CartDaoImpl cartDao;
     private final ProductDaoImpl productDao;
@@ -64,27 +43,10 @@ public class CartServiceImpl implements CartService {
             cart = cartDao.findCartByUserId(userId);
         }
         
->>>>>>> d2ca387 (thêm trang giỏ hàng, chỉnh sửa giao diện)
         return cart;
     }
 
     @Override
-<<<<<<< HEAD
-    public CartDetail addToCart(Long userId, Long productId, int quantity) {
-        Cart cart = getOrCreateCartForUser(userId);
-        Product p = productService.findById(productId);
-        if (p == null)
-            throw new IllegalArgumentException("Product not found");
-        CartDetail detail = CartDetail.builder()
-                .cart(cart)
-                .product(p)
-                .quantity(quantity)
-                .unitPrice(p.getUnitPrice())
-                .build();
-        return cartDao.addOrUpdateCartDetail(detail);
-    }
-}
-=======
     public List<CartDetail> getCartItems(Long userId) {
         Cart cart = getOrCreateCart(userId);
         return cartDao.findCartDetailsByCartId(cart.getCartID());
@@ -124,14 +86,13 @@ public class CartServiceImpl implements CartService {
             existingDetail.setQuantity(newQuantity);
             cartDao.updateCartDetail(existingDetail);
         } else {
-            // Thêm mới cart detail
-            Double unitPrice = product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getUnitPrice();
+            
             
             CartDetail cartDetail = CartDetail.builder()
                     .cart(cart)
                     .product(product)
                     .quantity(quantity)
-                    .unitPrice(unitPrice)
+                    .unitPrice(product.getUnitPrice())
                     .build();
             
             cartDao.addCartDetail(cartDetail);
@@ -238,5 +199,3 @@ public class CartServiceImpl implements CartService {
         }
     }
 }
-
->>>>>>> d2ca387 (thêm trang giỏ hàng, chỉnh sửa giao diện)

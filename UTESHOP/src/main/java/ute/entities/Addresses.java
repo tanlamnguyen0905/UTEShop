@@ -26,7 +26,7 @@ public class Addresses {
     @Column(columnDefinition = "NVARCHAR(255)")
     private String name; // Tên người nhận
 
-    @Column(columnDefinition = "NVARCHAR(20)")
+    @Column(columnDefinition = "VARCHAR(15)")
     private String phone; // Số điện thoại người nhận
 
     @Column(columnDefinition = "NVARCHAR(255)")
@@ -41,13 +41,8 @@ public class Addresses {
     @Column(columnDefinition = "NVARCHAR(255)")
     private String addressDetail;
     
-<<<<<<< HEAD
-    @Column(nullable = true)
-    private boolean isDefault;
-=======
     @Builder.Default
     private Boolean isDefault = false;
->>>>>>> 1707184 (them tang dto va dung api)
 
 
     @ManyToOne

@@ -166,18 +166,6 @@
 							</c:otherwise>
 						</c:choose>
 
-<<<<<<< HEAD
-						<!-- Cart -->
-						<div class="position-relative">
-							<a href="${pageContext.request.contextPath}/cart" class="btn btn-light rounded-circle"> <i
-									class="bi bi-bag-fill fs-4 text-dark"></i>
-							</a>
-							<!-- cart count badge -->
-							<span id="cartCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-								<c:out value="${sessionScope.cartCount != null ? sessionScope.cartCount : 0}"/>
-							</span>
-						</div>
-=======
 					<!-- Cart -->
 					<div class="position-relative">
 						<c:choose>
@@ -200,7 +188,6 @@
 							0
 						</span>
 					</div>
->>>>>>> d2ca387 (thêm trang giỏ hàng, chỉnh sửa giao diện)
 					</div>
 				</div>
 			</div>
