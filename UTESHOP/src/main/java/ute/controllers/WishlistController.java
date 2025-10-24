@@ -38,12 +38,14 @@ public class WishlistController extends HttpServlet {
         try {
 
             HttpSession session = req.getSession();
-            Users user = (Users) session.getAttribute("user");
-            if (user == null) {
-                user = (Users) session.getAttribute("currentUser");
-            }
+            Users user = (Users) session.getAttribute("currentUser");
             if (user == null) {
                 out.print("{\"success\":false, \"message\":\"Not authenticated\"}");
+                return;
+            }
+            // Ensure user ID is available
+            if (user.getUserID() == null) {
+                out.print("{\"success\":false, \"message\":\"User ID not found\"}");
                 return;
             }
 

@@ -31,16 +31,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="rating-stars">
                         <c:forEach begin="1" end="5" var="i">
-                            <i class="fas fa-star ${i <= averageRating ? 'text-warning' : 'text-secondary'}"></i>
+                            <i class="fas fa-star ${i <= productDTO.rating ? 'text-warning' : 'text-secondary'}"></i>
                         </c:forEach>
                         <span class="ms-2">
-                            <strong><fmt:formatNumber value="${averageRating}" type="number" maxFractionDigits="1" /></strong>/5
+                            <strong><fmt:formatNumber value="${productDTO.rating}" type="number" maxFractionDigits="1" /></strong>/5
                         </span>
                     </div>
                     <div class="vr"></div>
                     <div class="text-muted">
                         <i class="fas fa-comment-dots"></i>
-                        <fmt:formatNumber value="${reviewCount}" type="number" /> đánh giá
+                        <fmt:formatNumber value="${productDTO.reviewCount}" type="number" /> đánh giá
                     </div>
                     <div class="vr"></div>
                     <div class="text-muted">
@@ -77,7 +77,7 @@
                     <button type="button" id="addCartBtn" onclick="handleAddToCartClick()" class="btn btn-primary">
                         <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
                     </button>
-                    <button type="button" id="wishlistBtn" onclick="addToWishlist(${product.id})" class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}">
+                    <button type="button" id="wishlistBtn" onclick="addToWishlist(${productDTO.productID})" class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}">
                         <i id="wishlistIcon" class="fas ${isFavorite ? 'fa-heart' : 'fa-heart'} ${isFavorite ? 'text-white' : ''}"></i>
                         <span id="wishlistText">${isFavorite ? 'Đã yêu thích' : 'Yêu thích'}</span>
                     </button>
@@ -111,7 +111,6 @@
     <!-- Reviews Section -->
     <div class="reviews-section mt-5">
         <h3>Đánh giá sản phẩm</h3>
-        
         <!-- Review List -->
         <div class="review-list mt-4">
             <c:forEach items="${reviews}" var="review">
@@ -130,39 +129,13 @@
                         </small>
                     </div>
                     <p class="mt-2 mb-0">${review.content}</p>
+                    <c:set var="imageUrl" value="${empty review.image ? 'logo.png' : review.image}" />
+                    <img src="${pageContext.request.contextPath}/image?fname=${imageUrl}" 
+                             alt="${imageUrl}">
                 </div>
             </c:forEach>
         </div>
 
-        <!-- Add Review Form -->
-        <c:if test="${not empty sessionScope.user}">
-            <div class="add-review-form mt-4">
-                <h4>Thêm đánh giá của bạn</h4>
-                <form id="reviewForm" class="mt-3">
-                    <input type="hidden" name="productId" value="${product.productID}">
-                    <div class="form-group">
-                        <label>Đánh giá:</label>
-                        <div class="rating-input">
-                            <c:forEach begin="5" end="1" step="-1" var="i">
-                                <input type="radio" id="star${i}" name="rating" value="${i}">
-                                <label for="star${i}"><i class="fas fa-star"></i></label>
-                            </c:forEach>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment">Nhận xét của bạn:</label>
-                        <textarea class="form-control" 
-                                  id="comment" 
-                                  name="comment" 
-                                  rows="3" 
-                                  required></textarea>
-                    </div>
-                    <button type="button" onclick="submitReview()" class="btn btn-primary">
-                        Gửi đánh giá
-                    </button>
-                </form>
-            </div>
-        </c:if>
     </div>
 </div>
 
@@ -221,6 +194,10 @@
     }
 </style>
 
+
+<!-- Toast container -->
+<div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>
+
 <!-- Include Cart JS -->
 <script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
 
@@ -254,9 +231,9 @@ function addToWishlist(productId) {
     fetch('${pageContext.request.contextPath}/wishlist/add', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `productId=${productId}`
+        body: `productId=` + productId
     })
     .then(response => response.json())
     .then(data => {
@@ -286,58 +263,49 @@ function addToWishlist(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Lỗi', 'Có lỗi xảy ra khi thêm vào danh sách yêu thích', 'danger');
     });
 }
 
-function submitReview() {
-    const form = document.getElementById('reviewForm');
-    const formData = new FormData(form);
-
-    fetch('${pageContext.request.contextPath}/review/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            showToast('Cảm ơn', 'Cảm ơn bạn đã đánh giá sản phẩm!', 'success');
-            setTimeout(() => location.reload(), 800);
-        } else {
-            alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra khi gửi đánh giá');
-    });
-}
 
 // Helper to show bootstrap toasts (requires bootstrap 5)
 function showToast(title, message, type = 'info') {
-    // Create toast element
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        console.error('❌ Không tìm thấy toastContainer');
+        return;
+    }
+
     const toastId = 'toast' + Date.now();
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `\
-        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">\
-            <div class="d-flex">\
-                <div class="toast-body">\
-                    <strong class="me-1">${title}</strong> ${message}\
-                </div>\
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>\
-            </div>\
+    wrapper.innerHTML = `
+        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong class="me-1">${title}</strong> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
         </div>`;
-    const container = document.getElementById('toastContainer');
+    
     container.appendChild(wrapper);
     const toastEl = document.getElementById(toastId);
+
+    if (!toastEl) {
+        console.error('❌ Không thể tạo phần tử toast');
+        return;
+    }
+
+    if (typeof bootstrap === 'undefined' || !bootstrap.Toast) {
+        console.error('❌ Bootstrap JS chưa được tải!');
+        return;
+    }
+
     const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
     toast.show();
-    // Remove after hidden
+
     toastEl.addEventListener('hidden.bs.toast', () => wrapper.remove());
 }
+
 
 // Update cart badge helper
 function updateCartBadge(count) {
@@ -360,6 +328,3 @@ function handleAddToCartSuccess(data) {
     showToast('Thành công', 'Sản phẩm đã được thêm vào giỏ hàng!', 'success');
 }
 </script>
-
-<!-- Toast container -->
-<div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 11000;"></div>

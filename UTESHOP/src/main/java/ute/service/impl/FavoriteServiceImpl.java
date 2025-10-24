@@ -33,4 +33,5 @@ public class FavoriteServiceImpl implements FavoriteService {
     public List<Favorite> getUserFavorites(Long userId) {
         return favoriteDao.findByUserId(userId);
     }
+
 }
