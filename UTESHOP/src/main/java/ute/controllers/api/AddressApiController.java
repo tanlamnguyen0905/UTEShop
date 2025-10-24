@@ -303,14 +303,12 @@ public class AddressApiController extends HttpServlet {
         out.print(gson.toJson(response));
     }
 
-    private void sendError(HttpServletResponse resp, PrintWriter out, 
-                          int statusCode, String message) {
+    private void sendError(HttpServletResponse resp, PrintWriter out,
+            int statusCode, String message) {
         resp.setStatus(statusCode);
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
         response.put("error", message);
         out.print(gson.toJson(response));
-    }<<<<<<<HEAD
+    }
 }
-
-=======}>>>>>>>origin/dev
