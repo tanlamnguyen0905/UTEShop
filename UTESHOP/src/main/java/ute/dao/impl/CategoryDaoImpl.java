@@ -11,12 +11,22 @@ import ute.entities.Categories;
 public class CategoryDaoImpl implements CategoryDao {
 	@Override
 	public List<Categories> findAll() {
-		EntityManager em = JPAConfig.getEntityManager();
-		TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c", Categories.class);
+		EntityManager em = null;
 		try {
+			em = JPAConfig.getEntityManager();
+			if (em == null) {
+				throw new RuntimeException("EntityManager is null - Database connection failed");
+			}
+			TypedQuery<Categories> query = em.createQuery("SELECT c FROM Categories c", Categories.class);
 			return query.getResultList();			
+		} catch (Exception e) {
+			System.err.println("Lỗi trong CategoryDaoImpl.findAll(): " + e.getMessage());
+			e.printStackTrace();
+			throw e;
 		} finally {
-			em.close();
+			if (em != null) {
+				em.close();
+			}
 		}
 	}
 

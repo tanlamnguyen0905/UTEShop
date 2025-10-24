@@ -1,7 +1,9 @@
 package ute.controllers.admin.product;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import jakarta.servlet.ServletException;
@@ -10,11 +12,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ute.entities.Product;
 import ute.entities.Categories;
 import ute.entities.Brand;
+import ute.entities.Image;
 import ute.service.admin.Impl.ProductServiceImpl;
 import ute.service.admin.inter.ProductService;
 import ute.service.impl.CategoriesServiceImpl;
@@ -298,6 +302,41 @@ public class ProductController extends HttpServlet {
             product.setStockQuantity(stockQuantity);
             product.setCategory(category);
             product.setBrand(brand);
+
+            // Handle file upload
+            Part filePart = req.getPart("image");
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = filePart.getSubmittedFileName();
+                // Ensure uploads directory exists
+                String uploadPath = ute.utils.Constant.Dir + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                
+                // Generate unique filename to avoid conflicts
+                String fileExtension = "";
+                if (fileName.lastIndexOf(".") > 0) {
+                    fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                }
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                String filePath = uploadPath + File.separator + uniqueFileName;
+                
+                // Save the file
+                filePart.write(filePath);
+                
+                // Create Image entity
+                Image image = Image.builder()
+                        .dirImage("uploads/" + uniqueFileName)
+                        .product(product)
+                        .build();
+                
+                // Add to product's images list
+                if (product.getImages() == null) {
+                    product.setImages(new ArrayList<>());
+                }
+                product.getImages().add(image);
+            }
 
             // Check for duplicate product name (exact match)
             List<Product> existingProducts = productService.findByName(productName.trim());

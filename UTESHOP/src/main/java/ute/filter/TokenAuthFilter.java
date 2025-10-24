@@ -33,7 +33,8 @@ public class TokenAuthFilter implements Filter {
     private static final List<String> EXCLUDED_PATHS = List.of(
         "/auth/", "/public/", "/assets/", "/uploads/", 
         "/css/", "/js/", "/images/", "/user/", "/home", 
-        "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico"
+        "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
+        "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
     );
     
     @Override

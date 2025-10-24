@@ -199,25 +199,7 @@
 									<div class="row g-4">
 										<c:forEach var="p" items="${listPro}">
 											<div class="col-6 col-md-4 col-lg-3">
-												<div class="card border-0 shadow-sm rounded-4 h-100">
-													<c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
-													<c:url value="/image?fname=${productImage}" var="imgUrl" />
-
-													<a href="${pageContext.request.contextPath}/detailProduct?id=${p.productID}"
-														class="text-decoration-none">
-														<img src="${imgUrl}" class="card-img-top rounded-4"
-															alt="${p.productName}"
-															style="height: 250px; object-fit: cover;">
-														<div class="card-body p-3">
-															<h6 class="text-dark mb-2">${p.productName}</h6>
-
-															<span class="fw-bold text-dark">
-																<fmt:formatNumber value="${p.unitPrice}" type="number"
-																	maxFractionDigits="0" />đ
-															</span>
-														</div>
-													</a>
-												</div>
+												<%@ include file="product-card.jsp" %>
 											</div>
 										</c:forEach>
 									</div>
@@ -366,5 +348,8 @@
 				</script>
 
 			</body>
+			
+			<!-- Include Cart JS for quick add to cart functionality -->
+			<script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
 
 			</html>

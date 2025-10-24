@@ -33,8 +33,6 @@ public class OrderDetail {
         return quantity * unitPrice;
     }
 
-    private int status;
-
     @ManyToOne
     @JoinColumn(name = "orderID")
     private Orders order;

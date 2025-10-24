@@ -236,7 +236,7 @@
                                 <div class="recent-item d-flex align-items-center">
                                     <c:choose>
                                         <c:when test="${not empty product.images and not empty product.images[0]}">
-                                            <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].link}" 
+                                            <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}" 
                                                  class="product-img-small me-3" 
                                                  alt="${product.productName}">
                                         </c:when>
@@ -283,7 +283,7 @@
                                 <div class="recent-item d-flex align-items-center">
                                     <c:choose>
                                         <c:when test="${not empty product.images and not empty product.images[0]}">
-                                            <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].link}" 
+                                            <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}" 
                                                  class="product-img-small me-3" 
                                                  alt="${product.productName}">
                                         </c:when>

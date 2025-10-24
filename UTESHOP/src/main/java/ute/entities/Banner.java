@@ -21,7 +21,7 @@ public class Banner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bannerID;
 
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String bannerName;
 
     private String bannerImage;

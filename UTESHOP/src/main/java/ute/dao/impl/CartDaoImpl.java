@@ -89,7 +89,16 @@ public class CartDaoImpl implements CartDao {
     public CartDetail findCartDetailById(Long cartDetailId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            return em.find(CartDetail.class, cartDetailId);
+            TypedQuery<CartDetail> query = em.createQuery(
+                "SELECT cd FROM CartDetail cd " +
+                "JOIN FETCH cd.cart " +
+                "JOIN FETCH cd.product " +
+                "WHERE cd.cartDetailID = :id", 
+                CartDetail.class);
+            query.setParameter("id", cartDetailId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         } finally {
             em.close();
         }
@@ -103,7 +112,6 @@ public class CartDaoImpl implements CartDao {
                 "SELECT cd FROM CartDetail cd " +
                 "JOIN FETCH cd.product p " +
                 "LEFT JOIN FETCH p.images " +
-                "LEFT JOIN FETCH p.productDiscounts " +
                 "WHERE cd.cart.cartID = :cartId", 
                 CartDetail.class);
             query.setParameter("cartId", cartId);

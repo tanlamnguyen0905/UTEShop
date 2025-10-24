@@ -12,9 +12,10 @@ function addToCart(productId, quantity = 1) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies in cross-origin requests
         body: JSON.stringify({
-            productId: productId,
-            quantity: quantity
+            productId: parseInt(productId),
+            quantity: parseInt(quantity)
         })
     })
     .then(response => {
@@ -53,6 +54,7 @@ function updateCartQuantity(cartDetailId, quantity) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             cartDetailId: cartDetailId,
             quantity: quantity
@@ -61,33 +63,31 @@ function updateCartQuantity(cartDetailId, quantity) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showNotification(data.message, 'success');
+            // Không hiển thị thông báo, chỉ reload
             updateCartCount(data.itemCount);
-            // Reload trang giỏ hàng để cập nhật
             if (window.location.pathname.includes('/cart')) {
                 location.reload();
             }
         } else {
+            // Chỉ hiển thị thông báo khi có lỗi
             showNotification(data.error || 'Có lỗi xảy ra', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('Có lỗi xảy ra', 'error');
+        showNotification('Không thể cập nhật số lượng', 'error');
     });
 }
 
 // Xóa sản phẩm khỏi giỏ hàng
 function removeFromCart(cartDetailId) {
-    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-        return;
-    }
-    
+    // Xóa trực tiếp không cần confirm
     fetch(getContextPath() + '/api/cart/remove', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             cartDetailId: cartDetailId
         })
@@ -95,19 +95,19 @@ function removeFromCart(cartDetailId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showNotification(data.message, 'success');
+            // Không hiển thị thông báo, chỉ reload
             updateCartCount(data.itemCount);
-            // Reload trang giỏ hàng
             if (window.location.pathname.includes('/cart')) {
                 location.reload();
             }
         } else {
-            showNotification(data.error || 'Có lỗi xảy ra', 'error');
+            // Chỉ hiển thị thông báo khi có lỗi
+            showNotification(data.error || 'Không thể xóa sản phẩm', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('Có lỗi xảy ra', 'error');
+        showNotification('Không thể xóa sản phẩm', 'error');
     });
 }
 
@@ -121,28 +121,31 @@ function clearCart() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showNotification(data.message, 'success');
+            // Không hiển thị thông báo, chỉ reload
             updateCartCount(0);
-            // Reload trang
             location.reload();
         } else {
-            showNotification(data.error || 'Có lỗi xảy ra', 'error');
+            // Chỉ hiển thị thông báo khi có lỗi
+            showNotification(data.error || 'Không thể xóa giỏ hàng', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('Có lỗi xảy ra', 'error');
+        showNotification('Không thể xóa giỏ hàng', 'error');
     });
 }
 
 // Lấy số lượng sản phẩm trong giỏ hàng
 function getCartCount() {
-    fetch(getContextPath() + '/api/cart/count')
+    fetch(getContextPath() + '/api/cart/count', {
+        credentials: 'include'
+    })
         .then(response => {
             if (response.status === 401) {
                 // User chưa đăng nhập, hiển thị 0

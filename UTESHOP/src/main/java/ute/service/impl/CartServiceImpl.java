@@ -2,6 +2,9 @@ package ute.service.impl;
 
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import ute.configs.JPAConfig;
 import ute.dao.impl.CartDaoImpl;
 import ute.dao.impl.ProductDaoImpl;
 import ute.dao.impl.UserDaoImpl;
@@ -191,11 +194,26 @@ public class CartServiceImpl implements CartService {
                 .mapToDouble(detail -> detail.getUnitPrice() * detail.getQuantity())
                 .sum();
         
-        Cart cart = cartDao.findCartDetailById(cartDetails.isEmpty() ? null : cartDetails.get(0).getCartDetailID())
-                .getCart();
-        if (cart != null) {
-            cart.setTotalPrice(total);
-            cartDao.updateCart(cart);
+        // Lấy Cart trực tiếp từ EntityManager thay vì qua CartDetail
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            Cart cart = em.find(Cart.class, cartId);
+            if (cart != null) {
+                EntityTransaction trans = em.getTransaction();
+                try {
+                    trans.begin();
+                    cart.setTotalPrice(total);
+                    em.merge(cart);
+                    trans.commit();
+                } catch (Exception e) {
+                    if (trans.isActive()) {
+                        trans.rollback();
+                    }
+                    throw e;
+                }
+            }
+        } finally {
+            em.close();
         }
     }
 }

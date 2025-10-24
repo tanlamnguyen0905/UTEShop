@@ -231,21 +231,9 @@
                                 
                                 <!-- Price -->
                                 <div class="col-auto text-end">
-                                    <c:choose>
-                                        <c:when test="${item.product.discountPrice < item.product.unitPrice}">
-                                            <div class="price-original">
-                                                <fmt:formatNumber value="${item.product.unitPrice}" type="number" groupingUsed="true"/>đ
-                                            </div>
-                                            <div class="price-discount">
-                                                <fmt:formatNumber value="${item.product.discountPrice}" type="number" groupingUsed="true"/>đ
-                                            </div>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <div class="price-discount">
-                                                <fmt:formatNumber value="${item.product.unitPrice}" type="number" groupingUsed="true"/>đ
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <div class="fw-bold text-danger">
+                                        <fmt:formatNumber value="${item.product.unitPrice}" type="number" groupingUsed="true"/>₫
+                                    </div>
                                 </div>
                                 
                                 <!-- Quantity Control -->
@@ -271,7 +259,7 @@
                                 <!-- Subtotal -->
                                 <div class="col-auto">
                                     <div class="fw-bold text-danger">
-                                        <fmt:formatNumber value="${item.unitPrice * item.quantity}" type="number" groupingUsed="true"/>đ
+                                        <fmt:formatNumber value="${item.unitPrice * item.quantity}" type="number" groupingUsed="true"/>₫
                                     </div>
                                 </div>
                                 
@@ -299,7 +287,7 @@
                     <div class="d-flex justify-content-between">
                         <span class="text-muted">Tạm tính:</span>
                         <span class="fw-semibold">
-                            <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true"/>đ
+                            <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true"/>₫
                         </span>
                     </div>
                 </div>
@@ -315,7 +303,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="fw-bold fs-5">Tổng cộng:</span>
                         <span class="fw-bold fs-4 text-danger">
-                            <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true"/>đ
+                            <fmt:formatNumber value="${totalPrice}" type="number" groupingUsed="true"/>₫
                         </span>
                     </div>
                 </div>
@@ -363,6 +351,7 @@ function updateQuantity(cartDetailId, quantity) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             cartDetailId: cartDetailId,
             quantity: quantity
@@ -371,14 +360,13 @@ function updateQuantity(cartDetailId, quantity) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            if (window.showNotification) {
-                window.showNotification(data.message, 'success');
-            }
+            // Không hiển thị thông báo, reload ngay lập tức
             if (window.updateCartCount) {
                 window.updateCartCount(data.itemCount);
             }
-            setTimeout(() => location.reload(), 500);
+            location.reload();
         } else {
+            // Chỉ hiển thị thông báo khi có lỗi
             if (window.showNotification) {
                 window.showNotification(data.error, 'danger');
             } else {
@@ -388,21 +376,23 @@ function updateQuantity(cartDetailId, quantity) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Có lỗi xảy ra!');
+        if (window.showNotification) {
+            window.showNotification('Không thể cập nhật số lượng', 'error');
+        } else {
+            alert('Có lỗi xảy ra!');
+        }
     });
 }
 
 // Remove from cart
 function removeFromCart(cartDetailId) {
-    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-        return;
-    }
-    
+    // Xóa trực tiếp không cần confirm
     fetch('${pageContext.request.contextPath}/api/cart/remove', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             cartDetailId: cartDetailId
         })
@@ -410,14 +400,13 @@ function removeFromCart(cartDetailId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            if (window.showNotification) {
-                window.showNotification(data.message, 'success');
-            }
+            // Không hiển thị thông báo, chỉ reload và cập nhật badge
             if (window.updateCartCount) {
                 window.updateCartCount(data.itemCount);
             }
-            setTimeout(() => location.reload(), 500);
+            location.reload();
         } else {
+            // Chỉ hiển thị thông báo khi có lỗi
             if (window.showNotification) {
                 window.showNotification(data.error, 'danger');
             } else {
@@ -427,7 +416,11 @@ function removeFromCart(cartDetailId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Có lỗi xảy ra!');
+        if (window.showNotification) {
+            window.showNotification('Có lỗi xảy ra!', 'error');
+        } else {
+            alert('Có lỗi xảy ra!');
+        }
     });
 }
 
@@ -441,19 +434,19 @@ function clearCart() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            if (window.showNotification) {
-                window.showNotification(data.message, 'success');
-            }
+            // Không hiển thị thông báo, chỉ reload và cập nhật badge
             if (window.updateCartCount) {
                 window.updateCartCount(0);
             }
-            setTimeout(() => location.reload(), 500);
+            location.reload();
         } else {
+            // Chỉ hiển thị thông báo khi có lỗi
             if (window.showNotification) {
                 window.showNotification(data.error, 'danger');
             } else {
@@ -463,7 +456,11 @@ function clearCart() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Có lỗi xảy ra!');
+        if (window.showNotification) {
+            window.showNotification('Có lỗi xảy ra!', 'error');
+        } else {
+            alert('Có lỗi xảy ra!');
+        }
     });
 }
 </script>

@@ -7,7 +7,7 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Danh mục sản phẩm</title>
+                <title>UTESHOP</title>
             </head>
 
             <body class="bg-light py-5">
@@ -76,24 +76,7 @@
                         <div class="row g-4">
                             <c:forEach var="p" items="${listBestSell}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
-                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
-
-                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
-                                            class="text-decoration-none">
-                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
-                                                style="height: 250px; object-fit: cover;">
-                                            <div class="card-body p-2">
-                                                <h6 class="text-dark mb-2">${p.productName}</h6>
-
-                                                <span class="fw-bold text-dark">
-                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
-                                                        maxFractionDigits="0" />đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    <%@ include file="product-card.jsp" %>
                                 </div>
                             </c:forEach>
                         </div>
@@ -110,24 +93,7 @@
                         <div class="row g-4">
                             <c:forEach var="p" items="${listNewProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
-                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
-
-                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
-                                            class="text-decoration-none">
-                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
-                                                style="height: 250px; object-fit: cover;">
-                                            <div class="card-body p-2">
-                                                <h6 class="text-dark mb-2">${p.productName}</h6>
-
-                                                <span class="fw-bold text-dark">
-                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
-                                                        maxFractionDigits="0" />đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    <%@ include file="product-card.jsp" %>
                                 </div>
                             </c:forEach>
                         </div>
@@ -145,24 +111,7 @@
                         <div class="row g-4">
                             <c:forEach var="p" items="${listTopReviewProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
-                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
-
-                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
-                                            class="text-decoration-none">
-                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
-                                                style="height: 250px; object-fit: cover;">
-                                            <div class="card-body p-2">
-                                                <h6 class="text-dark mb-2">${p.productName}</h6>
-
-                                                <span class="fw-bold text-dark">
-                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
-                                                        maxFractionDigits="0" />đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    <%@ include file="product-card.jsp" %>
                                 </div>
                             </c:forEach>
                         </div>
@@ -180,24 +129,7 @@
                         <div class="row g-4">
                             <c:forEach var="p" items="${listTopFavoriteProducts}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:set var="productImage" value="${empty p.images ? 'logo.png' : p.images[0]}" />
-                                        <c:url value="/image?fname=${productImage}" var="imgUrl" />
-
-                                        <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}"
-                                            class="text-decoration-none">
-                                            <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
-                                                style="height: 250px; object-fit: cover;">
-                                            <div class="card-body p-2">
-                                                <h6 class="text-dark mb-2">${p.productName}</h6>
-
-                                                <span class="fw-bold text-dark">
-                                                    <fmt:formatNumber value="${p.unitPrice}" type="number"
-                                                        maxFractionDigits="0" />đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    <%@ include file="product-card.jsp" %>
                                 </div>
                             </c:forEach>
                         </div>
@@ -250,5 +182,8 @@
                         --%>
                 </div>
             </body>
+            
+            <!-- Include Cart JS for quick add to cart functionality -->
+            <script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
 
             </html>

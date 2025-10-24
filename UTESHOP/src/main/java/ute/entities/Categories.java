@@ -29,7 +29,7 @@ public class Categories {
     @Column(name = "categoryName", columnDefinition = "NVARCHAR(255)", nullable = false)
     private String categoryName;
 
-    @Column(name = "description", columnDefinition = "nvarchar(max)")
+    @Column(name = "description", columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
     @Column(name = "image", columnDefinition = "nvarchar(max)")

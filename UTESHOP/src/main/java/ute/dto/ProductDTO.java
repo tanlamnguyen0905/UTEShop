@@ -9,12 +9,10 @@ import ute.entities.Image;
 import ute.entities.Product;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {
@@ -27,6 +25,8 @@ public class ProductDTO {
     private String category;
     private String description;
     private float rating;
+    private Long soldCount;
+    private Long reviewCount;
     public List<String> images;
 
     public static ProductDTO fromEntity(Product p) {
@@ -41,6 +41,8 @@ public class ProductDTO {
         dto.setCategory(p.getCategory() != null ? p.getCategory().getCategoryName() : "N/A");
         dto.setBrand(p.getBrand() != null ? p.getBrand().getBrandName() : "N/A");
         dto.setRating(p.getRating());
+        dto.setSoldCount(p.getSoldCount() != null ? p.getSoldCount() : 0L);
+        dto.setReviewCount(p.getReviewCount() != null ? p.getReviewCount() : 0L);
         // discount price: không còn discount => mặc định bằng unitPrice
 
         // Convert all product images to URLs

@@ -1,5 +1,6 @@
 package ute.controllers.admin.category;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -123,11 +124,25 @@ public class CategoriesController extends HttpServlet {
             String image = null;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = filePart.getSubmittedFileName();
-                // Save the file to a directory (e.g., /assets/uploads/)
-                String uploadPath = getServletContext().getRealPath("/assets/uploads");
-                String filePath = uploadPath + "/" + fileName;
+                
+                // Ensure uploads directory exists
+                String uploadPath = ute.utils.Constant.Dir + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                
+                // Generate unique filename to avoid conflicts
+                String fileExtension = "";
+                if (fileName.lastIndexOf(".") > 0) {
+                    fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                }
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                String filePath = uploadPath + File.separator + uniqueFileName;
+                
+                // Save the file
                 filePart.write(filePath);
-                image = "uploads/" + fileName; // Store relative path in the database
+                image = "uploads/" + uniqueFileName; // Store relative path in the database
             } else if (id != null) {
                 // If no new image is uploaded, keep the existing image
                 image = category.getImage();
