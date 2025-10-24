@@ -28,14 +28,25 @@
             
             <!-- Rating Summary -->
             <div class="rating-summary mb-3">
-                <div class="rating-stars">
-                    <c:forEach begin="1" end="5" var="i">
-                        <i class="fas fa-star ${i <= averageRating ? 'text-warning' : 'text-secondary'}"></i>
-                    </c:forEach>
-                    <span class="ml-2">(${reviewCount} đánh giá)</span>
-                </div>
-                <div class="average-rating">
-                    <span class="h4">${averageRating}/5</span>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rating-stars">
+                        <c:forEach begin="1" end="5" var="i">
+                            <i class="fas fa-star ${i <= averageRating ? 'text-warning' : 'text-secondary'}"></i>
+                        </c:forEach>
+                        <span class="ms-2">
+                            <strong><fmt:formatNumber value="${averageRating}" type="number" maxFractionDigits="1" /></strong>/5
+                        </span>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="text-muted">
+                        <i class="fas fa-comment-dots"></i>
+                        <fmt:formatNumber value="${reviewCount}" type="number" /> đánh giá
+                    </div>
+                    <div class="vr"></div>
+                    <div class="text-muted">
+                        <i class="fas fa-shopping-bag"></i>
+                        Đã bán: <strong><fmt:formatNumber value="${productDTO.soldCount}" type="number" /></strong>
+                    </div>
                 </div>
             </div>
 
@@ -63,7 +74,7 @@
                            max="${productDTO.stockQuantity}">
                 </div>
                 <div class="action-buttons">
-                    <button type="button" id="addCartBtn" onclick="addToCart()" class="btn btn-primary">
+                    <button type="button" id="addCartBtn" onclick="handleAddToCartClick()" class="btn btn-primary">
                         <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
                     </button>
                     <button type="button" id="wishlistBtn" onclick="addToWishlist(${product.id})" class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}">
@@ -210,6 +221,9 @@
     }
 </style>
 
+<!-- Include Cart JS -->
+<script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
+
 <!-- JavaScript -->
 <script>
 function changeMainImage(imageUrl) {
@@ -222,29 +236,18 @@ function changeMainImage(imageUrl) {
     });
 }
 
-function addToCart() {
-    const quantity = document.getElementById('quantity').value;
-    const productId = document.querySelector('input[name="productId"]').value;
-
-    fetch('${pageContext.request.contextPath}/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `productId=${productId}&quantity=${quantity}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            handleAddToCartSuccess(data);
-        } else {
-            showToast('Lỗi', data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng', 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Lỗi', 'Có lỗi xảy ra khi thêm vào giỏ hàng', 'danger');
-    });
+// Handle click nút thêm vào giỏ hàng
+function handleAddToCartClick() {
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+    const productId = parseInt(document.querySelector('input[name="productId"]').value);
+    
+    // Gọi function addToCart từ cart.js (global function)
+    if (typeof addToCart === 'function') {
+        addToCart(productId, quantity);
+    } else {
+        console.error('Function addToCart from cart.js is not loaded');
+        showToast('Lỗi', 'Không thể tải chức năng giỏ hàng', 'danger');
+    }
 }
 
 function addToWishlist(productId) {
@@ -346,8 +349,13 @@ function updateCartBadge(count) {
 
 // After add to cart success, update header badge if returned
 function handleAddToCartSuccess(data) {
-    if(data.cartCount !== undefined) {
-        updateCartBadge(data.cartCount);
+    // Cập nhật badge số lượng giỏ hàng
+    if(data.itemCount !== undefined) {
+        updateCartBadge(data.itemCount);
+        // Cập nhật badge bằng cách gọi hàm từ cart.js nếu có
+        if (typeof window.updateCartCount !== 'undefined') {
+            window.updateCartCount(data.itemCount);
+        }
     }
     showToast('Thành công', 'Sản phẩm đã được thêm vào giỏ hàng!', 'success');
 }

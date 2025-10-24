@@ -18,7 +18,7 @@ public class CartDaoImpl implements CartDao {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Cart> query = em.createQuery(
-                "SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class);
+                    "SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class);
             query.setParameter("userId", userId);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -89,7 +89,16 @@ public class CartDaoImpl implements CartDao {
     public CartDetail findCartDetailById(Long cartDetailId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            return em.find(CartDetail.class, cartDetailId);
+            TypedQuery<CartDetail> query = em.createQuery(
+                    "SELECT cd FROM CartDetail cd " +
+                            "JOIN FETCH cd.cart " +
+                            "JOIN FETCH cd.product " +
+                            "WHERE cd.cartDetailID = :id",
+                    CartDetail.class);
+            query.setParameter("id", cartDetailId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         } finally {
             em.close();
         }
@@ -100,12 +109,11 @@ public class CartDaoImpl implements CartDao {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<CartDetail> query = em.createQuery(
-                "SELECT cd FROM CartDetail cd " +
-                "JOIN FETCH cd.product p " +
-                "LEFT JOIN FETCH p.images " +
-                "LEFT JOIN FETCH p.productDiscounts " +
-                "WHERE cd.cart.cartID = :cartId", 
-                CartDetail.class);
+                    "SELECT cd FROM CartDetail cd " +
+                            "JOIN FETCH cd.product p " +
+                            "LEFT JOIN FETCH p.images " +
+                            "WHERE cd.cart.cartID = :cartId",
+                    CartDetail.class);
             query.setParameter("cartId", cartId);
             return query.getResultList();
         } finally {
@@ -118,9 +126,9 @@ public class CartDaoImpl implements CartDao {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<CartDetail> query = em.createQuery(
-                "SELECT cd FROM CartDetail cd WHERE cd.cart.cartID = :cartId " +
-                "AND cd.product.productID = :productId", 
-                CartDetail.class);
+                    "SELECT cd FROM CartDetail cd WHERE cd.cart.cartID = :cartId " +
+                            "AND cd.product.productID = :productId",
+                    CartDetail.class);
             query.setParameter("cartId", cartId);
             query.setParameter("productId", productId);
             return query.getSingleResult();
@@ -195,8 +203,8 @@ public class CartDaoImpl implements CartDao {
         try {
             trans.begin();
             em.createQuery("DELETE FROM CartDetail cd WHERE cd.cart.cartID = :cartId")
-              .setParameter("cartId", cartId)
-              .executeUpdate();
+                    .setParameter("cartId", cartId)
+                    .executeUpdate();
             trans.commit();
         } catch (Exception e) {
             if (trans.isActive()) {
@@ -213,8 +221,8 @@ public class CartDaoImpl implements CartDao {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Long> query = em.createQuery(
-                "SELECT SUM(cd.quantity) FROM CartDetail cd WHERE cd.cart.cartID = :cartId", 
-                Long.class);
+                    "SELECT SUM(cd.quantity) FROM CartDetail cd WHERE cd.cart.cartID = :cartId",
+                    Long.class);
             query.setParameter("cartId", cartId);
             Long result = query.getSingleResult();
             return result != null ? result.intValue() : 0;

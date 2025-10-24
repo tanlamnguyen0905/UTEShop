@@ -33,7 +33,9 @@ public class TokenAuthFilter implements Filter {
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/auth/", "/public/", "/assets/", "/uploads/",
             "/css/", "/js/", "/images/", "/user/", "/home",
-            "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico");
+            "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
+            "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
+    );
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -62,7 +64,7 @@ public class TokenAuthFilter implements Filter {
         }
 
         // 2️⃣ Chỉ kiểm tra token cho /api/*
-        if (!path.startsWith(req.getContextPath() + "/")) {
+        if (!path.startsWith(req.getContextPath() + "/api/")) {
             chain.doFilter(request, response);
             return;
         }
@@ -136,16 +138,16 @@ public class TokenAuthFilter implements Filter {
 
             case "MANAGER":
                 // Manager can access manager and user APIs
-                return pathLower.contains("/manager") ||
-                        pathLower.contains("/user");
+                return pathLower.contains("/api/manager") ||
+                        pathLower.contains("/api/user");
 
             case "SHIPPER":
                 // Shipper can only access shipper APIs
-                return pathLower.contains("/shipper");
+                return pathLower.contains("/api/shipper");
 
             case "USER":
                 // User can only access user APIs
-                return pathLower.contains("/user");
+                return pathLower.contains("/api/user");
 
             default:
                 return false;

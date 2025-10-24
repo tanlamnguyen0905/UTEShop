@@ -34,6 +34,7 @@ public interface ProductService {
 
     List<Product> findByCategoryIdinPage(int categoryId, int page, int pageSize);
 
+    // Lấy các sản phẩm bán chạy nhất
     List<Product> findBestSeller(int limit);
 
     List<Product> findByPriceRange(double minPrice, double maxPrice);
@@ -54,6 +55,7 @@ public interface ProductService {
 
     int countProductsByFilter(ProductFilter filter);
 
+    // Convenience: return products + pagination metadata
     ProductPage getProductsPageByFilter(ProductFilter filter);
 
     List<ProductDTO> MapToProductDTO(List<Product> products);

@@ -19,6 +19,9 @@ public class JPAConfig {
             Properties props = new Properties();
             try (InputStream is = Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream("config.properties")) {
+                if (is == null) {
+                    throw new RuntimeException("Không tìm thấy file config.properties");
+                }
                 props.load(is);
             }
 
@@ -28,6 +31,9 @@ public class JPAConfig {
             String dbUser = props.getProperty("db.username");
             String dbPass = props.getProperty("db.password");
 
+            if (dbUrl == null || dbUser == null || dbPass == null) {
+                throw new RuntimeException("Thiếu thông tin kết nối database trong config.properties");
+            }
 
             overrides.put("jakarta.persistence.jdbc.url", dbUrl);
             overrides.put("jakarta.persistence.jdbc.user", dbUser);
@@ -35,16 +41,33 @@ public class JPAConfig {
 
             // Tạo EMF nếu chưa có (với overrides)
             if (emf == null || !emf.isOpen()) {
+                System.out.println("Đang tạo EntityManagerFactory...");
+                System.out.println("Database URL: " + dbUrl);
                 emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, overrides);
+                System.out.println("EntityManagerFactory đã được tạo thành công!");
             }
 
             // Tạo và return EM
-            return emf.createEntityManager();
+            EntityManager em = emf.createEntityManager();
+            if (em == null) {
+                throw new RuntimeException("Không thể tạo EntityManager từ EntityManagerFactory");
+            }
+            return em;
 
         } catch (Exception e) {
-            System.err.println("Lỗi khi tạo EntityManager: " + e.getMessage());
+            System.err.println("========================================");
+            System.err.println("LỖI KHI TẠO ENTITYMANAGER");
+            System.err.println("========================================");
+            System.err.println("Chi tiết lỗi: " + e.getMessage());
             e.printStackTrace();
-            return null;
+            System.err.println("========================================");
+            System.err.println("Vui lòng kiểm tra:");
+            System.err.println("1. SQL Server đã chạy chưa?");
+            System.err.println("2. Database UTESHOP đã tồn tại chưa?");
+            System.err.println("3. Username/password trong config.properties đúng chưa?");
+            System.err.println("4. File persistence.xml có lỗi cú pháp không?");
+            System.err.println("========================================");
+            throw new RuntimeException("Lỗi khởi tạo EntityManager: " + e.getMessage(), e);
         }
     }
 

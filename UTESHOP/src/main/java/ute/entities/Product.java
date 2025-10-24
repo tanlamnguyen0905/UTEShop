@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,9 +36,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productID;
 
-    @Column(name = "productName", columnDefinition = "nvarchar(255)")
+    @Column(name = "productName", columnDefinition = "NVARCHAR(255)")
     private String productName;
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String describe;
     private Double unitPrice;
     private Integer stockQuantity;
@@ -70,7 +71,7 @@ public class Product {
 
     private List<Favorite> favorites;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
 
     @ManyToMany

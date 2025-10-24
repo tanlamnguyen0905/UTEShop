@@ -147,25 +147,23 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public List<Product> findBestSeller(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
-		TypedQuery<Product> query = em.createQuery(
-				"SELECT p FROM Product p " +
-						"left join p.images i left JOIN p.orderDetails od " +
-						"GROUP BY p " +
-						"ORDER BY SUM(od.quantity) DESC",
-				Product.class);
-		query.setMaxResults(limit);
-
-		List<Product> bestSellers;
 		try {
-			bestSellers = query.getResultList();
+			TypedQuery<Product> query = em.createQuery(
+					"SELECT p FROM OrderDetail od right JOIN od.product p GROUP BY p ORDER BY SUM(od.quantity) DESC",
+					Product.class);
+			query.setMaxResults(limit);
+			List<Product> bestSellers = query.getResultList();
+			// Initialize collections
 			for (Product p : bestSellers) {
-				p.getImages().size(); // activate lazy loading of images
+				if (p.getImages() != null)
+					p.getImages().size();
+				if (p.getFavorites() != null)
+					p.getFavorites().size();
 			}
+			return bestSellers;
 		} finally {
 			em.close();
 		}
-
-		return bestSellers;
 	}
 
 	@Override
@@ -251,33 +249,29 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public List<Product> findTopFavorite(int limit) {
-		// TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY
-		// p.favoriteCount DESC",
-		// Product.class);
-		// return query.getResultList();
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Object[]> query = em.createQuery(
-				"SELECT p, COUNT(f) as favCount " +
-						"FROM Product p LEFT JOIN p.favorites f " +
-						"GROUP BY p " +
-						"ORDER BY favCount DESC",
-				Object[].class);
+					"SELECT p, COUNT(f) as favCount " +
+							"FROM Product p LEFT JOIN p.favorites f " +
+							"GROUP BY p " +
+							"ORDER BY favCount DESC",
+					Object[].class);
 
 			List<Object[]> result = query.getResultList();
 
-		// map lại thành Product + favoriteCount và initialize collections
-		List<Product> products = result.stream()
-				.map(arr -> {
-					Product p = (Product) arr[0];
-					p.setFavoriteCount(((Long) arr[1]).intValue());
-					if (p.getImages() != null)
-						p.getImages().size();
-					if (p.getFavorites() != null)
-						p.getFavorites().size();
-					return p;
-				})
-				.collect(Collectors.toList());
+			// map lại thành Product + favoriteCount và initialize collections
+			List<Product> products = result.stream()
+					.map(arr -> {
+						Product p = (Product) arr[0];
+						p.setFavoriteCount(((Long) arr[1]).intValue());
+						if (p.getImages() != null)
+							p.getImages().size();
+						if (p.getFavorites() != null)
+							p.getFavorites().size();
+						return p;
+					})
+					.collect(Collectors.toList());
 
 			return products.subList(0, Math.min(limit, products.size()));
 		} finally {
@@ -288,12 +282,13 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public List<Product> findTopFavoriteinPage(int page, int pageSize) {
 		EntityManager em = JPAConfig.getEntityManager();
-		TypedQuery<Object[]> query = em.createQuery(
-				"SELECT p, COUNT(f) as favCount " +
-						"FROM Product p LEFT JOIN p.favorites f " +
-						"GROUP BY p " +
-						"ORDER BY favCount DESC",
-				Object[].class);
+		try {
+			TypedQuery<Object[]> query = em.createQuery(
+					"SELECT p, COUNT(f) as favCount " +
+							"FROM Product p LEFT JOIN p.favorites f " +
+							"GROUP BY p " +
+							"ORDER BY favCount DESC",
+					Object[].class);
 
 			List<Object[]> result = query.getResultList();
 
@@ -306,12 +301,15 @@ public class ProductDaoImpl implements ProductDao {
 					})
 					.collect(Collectors.toList());
 
-		int start = (page - 1) * pageSize;
-		if (start >= products.size() || start < 0) {
-			return java.util.Collections.emptyList();
+			int start = (page - 1) * pageSize;
+			if (start >= products.size() || start < 0) {
+				return java.util.Collections.emptyList();
+			}
+			int end = Math.min(page * pageSize, products.size());
+			return products.subList(start, end);
+		} finally {
+			em.close();
 		}
-		int end = Math.min(page * pageSize, products.size());
-		return products.subList(start, end);
 	}
 
 	@Override
@@ -553,4 +551,5 @@ public class ProductDaoImpl implements ProductDao {
 			em.close();
 		}
 	}
+
 }

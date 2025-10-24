@@ -29,11 +29,16 @@ import ute.service.impl.UserServiceImpl;
 import ute.service.inter.AddressService;
 import ute.service.inter.UserService;
 
-@WebServlet({ 
-    // View endpoints
-    "/user/profile", "/user/update-profile", "/user/change-password", "/user/delete-account",
-    // API endpoints  
-    "/api/user/profile", "/api/user/password", "/api/user/account"
+/**
+ * Unified User Controller - xử lý cả API endpoints và View endpoints
+ * - API endpoints: /api/user/* - trả về JSON
+ * - View endpoints: /user/* - forward tới JSP
+ */
+@WebServlet({
+        // View endpoints
+        "/user/profile", "/user/update-profile", "/user/change-password", "/user/delete-account",
+        // API endpoints
+        "/api/user/profile", "/api/user/password", "/api/user/account"
 })
 @MultipartConfig
 public class UserController extends HttpServlet {
@@ -45,9 +50,9 @@ public class UserController extends HttpServlet {
     private final Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String path = req.getServletPath();
         HttpSession session = req.getSession();
         Users currentUser = (Users) session.getAttribute("currentUser");
@@ -63,9 +68,9 @@ public class UserController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String path = req.getServletPath();
         HttpSession session = req.getSession();
         Users currentUser = (Users) session.getAttribute("currentUser");
@@ -78,24 +83,24 @@ public class UserController extends HttpServlet {
 
         // Xử lý View POST endpoints
         switch (path) {
-        case "/user/update-profile":
-            updateProfileForm(req, resp, currentUser);
-            break;
-        case "/user/change-password":
-            changePasswordForm(req, resp, currentUser);
-            break;
-        case "/user/delete-account":
-            deleteAccountForm(req, resp, currentUser);
-            break;
-        default:
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            case "/user/update-profile":
+                updateProfileForm(req, resp, currentUser);
+                break;
+            case "/user/change-password":
+                changePasswordForm(req, resp, currentUser);
+                break;
+            case "/user/delete-account":
+                deleteAccountForm(req, resp, currentUser);
+                break;
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String path = req.getServletPath();
         HttpSession session = req.getSession();
         Users currentUser = (Users) session.getAttribute("currentUser");
@@ -112,14 +117,14 @@ public class UserController extends HttpServlet {
 
         try {
             switch (path) {
-            case "/api/user/profile":
-                updateProfileApi(req, resp, out, currentUser);
-                break;
-            case "/api/user/password":
-                updatePasswordApi(req, resp, out, currentUser);
-                break;
-            default:
-                sendError(resp, out, 400, "Invalid path");
+                case "/api/user/profile":
+                    updateProfileApi(req, resp, out, currentUser);
+                    break;
+                case "/api/user/password":
+                    updatePasswordApi(req, resp, out, currentUser);
+                    break;
+                default:
+                    sendError(resp, out, 400, "Invalid path");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,9 +133,9 @@ public class UserController extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         String path = req.getServletPath();
         HttpSession session = req.getSession();
         Users currentUser = (Users) session.getAttribute("currentUser");
@@ -158,10 +163,10 @@ public class UserController extends HttpServlet {
 
     // ==================== VIEW HANDLERS ====================
 
-    private void handleViewGet(HttpServletRequest req, HttpServletResponse resp, 
-                               String path, Users currentUser) 
+    private void handleViewGet(HttpServletRequest req, HttpServletResponse resp,
+            String path, Users currentUser)
             throws ServletException, IOException {
-        
+
         // Kiểm tra đăng nhập
         if (currentUser == null) {
             resp.sendRedirect(req.getContextPath() + "/auth/login");
@@ -169,23 +174,23 @@ public class UserController extends HttpServlet {
         }
 
         switch (path) {
-        case "/user/update-profile":
-            req.getRequestDispatcher("/WEB-INF/views/user/edit-profile.jsp").forward(req, resp);
-            break;
-        case "/user/change-password":
-            req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
-            break;
-        default: // /user/profile
-            List<Addresses> addresses = addressService.getAddressesByUserId(currentUser.getUserID());
-            req.setAttribute("addresses", addresses);
-            req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-            break;
+            case "/user/update-profile":
+                req.getRequestDispatcher("/WEB-INF/views/user/edit-profile.jsp").forward(req, resp);
+                break;
+            case "/user/change-password":
+                req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
+                break;
+            default: // /user/profile
+                List<Addresses> addresses = addressService.getAddressesByUserId(currentUser.getUserID());
+                req.setAttribute("addresses", addresses);
+                req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                break;
         }
     }
 
-    private void updateProfileForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser) 
+    private void updateProfileForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)
             throws IOException, ServletException {
-        
+
         String fullname = req.getParameter("fullname");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
@@ -222,9 +227,9 @@ public class UserController extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
     }
 
-    private void changePasswordForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser) 
+    private void changePasswordForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)
             throws IOException, ServletException {
-        
+
         String currentPassword = req.getParameter("currentPassword");
         String newPassword = req.getParameter("newPassword");
 
@@ -245,9 +250,9 @@ public class UserController extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
     }
 
-    private void deleteAccountForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser) 
+    private void deleteAccountForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)
             throws IOException {
-        
+
         HttpSession session = req.getSession();
         String confirmText = req.getParameter("confirmText");
 
@@ -271,10 +276,10 @@ public class UserController extends HttpServlet {
 
     // ==================== API HANDLERS ====================
 
-    private void handleApiGet(HttpServletRequest req, HttpServletResponse resp, 
-                             String path, Users currentUser) 
+    private void handleApiGet(HttpServletRequest req, HttpServletResponse resp,
+            String path, Users currentUser)
             throws IOException {
-        
+
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();
 
@@ -297,23 +302,23 @@ public class UserController extends HttpServlet {
 
     private void getUserProfileApi(HttpServletResponse resp, PrintWriter out, Users currentUser) {
         Users user = userService.findByUsername(currentUser.getUsername());
-        
+
         if (user == null) {
             sendError(resp, out, 404, "User not found");
             return;
         }
-        
+
         UserDTO dto = UserDTO.fromEntity(user);
         sendSuccess(resp, out, dto, "Success");
     }
 
-    private void updateProfileApi(HttpServletRequest req, HttpServletResponse resp, 
-                                 PrintWriter out, Users currentUser) 
+    private void updateProfileApi(HttpServletRequest req, HttpServletResponse resp,
+            PrintWriter out, Users currentUser)
             throws IOException {
-        
+
         HttpSession session = req.getSession();
         JsonObject json = gson.fromJson(req.getReader(), JsonObject.class);
-        
+
         Users user = userService.findByUsername(currentUser.getUsername());
         if (user == null) {
             sendError(resp, out, 404, "User not found");
@@ -361,10 +366,10 @@ public class UserController extends HttpServlet {
         sendSuccess(resp, out, result, "Profile updated successfully");
     }
 
-    private void updatePasswordApi(HttpServletRequest req, HttpServletResponse resp, 
-                                   PrintWriter out, Users currentUser) 
+    private void updatePasswordApi(HttpServletRequest req, HttpServletResponse resp,
+            PrintWriter out, Users currentUser)
             throws IOException {
-        
+
         HttpSession session = req.getSession();
         JsonObject json = gson.fromJson(req.getReader(), JsonObject.class);
 
@@ -409,10 +414,10 @@ public class UserController extends HttpServlet {
         sendSuccess(resp, out, null, "Password updated successfully");
     }
 
-    private void deleteAccountApi(HttpServletRequest req, HttpServletResponse resp, 
-                                  PrintWriter out, Users currentUser) 
+    private void deleteAccountApi(HttpServletRequest req, HttpServletResponse resp,
+            PrintWriter out, Users currentUser)
             throws IOException {
-        
+
         HttpSession session = req.getSession();
         JsonObject json = gson.fromJson(req.getReader(), JsonObject.class);
 
@@ -440,8 +445,8 @@ public class UserController extends HttpServlet {
 
     // ==================== HELPER METHODS ====================
 
-    private void sendSuccess(HttpServletResponse resp, PrintWriter out, 
-                            Object data, String message) {
+    private void sendSuccess(HttpServletResponse resp, PrintWriter out,
+            Object data, String message) {
         resp.setStatus(HttpServletResponse.SC_OK);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -450,8 +455,8 @@ public class UserController extends HttpServlet {
         out.print(gson.toJson(response));
     }
 
-    private void sendError(HttpServletResponse resp, PrintWriter out, 
-                          int statusCode, String message) {
+    private void sendError(HttpServletResponse resp, PrintWriter out,
+            int statusCode, String message) {
         resp.setStatus(statusCode);
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
@@ -459,4 +464,3 @@ public class UserController extends HttpServlet {
         out.print(gson.toJson(response));
     }
 }
-

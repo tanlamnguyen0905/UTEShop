@@ -118,6 +118,7 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Hình ảnh</th>
                         <th>Tên sản phẩm</th>
                         <th>Giá</th>
                         <th>Tồn kho</th>
@@ -132,6 +133,22 @@
                     <c:forEach var="product" items="${productList}">
                         <tr>
                             <td>${product.productID}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty product.images && not empty product.images[0]}">
+                                        <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}" 
+                                             alt="${product.productName}" 
+                                             width="50" height="50" 
+                                             class="img-thumbnail">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <img src="${pageContext.request.contextPath}/assets/images/logo.png" 
+                                             alt="No image" 
+                                             width="50" height="50" 
+                                             class="img-thumbnail">
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
                             <td>${product.productName}</td>
                             <td>${product.unitPrice} VNĐ</td>
                             <td>${product.stockQuantity}</td>
@@ -156,7 +173,7 @@
                     </c:forEach>
                     <c:if test="${empty productList}">
                         <tr>
-                            <td colspan="9" class="text-center text-muted">Không có sản phẩm nào.</td>
+                            <td colspan="10" class="text-center text-muted">Không có sản phẩm nào.</td>
                         </tr>
                     </c:if>
                     </tbody>
