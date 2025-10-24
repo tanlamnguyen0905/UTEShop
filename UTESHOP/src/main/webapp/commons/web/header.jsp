@@ -20,10 +20,10 @@
 				<!-- Navbar -->
 				<div class="col d-flex justify-content-center">
 					<nav class="nav main-nav">
-						<a class="nav-link fw-bold text-dark" href="#">Sản Phẩm</a> <a
-							class="nav-link fw-bold text-danger" href="#">Đang Sale</a> <a
-							class="nav-link fw-bold text-dark" href="#">Quần áo</a> <a
-							class="nav-link fw-bold text-dark" href="#">Phụ kiện</a>
+						<a class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=3">Top yêu thích</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=0">Bán chạy</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=1">Mới</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=2">Top đánh giá</a>
 					</nav>
 				</div>
 
