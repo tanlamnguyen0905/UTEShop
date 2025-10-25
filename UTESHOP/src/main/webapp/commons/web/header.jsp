@@ -105,11 +105,7 @@
 										<c:choose>
 											<%-- ADMIN Menu --%>
 											<c:when test="${sessionScope.currentUser.role == 'ADMIN'}">
-<<<<<<< HEAD
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/dashboard">
-=======
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/home/dashboard">
->>>>>>> origin/tan
 													<i class="fa-solid fa-gauge-high me-2 text-danger"></i> Trang quản trị
 												</a></li>
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/users">

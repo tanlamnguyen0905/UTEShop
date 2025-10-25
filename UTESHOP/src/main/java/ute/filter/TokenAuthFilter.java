@@ -58,29 +58,18 @@ public class TokenAuthFilter implements Filter {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-<<<<<<< HEAD
         
         //  Bỏ qua các đường dẫn public và static resources
-=======
-
-        // 1️⃣ Bỏ qua các đường dẫn public và static resources
->>>>>>> origin/tan
         if (isExcludedPath(path)) {
             chain.doFilter(request, response);
             return;
         }
-<<<<<<< HEAD
         
         // Chỉ kiểm tra token cho /api/*
-=======
-
-        // 2️⃣ Chỉ kiểm tra token cho /api/*
->>>>>>> origin/tan
         if (!path.startsWith(req.getContextPath() + "/api/")) {
             chain.doFilter(request, response);
             return;
         }
-<<<<<<< HEAD
         
         //  Lấy token từ nhiều nguồn (ưu tiên: Cookie > Header > Session)
         String token = null;
@@ -113,51 +102,24 @@ public class TokenAuthFilter implements Filter {
         }
         
         //  Validate token
-=======
-
-        // 3️⃣ Get Authorization header
-        String authHeader = req.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(res, 401, "Missing or invalid Authorization header");
-            return;
-        }
-
-        // 4️⃣ Extract and validate token
-        String token = authHeader.substring(7);
-
->>>>>>> origin/tan
         if (!JwtUtil.validateToken(token)) {
             sendError(res, 401, "Invalid or expired token");
             return;
         }
-<<<<<<< HEAD
         
         // Extract user info from token
-=======
-
-        // 5️⃣ Extract user info from token
->>>>>>> origin/tan
         String username = JwtUtil.extractUsername(token);
         String role = JwtUtil.extractRole(token);
         Long userId = JwtUtil.extractUserId(token);
 
         // Log for debugging
-<<<<<<< HEAD
         System.out.println(" JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
         
         //  Role-based access control
-=======
-        System.out
-                .println("✅ JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
-
-        // 6️⃣ Role-based access control
->>>>>>> origin/tan
         if (!hasAccess(path, role)) {
-            sendError(res, 403, "Access denied. You don't have permission to access this resource.");
+            sendError(res, 403, "Access denied. You do not have permission to access this resource.");
             return;
         }
-<<<<<<< HEAD
         
         //  Set user attributes for controller
         req.setAttribute("tokenUsername", username);
@@ -165,15 +127,6 @@ public class TokenAuthFilter implements Filter {
         req.setAttribute("tokenUserId", userId);
         
         //  Proceed to controller
-=======
-
-        // 7️⃣ Set user attributes for controller
-        req.setAttribute("tokenUsername", username);
-        req.setAttribute("tokenRole", role);
-        req.setAttribute("tokenUserId", userId);
-
-        // ✅ Proceed to controller
->>>>>>> origin/tan
         chain.doFilter(request, response);
     }
 
@@ -203,7 +156,6 @@ public class TokenAuthFilter implements Filter {
 
         switch (roleUpper) {
             case "ADMIN":
-<<<<<<< HEAD
                 // Admin has full access to everything
                 return true;
                 
@@ -217,19 +169,6 @@ public class TokenAuthFilter implements Filter {
                 return pathLower.contains("/api/shipper") || 
                        pathLower.contains("/api/user");
                 
-=======
-                return true; // Admin has full access
-
-            case "MANAGER":
-                // Manager can access manager and user APIs
-                return pathLower.contains("/api/manager") ||
-                        pathLower.contains("/api/user");
-
-            case "SHIPPER":
-                // Shipper can only access shipper APIs
-                return pathLower.contains("/api/shipper");
-
->>>>>>> origin/tan
             case "USER":
                 // User can only access user APIs
                 return pathLower.contains("/api/user");

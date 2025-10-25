@@ -47,7 +47,6 @@ public class AuthServlet extends HttpServlet {
 			HttpSession session = req.getSession(false);
 			if (session != null)
 				session.invalidate();
-<<<<<<< HEAD
 			
 			// Chuyển đến trang logout để xóa token trong localStorage
 			req.getRequestDispatcher("/WEB-INF/views/auth/logout.jsp").forward(req, resp);
@@ -58,15 +57,6 @@ public class AuthServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/auth/reset-password.jsp").forward(req, resp);
         } else if ("/auth/check-exist".equals(path)) {
             checkUserExist(req, resp);
-=======
-			resp.sendRedirect(req.getContextPath() + "/");
-		} else if ("/auth/forgot-password".equals(path)) {
-			req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
-		} else if ("/auth/reset-password".equals(path)) {
-			req.getRequestDispatcher("/WEB-INF/views/auth/reset-password.jsp").forward(req, resp);
-		} else if ("/auth/check-exist".equals(path)) {
-			checkUserExist(req, resp);
->>>>>>> origin/tan
 		}
 	}
 
@@ -87,12 +77,7 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-<<<<<<< HEAD
 	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI =====================
-=======
-	// ===================== 0️⃣ KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI
-	// =====================
->>>>>>> origin/tan
 	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
@@ -269,7 +254,6 @@ public class AuthServlet extends HttpServlet {
 			HttpSession session = req.getSession();
 			session.setAttribute("currentUser", user);
 
-<<<<<<< HEAD
 		// Generate JWT token
 		String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
 		session.setAttribute("token", token);
@@ -288,19 +272,6 @@ public class AuthServlet extends HttpServlet {
 		response.put("role", user.getRole());
 		response.put("token", token); // Trả token về client
 		out.print(gson.toJson(response));
-=======
-			// Generate JWT token
-			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-			session.setAttribute("token", token);
-
-			// Return token to client
-			Map<String, Object> response = new HashMap<>();
-			response.put("success", true);
-			response.put("username", user.getUsername());
-			response.put("role", user.getRole());
-			response.put("token", token); // ✅ Trả token về client
-			out.print(gson.toJson(response));
->>>>>>> origin/tan
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("{\"success\":false, \"error\":\"Lỗi máy chủ: " + e.getMessage() + "\"}");
@@ -321,17 +292,10 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-<<<<<<< HEAD
     // ===================== FORGOT PASSWORD (GỬI OTP) =====================
     private void forgotPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();
-=======
-	// ===================== 5️ FORGOT PASSWORD (GỬI OTP) =====================
-	private void forgotPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		resp.setContentType("application/json;charset=UTF-8");
-		PrintWriter out = resp.getWriter();
->>>>>>> origin/tan
 
 		String email = req.getParameter("email");
 		if (email == null || email.isBlank()) {
@@ -357,17 +321,10 @@ public class AuthServlet extends HttpServlet {
 		out.print("{\"success\":true, \"message\":\"Đã gửi OTP đến email!\"}");
 	}
 
-<<<<<<< HEAD
     // ===================== RESET PASSWORD (XÁC THỰC OTP) =====================
     private void resetPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();
-=======
-	// ===================== 6️ RESET PASSWORD (XÁC THỰC OTP) =====================
-	private void resetPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		resp.setContentType("application/json;charset=UTF-8");
-		PrintWriter out = resp.getWriter();
->>>>>>> origin/tan
 
 		String email = req.getParameter("email");
 		String otpInput = req.getParameter("otp");
