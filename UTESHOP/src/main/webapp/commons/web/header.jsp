@@ -140,7 +140,7 @@
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/dashboard">
 													<i class="fa-solid fa-truck-fast me-2 text-info"></i> Trang vận chuyển
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/history">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đã%20giao%20hàng">
 													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Lịch sử giao hàng
 												</a></li>
 											</c:when>

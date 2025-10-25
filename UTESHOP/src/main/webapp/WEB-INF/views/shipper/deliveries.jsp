@@ -16,19 +16,19 @@
             
             <!-- Filter buttons -->
             <div class="btn-group" role="group">
-                <a href="${pageContext.request.contextPath}/shipper/deliveries" 
+                <a href="$#" 
                    class="btn ${empty currentStatus ? 'btn-primary' : 'btn-outline-primary'}">
                     Tất cả
                 </a>
-                <a href="${pageContext.request.contextPath}/shipper/deliveries?status=Đang giao hàng" 
+                <a href="#" 
                    class="btn ${currentStatus == 'Đang giao hàng' ? 'btn-info' : 'btn-outline-info'}">
                     Đang giao
                 </a>
-                <a href="${pageContext.request.contextPath}/shipper/deliveries?status=Đã giao hàng" 
+                <a href="#" 
                    class="btn ${currentStatus == 'Đã giao hàng' ? 'btn-success' : 'btn-outline-success'}">
                     Hoàn thành
                 </a>
-                <a href="${pageContext.request.contextPath}/shipper/deliveries?status=Giao hàng thất bại" 
+                <a href="#" 
                    class="btn ${currentStatus == 'Giao hàng thất bại' ? 'btn-danger' : 'btn-outline-danger'}">
                     Thất bại
                 </a>

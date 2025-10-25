@@ -368,7 +368,7 @@
 
                 <!-- Order Statistics -->
                 <c:set var="pendingCount" value="0" />
-                <c:set var="processingCount" value="0" />
+                <c:set var="confirmedCount" value="0" />
                 <c:set var="shippingCount" value="0" />
                 <c:set var="completedCount" value="0" />
                 <c:set var="canceledCount" value="0" />
@@ -377,13 +377,13 @@
                         <c:when test="${order.orderStatus eq 'Đang chờ'}">
                             <c:set var="pendingCount" value="${pendingCount + 1}" />
                         </c:when>
-                        <c:when test="${order.orderStatus eq 'Đang xử lý'}">
-                            <c:set var="processingCount" value="${processingCount + 1}" />
+                        <c:when test="${order.orderStatus eq 'Đã xác nhận'}">
+                            <c:set var="confirmedCount" value="${confirmedCount + 1}" />
                         </c:when>
-                        <c:when test="${order.orderStatus eq 'Đang giao'}">
+                        <c:when test="${order.orderStatus eq 'Đang giao hàng' || order.orderStatus eq 'Đang giao'}">
                             <c:set var="shippingCount" value="${shippingCount + 1}" />
                         </c:when>
-                        <c:when test="${order.orderStatus eq 'Đã giao'}">
+                        <c:when test="${order.orderStatus eq 'Đã giao hàng' || order.orderStatus eq 'Đã giao'}">
                             <c:set var="completedCount" value="${completedCount + 1}" />
                         </c:when>
                         <c:when test="${order.orderStatus eq 'Đã hủy'}">
@@ -403,12 +403,12 @@
                         </div>
                     </div>
                     
-                    <!-- Đang xử lý - Cam -->
+                    <!-- Đã xác nhận - Xanh lá nhạt -->
                     <div class="col">
                         <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <h5 class="fw-bold mb-1" style="color: #fd7e14;">${processingCount}</h5>
-                                <small class="text-muted">Đang xử lý</small>
+                                <h5 class="fw-bold mb-1" style="color: #198754;">${confirmedCount}</h5>
+                                <small class="text-muted">Đã xác nhận</small>
                             </div>
                         </div>
                     </div>
@@ -417,17 +417,17 @@
                     <div class="col">
                         <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <h5 class="text-primary fw-bold mb-1">${shippingCount}</h5>
+                                <h5 class="text-info fw-bold mb-1">${shippingCount}</h5>
                                 <small class="text-muted">Đang giao</small>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Hoàn thành - Xanh lá -->
+                    <!-- Hoàn thành - Xanh dương đậm -->
                     <div class="col">
                         <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <h5 class="text-success fw-bold mb-1">${completedCount}</h5>
+                                <h5 class="text-primary fw-bold mb-1">${completedCount}</h5>
                                 <small class="text-muted">Hoàn thành</small>
                             </div>
                         </div>
@@ -481,18 +481,18 @@
                                                         <i class="fas fa-clock me-1"></i>Chờ xác nhận
                                                     </span>
                                                 </c:when>
-                                                <c:when test="${order.orderStatus eq 'Đang xử lý'}">
-                                                    <span class="badge text-white" style="background-color: #fd7e14; font-size: 0.85rem; padding: 0.5rem 1rem;">
-                                                        <i class="fas fa-hourglass-half me-1"></i>Đang xử lý
+                                                <c:when test="${order.orderStatus eq 'Đã xác nhận'}">
+                                                    <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                        <i class="fas fa-check me-1"></i>Đã xác nhận
                                                     </span>
                                                 </c:when>
-                                                <c:when test="${order.orderStatus eq 'Đang giao'}">
-                                                    <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                <c:when test="${order.orderStatus eq 'Đang giao hàng' || order.orderStatus eq 'Đang giao'}">
+                                                    <span class="badge bg-info" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
                                                         <i class="fas fa-shipping-fast me-1"></i>Đang giao
                                                     </span>
                                                 </c:when>
-                                                <c:when test="${order.orderStatus eq 'Đã giao'}">
-                                                    <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                <c:when test="${order.orderStatus eq 'Đã giao hàng' || order.orderStatus eq 'Đã giao'}">
+                                                    <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
                                                         <i class="fas fa-check-circle me-1"></i>Hoàn thành
                                                     </span>
                                                 </c:when>
@@ -509,7 +509,7 @@
                                             </c:choose>
                                             
                                             <!-- Nút đánh giá cho đơn hàng đã hoàn thành -->
-                                            <c:if test="${order.orderStatus eq 'Đã giao'}">
+                                            <c:if test="${order.orderStatus eq 'Đã giao hàng' || order.orderStatus eq 'Đã giao'}">
                                                 <button class="btn btn-sm btn-outline-warning shadow-sm" 
                                                         onclick="openReviewModal(${order.orderID})"
                                                         title="Đánh giá sản phẩm"

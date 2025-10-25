@@ -1,17 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Quản lý người dùng - Admin</title>
     <style>
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
         .stats-card {
             border-left: 4px solid;
             transition: transform 0.2s;
@@ -139,7 +132,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Avatar</th>
                                     <th>Username</th>
                                     <th>Họ tên</th>
                                     <th>Email</th>
@@ -154,19 +146,6 @@
                                 <c:forEach items="${users}" var="user">
                                     <tr>
                                         <td><strong>#${user.userID}</strong></td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty user.avatar}">
-                                                    <img src="${pageContext.request.contextPath}${user.avatar}" 
-                                                         class="user-avatar" alt="${user.fullname}">
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <div class="user-avatar bg-secondary d-flex align-items-center justify-content-center text-white">
-                                                        <i class="fas fa-user"></i>
-                                                    </div>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
                                         <td>${user.username}</td>
                                         <td>${user.fullname}</td>
                                         <td>${user.email}</td>
@@ -205,18 +184,20 @@
                                         </td>
                                         <td>
                                             <c:if test="${not empty user.createAt}">
-                                                <fmt:formatDate value="${user.createAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                ${user.createAt.toString().replace('T', ' ').substring(0, 16)}
+                                            </c:if>
+                                            <c:if test="${empty user.createAt}">
+                                                -
                                             </c:if>
                                         </td>
                                         <td>
-                                            <a href="${pageContext.request.contextPath}/admin/user/edit?id=${user.userID}" 
+                                            <a href="${pageContext.request.contextPath}/api/admin/user/edit?id=${user.userID}" 
                                                class="btn btn-sm btn-warning" title="Chỉnh sửa">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <button type="button" class="btn btn-sm btn-danger" 
                                                     onclick="confirmDelete(${user.userID}, '${user.username}')"
-                                                    title="Xóa"
-                                                    ${currentUser.userID == user.userID ? 'disabled' : ''}>
+                                                    title="Xóa">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -259,7 +240,7 @@
     <script>
         function confirmDelete(userId, username) {
             document.getElementById('deleteUsername').textContent = username;
-            document.getElementById('deleteForm').action = '${pageContext.request.contextPath}/admin/user/delete?id=' + userId;
+            document.getElementById('deleteForm').action = '${pageContext.request.contextPath}/api/admin/user/delete?id=' + userId;
             var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();
         }

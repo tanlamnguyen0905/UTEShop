@@ -74,13 +74,13 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		
-		// Update entity (không update password ở đây)
+		// Update entity (không update password và avatar ở đây)
 		Users updatedUser = Users.builder()
 			.userID(dto.getUserID())
 			.fullname(dto.getFullname())
 			.email(dto.getEmail())
 			.phone(dto.getPhone())
-			.avatar(dto.getAvatar())
+			.avatar(existingUser.getAvatar())
 			.role(dto.getRole())
 			.status(dto.getStatus())
 			.build();

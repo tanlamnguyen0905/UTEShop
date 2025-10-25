@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import ute.dto.UpdateUserDTO;
 import ute.dto.UserDTO;
-import ute.entities.Users;
 import ute.service.impl.UserServiceImpl;
 
 @WebServlet(urlPatterns = {
@@ -38,10 +37,6 @@ public class UserManagementController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         
         String uri = req.getRequestURI();
-        HttpSession session = req.getSession();
-        
-        // Filter đã kiểm tra authentication và role, chỉ cần lấy user
-        Users currentUser = (Users) session.getAttribute("currentUser");
         
         try {
             if (uri.contains("/api/admin/users")) {
@@ -65,9 +60,6 @@ public class UserManagementController extends HttpServlet {
         
         String uri = req.getRequestURI();
         HttpSession session = req.getSession();
-        
-        // Filter đã kiểm tra authentication và role, chỉ cần lấy user
-        Users currentUser = (Users) session.getAttribute("currentUser");
         
         try {
             if (uri.contains("/api/admin/user/update")) {
@@ -152,7 +144,6 @@ public class UserManagementController extends HttpServlet {
                 .fullname(req.getParameter("fullname"))
                 .email(req.getParameter("email"))
                 .phone(req.getParameter("phone"))
-                .avatar(req.getParameter("avatar"))
                 .role(req.getParameter("role"))
                 .status(req.getParameter("status"))
                 .build();
@@ -192,9 +183,9 @@ public class UserManagementController extends HttpServlet {
             
             Long userId = Long.parseLong(userIdStr);
             
-            // Không cho phép xóa chính mình
-            Users currentUser = (Users) session.getAttribute("currentUser");
-            if (currentUser.getUserID().equals(userId)) {
+            // Không cho phép xóa chính mình (lấy từ JWT token)
+            Long currentUserId = (Long) req.getAttribute("tokenUserId");
+            if (currentUserId != null && currentUserId.equals(userId)) {
                 throw new IllegalArgumentException("Không thể xóa tài khoản của chính bạn");
             }
             

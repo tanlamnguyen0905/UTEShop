@@ -63,7 +63,7 @@
                 <div class="sb-sidenav-menu-heading">Quản lý bán hàng</div>
                 
                 <!-- Orders -->
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/orders">
                     <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                     Đơn hàng
                 </a>

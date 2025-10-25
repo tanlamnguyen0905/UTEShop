@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,10 +15,12 @@
             color: red;
         }
         .user-avatar-preview {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
+            border: 4px solid #0d6efd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -29,7 +30,7 @@
         <h1 class="mt-4 mb-1">Chỉnh sửa người dùng</h1>
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/users">Người dùng</a></li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/api/admin/users">Người dùng</a></li>
             <li class="breadcrumb-item active">Chỉnh sửa #${user.userID}</li>
         </ol>
 
@@ -49,7 +50,7 @@
                         <i class="fas fa-user-edit me-2"></i>Thông tin người dùng
                     </div>
                     <div class="card-body">
-                        <form action="${pageContext.request.contextPath}/admin/user/update" method="post" id="updateForm">
+                        <form action="${pageContext.request.contextPath}/api/admin/user/update" method="post" id="updateForm">
                             <input type="hidden" name="userID" value="${user.userID}">
                             
                             <!-- Account Information (Read-only) -->
@@ -94,9 +95,6 @@
                                         <select class="form-select" id="status" name="status" required>
                                             <option value="ACTIVE" ${user.status == 'ACTIVE' || user.status == 'active' ? 'selected' : ''}>
                                                 Hoạt động
-                                            </option>
-                                            <option value="INACTIVE" ${user.status == 'INACTIVE' ? 'selected' : ''}>
-                                                Chưa kích hoạt
                                             </option>
                                             <option value="LOCKED" ${user.status == 'LOCKED' ? 'selected' : ''}>
                                                 Khóa
@@ -153,7 +151,7 @@
 
                             <!-- Action buttons -->
                             <div class="d-flex justify-content-between">
-                                <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/api/admin/users" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left me-2"></i>Quay lại
                                 </a>
                                 <button type="submit" class="btn btn-primary">
@@ -172,17 +170,32 @@
                         <i class="fas fa-user me-2"></i>Thông tin người dùng
                     </div>
                     <div class="card-body text-center">
-                        <c:choose>
-                            <c:when test="${not empty user.avatar}">
-                                <img src="${pageContext.request.contextPath}${user.avatar}" 
-                                     class="user-avatar-preview mb-3" alt="${user.fullname}">
-                            </c:when>
-                            <c:otherwise>
-                                <div class="user-avatar-preview bg-secondary d-flex align-items-center justify-content-center text-white mx-auto mb-3">
-                                    <i class="fas fa-user fa-3x"></i>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                        <div class="mb-3">
+                            <c:choose>
+                                <c:when test="${not empty user.avatar}">
+                                    <c:choose>
+                                        <c:when test="${user.avatar.startsWith('http://') || user.avatar.startsWith('https://')}">
+                                            <img src="${user.avatar}" 
+                                                 class="user-avatar-preview" alt="${user.fullname}"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${user.avatar}" 
+                                                 class="user-avatar-preview" alt="${user.fullname}"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                        <i class="fas fa-user fa-3x text-white"></i>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                        <i class="fas fa-user fa-3x text-white"></i>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                         
                         <h5 class="mb-1">${user.fullname}</h5>
                         <p class="text-muted mb-2">@${user.username}</p>
@@ -214,7 +227,10 @@
                             <p class="mb-1"><strong>SĐT:</strong> ${not empty user.phone ? user.phone : 'Chưa cập nhật'}</p>
                             <p class="mb-0"><strong>Ngày tạo:</strong>
                                 <c:if test="${not empty user.createAt}">
-                                    <fmt:formatDate value="${user.createAt}" pattern="dd/MM/yyyy" />
+                                    ${user.createAt.toString().substring(0, 10)}
+                                </c:if>
+                                <c:if test="${empty user.createAt}">
+                                    -
                                 </c:if>
                             </p>
                         </div>

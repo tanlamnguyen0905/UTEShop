@@ -59,5 +59,16 @@ public interface OrderDao {
      * Đếm số đơn hàng của user
      */
     long countByUserId(Long userId);
+    
+    /**
+     * Tìm đơn hàng chưa có trong bảng Delivery (pending orders - chưa có shipper nhận)
+     * Điều kiện: orderStatus != 'Đang chờ' AND orderID không có trong Delivery
+     */
+    List<Orders> findConfirmedOrders();
+    
+    /**
+     * Đếm số đơn hàng chưa có shipper
+     */
+    long countConfirmedOrders();
 }
 
