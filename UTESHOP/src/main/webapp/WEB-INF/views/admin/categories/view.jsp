@@ -27,8 +27,13 @@
                     <img src="${pageContext.request.contextPath}/assets/${category.image}"
                          alt="${category.categoryName}"
                          width="200"
-                         class="img-thumbnail">
+                         class="img-thumbnail"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <span style="display:none; color: #6c757d;">Không tải được ảnh</span>
                 </p>
+            </c:if>
+            <c:if test="${empty category.image}">
+                <p><strong>Hình ảnh:</strong> <span class="text-muted">Không có ảnh</span></p>
             </c:if>
 
             <p><strong>Số sản phẩm:</strong>

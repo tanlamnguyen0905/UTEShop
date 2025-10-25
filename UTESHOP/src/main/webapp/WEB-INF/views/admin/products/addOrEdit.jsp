@@ -118,14 +118,16 @@
                 <div class="mb-3">
                     <label class="form-label">Hình ảnh:</label>
                     <input type="file" name="image" class="form-control" accept="image/*">
-                    <small class="text-muted">Chọn hình ảnh mới (nếu muốn thay đổi). Hình ảnh hiện tại sẽ được giữ nếu không chọn.</small>
+                    <small class="text-muted">Chọn hình ảnh mới (nếu muốn thêm). Hình ảnh hiện tại sẽ được giữ nếu không chọn. Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 10MB.</small>
                     <c:if test="${not empty product.images}">
                         <div class="mt-2 d-flex flex-wrap">
                             <c:forEach var="image" items="${product.images}">
                                 <div class="me-2 mb-2">
                                     <img src="${pageContext.request.contextPath}/assets/${image.dirImage}"
                                          alt="${product.productName}"
-                                         width="50" height="50" class="img-thumbnail">
+                                         width="50" height="50" class="img-thumbnail"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <span style="display:none; color: #6c757d;">Không tải được ảnh hiện tại</span>
                                     <small class="d-block">Hình ảnh hiện tại</small>
                                 </div>
                             </c:forEach>
