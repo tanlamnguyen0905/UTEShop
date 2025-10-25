@@ -3,7 +3,7 @@
     * Copyright 2013-2023 Start Bootstrap
     * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-sb-admin/blob/master/LICENSE)
     */
-    // 
+// 
 // Scripts
 // 
 
@@ -20,18 +20,18 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
     // Sidebar Collapse - Simple Toggle
-    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(toggle) {
-        toggle.addEventListener('click', function(e) {
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             const targetId = this.getAttribute('data-bs-target');
             const target = document.querySelector(targetId);
-            
+
             if (target) {
                 // Toggle collapse
                 target.classList.toggle('show');
                 this.classList.toggle('collapsed');
-                
+
                 // Toggle arrow icon
                 const arrow = this.querySelector('.sb-sidenav-collapse-arrow i');
                 if (arrow) {

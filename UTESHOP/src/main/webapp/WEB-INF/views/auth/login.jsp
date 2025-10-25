@@ -163,8 +163,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.appendChild(toast);
                 new bootstrap.Toast(toast).show();
 
-                // Reload lại trang sau 1.5s
-                setTimeout(() => location.reload(), 1500);
+                // Check for redirect URL
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 1500);
+                } else {
+                    setTimeout(() => location.reload(), 1500);
+                }
             } else {
                 // ❌ Sai tài khoản / mật khẩu
                 errorBox.textContent = data.error || "Sai tên đăng nhập hoặc mật khẩu!";

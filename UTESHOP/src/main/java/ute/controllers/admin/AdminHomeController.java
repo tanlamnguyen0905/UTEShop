@@ -17,7 +17,7 @@ import java.util.List;
 @WebServlet("/api/admin/dashboard")
 public class AdminHomeController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
+
     private ProductService productService = new ProductServiceImpl();
     private CategoriesService categoriesService = new CategoriesServiceImpl();
 
@@ -25,18 +25,19 @@ public class AdminHomeController extends HttpServlet {
         super();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             // Fetch statistics
             long totalProducts = productService.count();
             long totalCategories = categoriesService.count();
-            
+
             // Get recent products
             List<Product> recentProducts = productService.findNewProduct(5);
-            
+
             // Get best sellers
             List<Product> bestSellers = productService.findBestSeller(5);
-            
+
             // Set attributes
             request.setAttribute("totalProducts", totalProducts);
             request.setAttribute("totalCategories", totalCategories);
@@ -45,7 +46,7 @@ public class AdminHomeController extends HttpServlet {
             request.setAttribute("totalRevenue", 125000000); // TODO: Implement revenue calculation
             request.setAttribute("recentProducts", recentProducts);
             request.setAttribute("bestSellers", bestSellers);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             // Set default values if services fail
@@ -55,11 +56,12 @@ public class AdminHomeController extends HttpServlet {
             request.setAttribute("totalUsers", 0);
             request.setAttribute("totalRevenue", 0);
         }
-        
+
         request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         doGet(request, response);
     }
 }

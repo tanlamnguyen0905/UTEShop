@@ -1,6 +1,8 @@
 package ute.service.inter;
 
 import java.util.List;
+
+import ute.dto.ProductDTO;
 import ute.entities.Favorite;
 
 public interface FavoriteService {
@@ -10,5 +12,6 @@ public interface FavoriteService {
 
     boolean isFavorite(Long userId, Long productId);
 
-    List<Favorite> getUserFavorites(Long userId);
+    List<ProductDTO> findByUserId(Long userId);
+
 }

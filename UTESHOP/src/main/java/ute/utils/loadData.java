@@ -11,7 +11,7 @@ public class loadData {
 
     // ========================= CATEGORY =========================
     public static void loadCategories(HttpServletRequest request, HttpServletResponse response) {
-        List<Categories> listCate = new CategoryServiceImpl().findAll();
+        List<Categories> listCate = new CategoriesServiceImpl().findAll();
         request.setAttribute("listCate", listCate);
     }
 

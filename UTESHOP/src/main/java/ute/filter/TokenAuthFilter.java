@@ -26,50 +26,61 @@ import ute.utils.JwtUtil;
  * - Role-based access control
  * - CORS support
  */
-@WebFilter(urlPatterns = {"/*"})
+@WebFilter(urlPatterns = { "/*" })
 public class TokenAuthFilter implements Filter {
-    
+
     private final Gson gson = new Gson();
-    
+
     // Các route được bỏ qua (public, static resources, login/register)
     private static final List<String> EXCLUDED_PATHS = List.of(
-        "/auth/", "/public/", "/assets/", "/uploads/", 
-        "/css/", "/js/", "/images/", "/user/", "/home", 
-        "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
-        "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
+            "/auth/", "/public/", "/assets/", "/uploads/",
+            "/css/", "/js/", "/images/", "/user/", "/home",
+            "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
+            "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
     );
-    
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        
+
         String path = req.getRequestURI();
-        
+
         // CORS headers
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        
+
         // Handle preflight requests
         if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
+<<<<<<< HEAD
         
         //  Bỏ qua các đường dẫn public và static resources
+=======
+
+        // 1️⃣ Bỏ qua các đường dẫn public và static resources
+>>>>>>> origin/tan
         if (isExcludedPath(path)) {
             chain.doFilter(request, response);
             return;
         }
+<<<<<<< HEAD
         
         // Chỉ kiểm tra token cho /api/*
+=======
+
+        // 2️⃣ Chỉ kiểm tra token cho /api/*
+>>>>>>> origin/tan
         if (!path.startsWith(req.getContextPath() + "/api/")) {
             chain.doFilter(request, response);
             return;
         }
+<<<<<<< HEAD
         
         //  Lấy token từ nhiều nguồn (ưu tiên: Cookie > Header > Session)
         String token = null;
@@ -102,24 +113,51 @@ public class TokenAuthFilter implements Filter {
         }
         
         //  Validate token
+=======
+
+        // 3️⃣ Get Authorization header
+        String authHeader = req.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            sendError(res, 401, "Missing or invalid Authorization header");
+            return;
+        }
+
+        // 4️⃣ Extract and validate token
+        String token = authHeader.substring(7);
+
+>>>>>>> origin/tan
         if (!JwtUtil.validateToken(token)) {
             sendError(res, 401, "Invalid or expired token");
             return;
         }
+<<<<<<< HEAD
         
         // Extract user info from token
+=======
+
+        // 5️⃣ Extract user info from token
+>>>>>>> origin/tan
         String username = JwtUtil.extractUsername(token);
         String role = JwtUtil.extractRole(token);
         Long userId = JwtUtil.extractUserId(token);
-        
+
         // Log for debugging
+<<<<<<< HEAD
         System.out.println(" JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
         
         //  Role-based access control
+=======
+        System.out
+                .println("✅ JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
+
+        // 6️⃣ Role-based access control
+>>>>>>> origin/tan
         if (!hasAccess(path, role)) {
             sendError(res, 403, "Access denied. You don't have permission to access this resource.");
             return;
         }
+<<<<<<< HEAD
         
         //  Set user attributes for controller
         req.setAttribute("tokenUsername", username);
@@ -127,9 +165,18 @@ public class TokenAuthFilter implements Filter {
         req.setAttribute("tokenUserId", userId);
         
         //  Proceed to controller
+=======
+
+        // 7️⃣ Set user attributes for controller
+        req.setAttribute("tokenUsername", username);
+        req.setAttribute("tokenRole", role);
+        req.setAttribute("tokenUserId", userId);
+
+        // ✅ Proceed to controller
+>>>>>>> origin/tan
         chain.doFilter(request, response);
     }
-    
+
     /**
      * Check if path should skip token validation
      */
@@ -141,7 +188,7 @@ public class TokenAuthFilter implements Filter {
         }
         return false;
     }
-    
+
     /**
      * Role-based access control
      * Hierarchy: ADMIN > MANAGER > SHIPPER > USER
@@ -150,12 +197,13 @@ public class TokenAuthFilter implements Filter {
         if (role == null) {
             return false;
         }
-        
+
         String pathLower = path.toLowerCase();
         String roleUpper = role.toUpperCase();
-        
+
         switch (roleUpper) {
             case "ADMIN":
+<<<<<<< HEAD
                 // Admin has full access to everything
                 return true;
                 
@@ -169,28 +217,40 @@ public class TokenAuthFilter implements Filter {
                 return pathLower.contains("/api/shipper") || 
                        pathLower.contains("/api/user");
                 
+=======
+                return true; // Admin has full access
+
+            case "MANAGER":
+                // Manager can access manager and user APIs
+                return pathLower.contains("/api/manager") ||
+                        pathLower.contains("/api/user");
+
+            case "SHIPPER":
+                // Shipper can only access shipper APIs
+                return pathLower.contains("/api/shipper");
+
+>>>>>>> origin/tan
             case "USER":
                 // User can only access user APIs
                 return pathLower.contains("/api/user");
-                
+
             default:
                 return false;
         }
     }
-    
+
     /**
      * Send JSON error response
      */
     private void sendError(HttpServletResponse res, int status, String message) throws IOException {
         res.setStatus(status);
         res.setContentType("application/json;charset=UTF-8");
-        
+
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
         error.put("error", message);
-        
+
         PrintWriter out = res.getWriter();
         out.print(gson.toJson(error));
     }
 }
-

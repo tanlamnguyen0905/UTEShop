@@ -1,14 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- Footer -->
-<footer class="py-3 bg-light mt-auto border-top">
+<footer class="py-4 bg-light mt-auto">
     <div class="container-fluid px-4">
-        <div class="text-center">
-            <div class="text-muted fw-semibold">
-                <i class="fas fa-shield-alt me-2"></i>Administrator - UTESHOP
-            </div>
-            <div class="text-muted small mt-1">
-                &copy; 2025. All rights reserved.
+        <div class="d-flex align-items-center justify-content-between small">
+            <div class="text-muted">Copyright &copy; UTESHOP 2025. All rights reserved.</div>
+            <div>
+                <a href="#">Privacy Policy</a>
+                &middot;
+                <a href="#">Terms &amp; Conditions</a>
             </div>
         </div>
     </div>
