@@ -135,51 +135,7 @@
                         </div>
                     </section>
 
-                    <!-- ====================== BANNER + SẢN PHẨM THEO BANNER ====================== -->
-                    <%-- <c:forEach var="banner" items="${listBanner}" end="5">
-                        <c:url value="/image?fname=${banner.bannerImage}" var="bannerImgUrl" />
-                        <section class="py-5">
-                            <a href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}">
-                                <img src="${bannerImgUrl}" class="d-block w-100 rounded-4 mb-3"
-                                    alt="${banner.bannerName}" style="height: 300px; object-fit: cover;">
-                            </a>
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="mb-0">${banner.bannerName}</h3>
-                                <a href="#" class="fw-semibold text-dark text-decoration-underline">Xem thêm</a>
-                            </div>
-
-                            <div class="row g-3">
-                                <c:forEach var="p" items="${banner.products}">
-                                    <div class="col-6 col-md-4 col-lg-2">
-                                        <div class="card border-0 shadow-sm rounded-4 h-100">
-                                            <c:choose>
-                                                <c:when test="${not empty p.images}">
-                                                    <c:url value="/image?fname=${p.images[0].dirImage}" var="imgUrl" />
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:url value="/image?fname=logo.png" var="imgUrl" />
-                                                </c:otherwise>
-                                            </c:choose>
-
-                                            <a href="#" class="text-decoration-none">
-                                                <img src="${imgUrl}" class="card-img-top rounded-4"
-                                                    alt="${p.productName}" style="height: 250px; object-fit: cover;">
-                                                <div class="card-body p-2">
-                                                    <h6 class="text-dark mb-2">${p.productName}</h6>
-                                                    <span class="fw-bold text-dark">
-                                                        <fmt:formatNumber value="${p.unitPrice}" type="number"
-                                                            maxFractionDigits="0" />đ
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </section>
-                        </c:forEach>
-                        --%>
                 </div>
             </body>
             

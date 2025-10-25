@@ -52,13 +52,19 @@
 
             <!-- Price -->
             <div class="price-tag mb-4">
+                <span class="fw-bold text-danger fs-5">
+                    <fmt:formatNumber value="${p.unitPrice}" type="number" maxFractionDigits="0" />₫
+                </span>
+            </div>
+            <%-- <div class="price-tag mb-4">
+
                 <fmt:formatNumber value="${productDTO.unitPrice}" type="currency" currencySymbol="₫"/>
-                <%-- <c:if test="${productDTO.discountPrice > 0}">
+                <c:if test="${productDTO.discountPrice > 0}">
                     <span class="original-price text-muted ml-2">
                         <del><fmt:formatNumber value="${productDTO.originalPrice}" type="currency" currencySymbol="₫"/></del>
                     </span>
-                </c:if> --%>
-            </div>
+                </c:if>
+            </div> --%>
 
             <!-- Add to Cart Form -->
             <form id="addToCartForm" class="mb-4">

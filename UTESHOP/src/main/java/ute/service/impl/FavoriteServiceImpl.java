@@ -4,6 +4,7 @@ import java.util.List;
 
 import ute.dao.impl.FavoriteDaoImpl;
 import ute.dao.inter.FavoriteDao;
+import ute.dto.ProductDTO;
 import ute.entities.Favorite;
 import ute.service.inter.FavoriteService;
 
@@ -30,7 +31,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public List<Favorite> getUserFavorites(Long userId) {
+    public List<ProductDTO> findByUserId(Long userId) {
+        // TODO Auto-generated method stub
         return favoriteDao.findByUserId(userId);
     }
 
