@@ -17,12 +17,10 @@ import ute.service.impl.CategoriesServiceImpl;
 
 @WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
         "/api/admin/categories/delete", "/api/admin/categories/view" })
-@MultipartConfig(
-        fileSizeThreshold = 10240,    // 10KB
-        maxFileSize = 10485760,       // 10MB
-        maxRequestSize = 20971520     // 20MB
+@MultipartConfig(fileSizeThreshold = 10240, // 10KB
+        maxFileSize = 10485760, // 10MB
+        maxRequestSize = 20971520 // 20MB
 )
-@MultipartConfig
 public class CategoriesController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -137,22 +135,27 @@ public class CategoriesController extends HttpServlet {
                         // Get webapp root path for reliable file storage
                         String webAppRoot = getServletContext().getRealPath("/");
                         if (webAppRoot == null) {
-                            // Fallback for environments where getRealPath returns null (e.g., some cloud setups)
+                            // Fallback for environments where getRealPath returns null (e.g., some cloud
+                            // setups)
                             webAppRoot = System.getProperty("java.io.tmpdir");
-                            req.setAttribute("error", "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
+                            req.setAttribute("error",
+                                    "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
                             req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
+                                    resp);
                             return;
                         }
 
                         // Ensure uploads directory exists
-                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images" + File.separator + "categories";
+                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images"
+                                + File.separator + "categories";
                         File uploadDir = new File(uploadPath);
                         if (!uploadDir.exists()) {
                             if (!uploadDir.mkdirs()) {
                                 req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
                                 req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
+                                        resp);
                                 return;
                             }
                         }
@@ -163,7 +166,8 @@ public class CategoriesController extends HttpServlet {
                         if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
                             fileExtension = fileName.substring(lastDotIndex);
                         }
-                        String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
+                        String uniqueFileName = System.currentTimeMillis() + "_"
+                                + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
                         String filePath = uploadPath + File.separator + uniqueFileName;
 
                         // Save the file
@@ -181,7 +185,8 @@ public class CategoriesController extends HttpServlet {
                                 }
                                 req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
                                 req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
+                                        resp);
                                 return;
                             }
                         } catch (IOException e) {
@@ -192,7 +197,8 @@ public class CategoriesController extends HttpServlet {
                             }
                             req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
                             req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
+                                    resp);
                             return;
                         }
                     } else {
