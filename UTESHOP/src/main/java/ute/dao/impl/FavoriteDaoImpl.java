@@ -64,16 +64,39 @@ public class FavoriteDaoImpl implements FavoriteDao {
     }
 
     @Override
-    public List<ProductDTO> findByUserId(Long userId) {
-        // TODO Auto-generated method stub
-        TypedQuery<Product> query = em.createQuery(
-                "Select p from Favorite f left join f.product p where f.user.userID= :userId", Product.class);
-        query.setParameter("userId", userId);
-        List<Product> listProducts = query.getResultList();
-        ProductServiceImpl p = new ProductServiceImpl();
-        List<ProductDTO> listProductDTOs = p.MapToProductDTO(listProducts);
-        return listProductDTOs;
+    public List<Product> findByUserId(Long userId) {
+        System.out.println("=== DEBUG FAVORITE ===");
+        System.out.println("User ID: " + userId);
 
+        List<Product> products = em.createQuery(
+                "SELECT DISTINCT p FROM Product p " +
+                        "JOIN p.favorites f " +
+                        "WHERE f.user.userID = :userId",
+                Product.class)
+                .setParameter("userId", userId)
+                .getResultList();
+
+        return products;
+    }
+
+    @Override
+    public void clearFavorite(Long userId) {
+        // TODO Auto-generated method stub
+        try {
+            em.getTransaction().begin();
+            TypedQuery<Favorite> q = em.createQuery(
+                    "SELECT f FROM Favorite f WHERE f.user.userID = :userId",
+                    Favorite.class);
+            q.setParameter("userId", userId);
+            List<Favorite> list = q.getResultList();
+            for (Favorite f : list) {
+                em.remove(em.contains(f) ? f : em.merge(f));
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            throw e;
+        }
     }
 
 }

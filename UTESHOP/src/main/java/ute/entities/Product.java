@@ -53,11 +53,11 @@ public class Product {
         this.importDate = LocalDateTime.now();
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoryID")
     private Categories category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brandID")
     private Brand brand;
 

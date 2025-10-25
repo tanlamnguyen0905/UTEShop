@@ -13,5 +13,7 @@ public interface FavoriteDao {
 
     boolean existsByUserAndProduct(Long userId, Long productId);
 
-    List<ProductDTO> findByUserId(Long userId);
+    List<Product> findByUserId(Long userId);
+
+    void clearFavorite(Long userId);
 }
