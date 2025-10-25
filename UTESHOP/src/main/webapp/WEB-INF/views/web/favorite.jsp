@@ -192,17 +192,8 @@
       });
       const data = await res.json();
       if (data.success) {
-        if (typeof window.updatefavoriteCount === 'function') {
-          window.updatefavoriteCount(data.itemCount);
-        }
         showToast('Đã xóa', 'Đã gỡ khỏi yêu thích', 'success');
         // Xóa phần tử khỏi DOM để mượt mà hơn thay vì reload toàn trang
-        const card = document.querySelector(`[onclick="removeFavorite(${productID})"]`)?.closest('.list-group-item');
-        if (card) card.remove();
-        // Nếu hết item, có thể reload để hiện empty-state
-        if (document.querySelectorAll('.list-group-item').length === 0) {
-          location.reload();
-        }
       } else {
         showToast('Lỗi', data.error || 'Không thể xóa sản phẩm', 'danger');
       }

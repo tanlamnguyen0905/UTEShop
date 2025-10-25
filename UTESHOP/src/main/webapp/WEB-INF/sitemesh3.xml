@@ -13,12 +13,8 @@
     <!-- Decorator mặc định cho web -->
     <mapping path="/*" decorator="/web.jsp" />
 
-<<<<<<< HEAD
-    <!-- Exclude auth pages -->
-=======
 	    <!-- Exclude các đường dẫn không cần decorate -->
     <mapping path="/api*" exclude="true" />
->>>>>>> origin/dev
     <mapping path="/auth/logout" exclude="true" />
 
     <!-- Exclude static files để tránh decorate -->
