@@ -1,4 +1,4 @@
-package ute.controllers.api;
+package ute.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;

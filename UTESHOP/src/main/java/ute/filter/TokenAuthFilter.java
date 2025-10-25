@@ -97,13 +97,13 @@ public class TokenAuthFilter implements Filter {
         
         // Nếu không có token, báo lỗi
         if (token == null) {
-            sendError(res, 401, "Missing authentication token");
+            sendError(req, res, 401, "Missing authentication token");
             return;
         }
         
         //  Validate token
         if (!JwtUtil.validateToken(token)) {
-            sendError(res, 401, "Invalid or expired token");
+            sendError(req, res, 401, "Invalid or expired token");
             return;
         }
         
@@ -117,7 +117,7 @@ public class TokenAuthFilter implements Filter {
         
         //  Role-based access control
         if (!hasAccess(path, role)) {
-            sendError(res, 403, "Access denied. You do not have permission to access this resource.");
+            sendError(req, res, 403, "Access denied. You do not have permission to access this resource.");
             return;
         }
         
@@ -179,17 +179,44 @@ public class TokenAuthFilter implements Filter {
     }
 
     /**
-     * Send JSON error response
+     * Send error response (JSON for API clients, HTML page for browsers)
      */
     private void sendError(HttpServletResponse res, int status, String message) throws IOException {
         res.setStatus(status);
+        
+        // Nếu không có ServletRequest, trả JSON mặc định
         res.setContentType("application/json;charset=UTF-8");
-
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
         error.put("error", message);
-
+        
         PrintWriter out = res.getWriter();
         out.print(gson.toJson(error));
+    }
+    
+    /**
+     * Send error response with request context (can forward to error pages)
+     */
+    private void sendError(HttpServletRequest req, HttpServletResponse res, int status, String message) throws IOException, ServletException {
+        // Kiểm tra xem request có từ browser không (Accept header chứa text/html)
+        String acceptHeader = req.getHeader("Accept");
+        boolean isBrowserRequest = acceptHeader != null && acceptHeader.contains("text/html");
+        
+        if (isBrowserRequest) {
+            // Forward đến error page đẹp cho browser
+            res.setStatus(status);
+            req.setAttribute("errorMessage", message);
+            
+            String errorPage = "/WEB-INF/views/error/" + status + ".jsp";
+            try {
+                req.getRequestDispatcher(errorPage).forward(req, res);
+            } catch (Exception e) {
+                // Fallback to JSON nếu không tìm thấy error page
+                sendError(res, status, message);
+            }
+        } else {
+            // Trả JSON cho API clients
+            sendError(res, status, message);
+        }
     }
 }

@@ -8,7 +8,7 @@
 
                 <!-- CORE SECTION -->
                 <div class="sb-sidenav-menu-heading">Core</div>
-                <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/dashboard">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Dashboard
                 </a>
@@ -24,13 +24,13 @@
                 </a>
                 <div class="collapse" id="collapseProducts">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/products/searchpaginated">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/products/searchpaginated">
                             <i class="fas fa-list me-1"></i> Danh sách sản phẩm
                         </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/products/saveOrUpdate">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate">
                             <i class="fas fa-plus me-1"></i> Thêm sản phẩm
                         </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/products/export">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/products/export">
                             <i class="fas fa-file-excel me-1"></i> Xuất Excel
                         </a>
                     </nav>
@@ -44,10 +44,10 @@
                 </a>
                 <div class="collapse" id="collapseCategories">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/categories/searchpaginated">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated">
                             <i class="fas fa-list me-1"></i> Danh sách danh mục
                         </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate">
                             <i class="fas fa-plus me-1"></i> Thêm danh mục
                         </a>
                     </nav>
@@ -84,7 +84,7 @@
                 <div class="sb-sidenav-menu-heading">Quản lý người dùng</div>
                 
                 <!-- Users -->
-                <a class="nav-link" href="${pageContext.request.contextPath}/admin/users">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/users">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     Người dùng
                 </a>
@@ -93,7 +93,7 @@
                 <div class="sb-sidenav-menu-heading">Giao diện & Nội dung</div>
                 
                 <!-- Banners -->
-                <a class="nav-link" href="${pageContext.request.contextPath}/admin/banners">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/banners">
                     <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
                     Banner quảng cáo
                 </a>
@@ -125,7 +125,7 @@
                 <div class="sb-sidenav-menu-heading">Hệ thống</div>
                 
                 <!-- Settings -->
-                <a class="nav-link" href="${pageContext.request.contextPath}/admin/settings">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/settings">
                     <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
                     Cài đặt
                 </a>

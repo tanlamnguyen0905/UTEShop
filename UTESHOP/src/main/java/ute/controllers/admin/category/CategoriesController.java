@@ -69,7 +69,7 @@ public class CategoriesController extends HttpServlet {
             req.setAttribute("size", size);
             req.setAttribute("searchKeyword", searchKeyword);
 
-            req.getRequestDispatcher("/WEB-INF/views/api/admin/categories/searchpaginated.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/admin/categories/searchpaginated.jsp").forward(req, resp);
 
         } else if (uri.contains("/api/admin/categories/saveOrUpdate")) {
             String idStr = req.getParameter("id");
@@ -77,12 +77,12 @@ public class CategoriesController extends HttpServlet {
                 Categories category = categoriesService.findById(Long.parseLong(idStr));
                 req.setAttribute("category", category);
             }
-            req.getRequestDispatcher("/WEB-INF/views/api/admin/categories/addOrEdit.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/categories/view")) {
             String idStr = req.getParameter("id");
             Categories category = categoriesService.findById(Long.parseLong(idStr));
             req.setAttribute("category", category);
-            req.getRequestDispatcher("/views/api/admin/categories/view.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views//admin/categories/view.jsp").forward(req, resp);
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
             categoriesService.delete(Long.parseLong(idStr));
@@ -112,7 +112,7 @@ public class CategoriesController extends HttpServlet {
             if (categoryName == null || categoryName.trim().isEmpty()) {
                 req.setAttribute("error", "Tên danh mục không được để trống!");
                 req.setAttribute("category", category);
-                req.getRequestDispatcher("/WEB-INF/views/api/admin/categories/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
@@ -155,7 +155,7 @@ public class CategoriesController extends HttpServlet {
             if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
                 req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
                 req.setAttribute("category", category);
-                req.getRequestDispatcher("/WEB-INF/views/api/admin/categories/addOrEdit.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
