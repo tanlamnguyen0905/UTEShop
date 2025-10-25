@@ -105,11 +105,7 @@
 										<c:choose>
 											<%-- ADMIN Menu --%>
 											<c:when test="${sessionScope.currentUser.role == 'ADMIN'}">
-<<<<<<< HEAD
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/dashboard">
-=======
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/home/dashboard">
->>>>>>> origin/tan
 													<i class="fa-solid fa-gauge-high me-2 text-danger"></i> Trang quản trị
 												</a></li>
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/users">
@@ -144,7 +140,7 @@
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/dashboard">
 													<i class="fa-solid fa-truck-fast me-2 text-info"></i> Trang vận chuyển
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/history">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đã%20giao%20hàng">
 													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Lịch sử giao hàng
 												</a></li>
 											</c:when>

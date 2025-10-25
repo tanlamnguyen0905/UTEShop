@@ -81,7 +81,9 @@
                                     <div class="col-md-4 mb-3">
                                         <img src="${pageContext.request.contextPath}/assets/${image.dirImage}"
                                              alt="${product.productName}"
-                                             class="img-thumbnail w-100" style="height: 150px;">
+                                             class="img-thumbnail w-100" style="height: 150px;"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span style="display:none; color: #6c757d;">Không tải được ảnh</span>
                                     </div>
                                 </c:forEach>
                             </div>

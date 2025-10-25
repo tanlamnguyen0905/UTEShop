@@ -188,7 +188,7 @@ const AuthUtils = {
 		const remaining = this.getTokenTimeRemaining();
 
 		if (remaining > 0) {
-			console.log('⏰ Token sẽ hết hạn sau: ${this.getTokenTimeRemainingFormatted()}');
+			console.log(`⏰ Token sẽ hết hạn sau: ${this.getTokenTimeRemainingFormatted()}`);
 
 			setTimeout(() => {
 				console.warn('⚠️ Token đã hết hạn! Tự động đăng xuất...');

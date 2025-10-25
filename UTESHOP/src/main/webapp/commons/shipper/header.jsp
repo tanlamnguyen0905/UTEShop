@@ -17,10 +17,6 @@
                             0
                         </span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                        <li><h6 class="dropdown-header">Thông báo</h6></li>
-                        <li><a class="dropdown-item" href="#">Không có thông báo mới</a></li>
-                    </ul>
                 </li>
 
                 <!-- User menu -->

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
+
     <!-- Decorator cho admin -->
     <mapping path="/api/admin/*" decorator="/admin.jsp" />
     
@@ -12,18 +13,21 @@
     <!-- Decorator mặc định cho web -->
     <mapping path="/*" decorator="/web.jsp" />
 
+<<<<<<< HEAD
     <!-- Exclude auth pages -->
+=======
+	    <!-- Exclude các đường dẫn không cần decorate -->
+    <mapping path="/api*" exclude="true" />
+>>>>>>> origin/dev
     <mapping path="/auth/logout" exclude="true" />
 
-    <!-- Exclude static files -->
-    <mapping path="*.css" exclude="true" />
-    <mapping path="*.js" exclude="true" />
-    <mapping path="*.png" exclude="true" />
-    <mapping path="*.jpg" exclude="true" />
-    <mapping path="*.jpeg" exclude="true" />
-    <mapping path="*.gif" exclude="true" />
-    <mapping path="*.ico" exclude="true" />
-    <mapping path="/assets/*" exclude="true" />
+    <!-- Exclude static files để tránh decorate -->
+    <mapping path="/*.css" exclude="true" />
+    <mapping path="/*.js" exclude="true" />
+    <mapping path="/*.png" exclude="true" />
+    <mapping path="/*.jpg" exclude="true" />
+    <mapping path="/*.gif" exclude="true" />
     <mapping path="/images/*" exclude="true" />
     <mapping path="/templates/*" exclude="true" />
+
 </sitemesh>

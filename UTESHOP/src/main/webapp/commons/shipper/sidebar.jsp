@@ -55,15 +55,15 @@
         <!-- Additional Links -->
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" href="${pageContext.request.contextPath}/profile">
+                <a class="nav-link" href="${pageContext.request.contextPath}/user/profile">
                     <i class="fas fa-user"></i>
                     Hồ sơ
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="${pageContext.request.contextPath}/auth/logout">
+                <a class="nav-link" href="${pageContext.request.contextPath}/home">
                     <i class="fas fa-sign-out-alt"></i>
-                    Đăng xuất
+                    Trang chủ
                 </a>
             </li>
         </ul>
