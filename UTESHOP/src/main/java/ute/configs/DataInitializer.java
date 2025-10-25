@@ -21,7 +21,7 @@ public class DataInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("========================================");
-        System.out.println("🚀 Khởi động ứng dụng UTESHOP...");
+        System.out.println("=== Khởi động ứng dụng UTESHOP ===");
         System.out.println("========================================");
         
         createDefaultAccounts();
@@ -47,7 +47,7 @@ public class DataInitializer implements ServletContextListener {
         try {
             // Kiểm tra xem admin đã tồn tại chưa
             if (!userDao.existsByUsername("admin")) {
-                System.out.println("📝 Đang tạo tài khoản ADMIN mặc định...");
+                System.out.println("[INIT] Đang tạo tài khoản ADMIN mặc định...");
                 
                 String hashedPassword = BCrypt.hashpw("admin", BCrypt.gensalt());
                 

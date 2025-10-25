@@ -17,17 +17,17 @@ public class AddressDaoImpl implements AddressDao {
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            
+
             // Debug log
             System.out.println("=== DAO INSERT ADDRESS ===");
             System.out.println("Name: " + address.getName());
             System.out.println("Phone: " + address.getPhone());
             System.out.println("Province: " + address.getProvince());
             System.out.println("==========================");
-            
+
             em.persist(address);
             trans.commit();
-            
+
             System.out.println("Address inserted with ID: " + address.getAddressID());
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,7 +44,7 @@ public class AddressDaoImpl implements AddressDao {
         EntityTransaction trans = em.getTransaction();
         try {
             trans.begin();
-            
+
             // Tìm entity hiện tại trong DB
             Addresses existing = em.find(Addresses.class, address.getAddressID());
             if (existing != null) {
@@ -53,7 +53,7 @@ public class AddressDaoImpl implements AddressDao {
                 System.out.println("AddressID: " + address.getAddressID());
                 System.out.println("Old Phone: " + existing.getPhone());
                 System.out.println("New Phone: " + address.getPhone());
-                
+
                 // Update từng field một để đảm bảo không bị mất dữ liệu
                 existing.setName(address.getName());
                 existing.setPhone(address.getPhone());
@@ -63,11 +63,11 @@ public class AddressDaoImpl implements AddressDao {
                 existing.setAddressDetail(address.getAddressDetail());
                 existing.setIsDefault(address.getIsDefault());
                 // User không thay đổi nên không cần set
-                
+
                 System.out.println("Updated Phone: " + existing.getPhone());
                 System.out.println("==========================");
             }
-            
+
             trans.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,8 +142,8 @@ public class AddressDaoImpl implements AddressDao {
             trans.begin();
             String jpql = "UPDATE Addresses a SET a.isDefault = false WHERE a.user.userID = :userID";
             em.createQuery(jpql)
-              .setParameter("userID", userID)
-              .executeUpdate();
+                    .setParameter("userID", userID)
+                    .executeUpdate();
             trans.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,4 +154,3 @@ public class AddressDaoImpl implements AddressDao {
         }
     }
 }
-

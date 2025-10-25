@@ -31,8 +31,9 @@ import ute.service.admin.inter.BrandService;
         maxFileSize = 10485760,       // 10MB
         maxRequestSize = 20971520     // 20MB
 )
-@WebServlet(urlPatterns = { "/admin/products/searchpaginated", "/admin/products/saveOrUpdate",
-        "/admin/products/delete", "/admin/products/view", "/admin/products/export" })
+@MultipartConfig
+@WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
+        "/api/admin/products/delete", "/api/admin/products/view", "/api/admin/products/export" })
 public class ProductController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -48,7 +49,7 @@ public class ProductController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
 
-        if (uri.contains("/admin/products/export")) {
+        if (uri.contains("/api/admin/products/export")) {
             // Xuất file Excel cho tất cả sản phẩm (hoặc filtered nếu cần)
             String searchKeyword = req.getParameter("searchKeyword");
             List<Product> products;
@@ -107,9 +108,11 @@ public class ProductController extends HttpServlet {
             try (OutputStream out = resp.getOutputStream()) {
                 workbook.write(out);
             }
-            workbook.close();
-            return;
-        } else if (uri.contains("/admin/products/searchpaginated")) {
+            return;  // Kết thúc response ở đây
+        }
+
+        if (uri.contains("/api/admin/products/searchpaginated")) {
+
             int page = 1;
             int size = 6;
             if (req.getParameter("page") != null) {
@@ -136,15 +139,15 @@ public class ProductController extends HttpServlet {
             req.setAttribute("size", size);
             req.setAttribute("searchKeyword", searchKeyword);
             req.getRequestDispatcher("/WEB-INF/views/admin/products/searchpaginated.jsp").forward(req, resp);
-        } else if (uri.contains("/admin/products/saveOrUpdate")) {
-            loadDropdowns(req);
+
+        } else if (uri.contains("/api/admin/products/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
                 Product product = productService.findById(Long.parseLong(idStr));
                 req.setAttribute("product", product);
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-        } else if (uri.contains("/admin/products/view")) {
+        } else if (uri.contains("/api/admin/products/view")) {
             String idStr = req.getParameter("id");
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
@@ -152,7 +155,7 @@ public class ProductController extends HttpServlet {
         } else if (uri.contains("/admin/products/delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
-            resp.sendRedirect(req.getContextPath() + "/admin/products/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
     }
 
@@ -382,7 +385,7 @@ public class ProductController extends HttpServlet {
             }
 
             req.getSession().setAttribute("message", message);
-            resp.sendRedirect(req.getContextPath() + "/admin/products/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
     }
 

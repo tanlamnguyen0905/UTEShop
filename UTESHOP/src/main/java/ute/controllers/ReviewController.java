@@ -65,7 +65,6 @@ public class ReviewController extends HttpServlet {
             Review review = Review.builder()
                     .content(comment)
                     .rating(rating)
-                    .createAt(LocalDateTime.now())
                     .user(user)
                     .product(product)
                     .build();

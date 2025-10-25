@@ -6,7 +6,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.FavoriteDao;
+import ute.dto.ProductDTO;
 import ute.entities.Favorite;
+import ute.entities.Product;
+import ute.service.admin.Impl.ProductServiceImpl;
+import ute.service.admin.inter.ProductService;
 
 public class FavoriteDaoImpl implements FavoriteDao {
     private EntityManager em;
@@ -60,10 +64,16 @@ public class FavoriteDaoImpl implements FavoriteDao {
     }
 
     @Override
-    public List<Favorite> findByUserId(Long userId) {
-        TypedQuery<Favorite> q = em.createQuery("SELECT f FROM Favorite f WHERE f.user.userID = :userId",
-                Favorite.class);
-        q.setParameter("userId", userId);
-        return q.getResultList();
+    public List<ProductDTO> findByUserId(Long userId) {
+        // TODO Auto-generated method stub
+        TypedQuery<Product> query = em.createQuery(
+                "Select p from Favorite f left join f.product p where f.user.userID= :userId", Product.class);
+        query.setParameter("userId", userId);
+        List<Product> listProducts = query.getResultList();
+        ProductServiceImpl p = new ProductServiceImpl();
+        List<ProductDTO> listProductDTOs = p.MapToProductDTO(listProducts);
+        return listProductDTOs;
+
     }
+
 }

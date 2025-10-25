@@ -20,10 +20,10 @@
 				<!-- Navbar -->
 				<div class="col d-flex justify-content-center">
 					<nav class="nav main-nav">
-						<a class="nav-link fw-bold text-dark" href="#">Sản Phẩm</a> <a
-							class="nav-link fw-bold text-danger" href="#">Đang Sale</a> <a
-							class="nav-link fw-bold text-dark" href="#">Quần áo</a> <a
-							class="nav-link fw-bold text-dark" href="#">Phụ kiện</a>
+						<a class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=3">Top yêu thích</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=0">Bán chạy</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=1">Mới</a> <a
+							class="nav-link fw-bold text-dark" href="${pageContext.request.contextPath}/filter?sortBy=2">Top đánh giá</a>
 					</nav>
 				</div>
 
@@ -105,42 +105,42 @@
 										<c:choose>
 											<%-- ADMIN Menu --%>
 											<c:when test="${sessionScope.currentUser.role == 'ADMIN'}">
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/dashboard">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/dashboard">
 													<i class="fa-solid fa-gauge-high me-2 text-danger"></i> Trang quản trị
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/users">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/users">
 													<i class="fa-solid fa-users-gear me-2 text-danger"></i> Quản lý người dùng
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/products">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/products">
 													<i class="fa-solid fa-box me-2 text-danger"></i> Quản lý sản phẩm
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/orders">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/orders">
 													<i class="fa-solid fa-cart-shopping me-2 text-danger"></i> Quản lý đơn hàng
 												</a></li>
 											</c:when>
 
 											<%-- MANAGER Menu --%>
 											<c:when test="${sessionScope.currentUser.role == 'MANAGER'}">
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/manager/dashboard">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/manager/dashboard">
 													<i class="fa-solid fa-chart-line me-2 text-warning"></i> Trang quản lý
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/manager/products">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/manager/products">
 													<i class="fa-solid fa-box me-2 text-warning"></i> Quản lý sản phẩm
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/manager/orders">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/manager/orders">
 													<i class="fa-solid fa-clipboard-list me-2 text-warning"></i> Quản lý đơn hàng
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/manager/reports">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/manager/reports">
 													<i class="fa-solid fa-file-chart-line me-2 text-warning"></i> Báo cáo
 												</a></li>
 											</c:when>
 
 											<%-- SHIPPER Menu --%>
 											<c:when test="${sessionScope.currentUser.role == 'SHIPPER'}">
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/shipper/dashboard">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/dashboard">
 													<i class="fa-solid fa-truck-fast me-2 text-info"></i> Trang vận chuyển
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/shipper/history">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đã%20giao%20hàng">
 													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Lịch sử giao hàng
 												</a></li>
 											</c:when>

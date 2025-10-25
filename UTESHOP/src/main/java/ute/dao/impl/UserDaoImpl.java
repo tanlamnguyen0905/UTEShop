@@ -204,4 +204,55 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
+	@Override
+	public List<Users> findByRole(String role) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery(
+				"SELECT u FROM Users u WHERE u.role = :role AND u.status = 'active' ORDER BY u.fullname", 
+				Users.class);
+			query.setParameter("role", role);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public List<Users> findAll() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery(
+				"SELECT u FROM Users u ORDER BY u.createAt DESC", 
+				Users.class);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public long countAll() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.createQuery("SELECT COUNT(u) FROM Users u", Long.class)
+				.getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public long countByRole(String role) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.createQuery(
+				"SELECT COUNT(u) FROM Users u WHERE u.role = :role", Long.class)
+				.setParameter("role", role)
+				.getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
 }

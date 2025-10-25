@@ -1,5 +1,6 @@
 package ute.dao.inter;
 
+import java.util.List;
 import ute.entities.Users;
 
 public interface UserDao {
@@ -21,4 +22,12 @@ public interface UserDao {
 	void delete(Long userId);
 
 	boolean activateUserByEmail(String email);
+	
+	List<Users> findByRole(String role);
+	
+	List<Users> findAll();
+	
+	long countAll();
+	
+	long countByRole(String role);
 }

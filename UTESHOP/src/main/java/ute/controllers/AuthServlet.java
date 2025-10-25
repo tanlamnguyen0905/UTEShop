@@ -21,7 +21,8 @@ import ute.utils.JwtUtil;
 import ute.utils.OtpUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
-@WebServlet(urlPatterns = { "/auth/register", "/auth/login", "/auth/logout", "/auth/verify-otp", "/auth/forgot-password", "/auth/reset-password", "/auth/check-exist" })
+@WebServlet(urlPatterns = { "/auth/register", "/auth/login", "/auth/logout", "/auth/verify-otp",
+		"/auth/forgot-password", "/auth/reset-password", "/auth/check-exist" })
 @MultipartConfig
 public class AuthServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -35,17 +36,21 @@ public class AuthServlet extends HttpServlet {
 		if ("/auth/login".equals(path)) {
 			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
 		} else if ("/auth/register".equals(path)) {
-			// 📨 Trường hợp chỉ gửi OTP
+			// Trường hợp chỉ gửi OTP
 			if (req.getParameter("sendOtp") != null) {
 				sendOtp(req, resp);
 				return;
 			}
 			req.getRequestDispatcher("/WEB-INF/views/auth/register.jsp").forward(req, resp);
 		} else if ("/auth/logout".equals(path)) {
+			// Xóa session
 			HttpSession session = req.getSession(false);
 			if (session != null)
 				session.invalidate();
-			resp.sendRedirect(req.getContextPath() + "/");
+			
+			// Chuyển đến trang logout để xóa token trong localStorage
+			req.getRequestDispatcher("/WEB-INF/views/auth/logout.jsp").forward(req, resp);
+			return;
         } else if ("/auth/forgot-password".equals(path)) {
             req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
         } else if ("/auth/reset-password".equals(path)) {
@@ -61,18 +66,18 @@ public class AuthServlet extends HttpServlet {
 		PrintWriter out = resp.getWriter();
 		String path = req.getServletPath();
 
-        if ("/auth/register".equals(path)) {
+		if ("/auth/register".equals(path)) {
 			register(req, resp, out);
 		} else if ("/auth/login".equals(path)) {
 			login(req, resp, out);
-        } else if ("/auth/forgot-password".equals(path)) {
-            forgotPassword(req, resp);
-        } else if ("/auth/reset-password".equals(path)) {
-            resetPassword(req, resp);
+		} else if ("/auth/forgot-password".equals(path)) {
+			forgotPassword(req, resp);
+		} else if ("/auth/reset-password".equals(path)) {
+			resetPassword(req, resp);
 		}
 	}
 
-	// ===================== 0️⃣ KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI =====================
+	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI =====================
 	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
@@ -99,21 +104,21 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-	// ===================== 1️⃣ GỬI OTP =====================
+	// ===================== GỬI OTP =====================
 	private void sendOtp(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
 
 		String email = req.getParameter("email");
 		String username = req.getParameter("username");
-		
+
 		if (email == null || email.isEmpty()) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			out.print("{\"success\":false, \"error\":\"Email không hợp lệ!\"}");
 			return;
 		}
 
-		// ✅ Kiểm tra username/email trước khi gửi OTP
+		// Kiểm tra username/email trước khi gửi OTP
 		if (username != null && !username.isEmpty() && userDAO.existsByUsername(username)) {
 			out.print("{\"success\":false, \"error\":\"Tên đăng nhập đã tồn tại!\"}");
 			return;
@@ -137,7 +142,7 @@ public class AuthServlet extends HttpServlet {
 		out.print("{\"success\":true, \"message\":\"Đã gửi mã OTP đến email!\"}");
 	}
 
-	// ===================== 2️⃣ ĐĂNG KÝ + XÁC THỰC OTP =====================
+	// ===================== ĐĂNG KÝ + XÁC THỰC OTP =====================
 	private void register(HttpServletRequest req, HttpServletResponse resp, PrintWriter out)
 			throws IOException, ServletException {
 		resp.setContentType("application/json;charset=UTF-8");
@@ -157,7 +162,7 @@ public class AuthServlet extends HttpServlet {
 			String otpEmail = (String) session.getAttribute("otp_email");
 			Long otpTime = (Long) session.getAttribute("otp_time");
 
-			//  Kiểm tra mã OTP
+			// Kiểm tra mã OTP
 			if (otpSession == null || otpEmail == null || otpTime == null) {
 				out.print("{\"success\":false, \"error\":\"Vui lòng nhận mã OTP trước!\"}");
 				return;
@@ -175,7 +180,7 @@ public class AuthServlet extends HttpServlet {
 				return;
 			}
 
-			//  Kiểm tra username/email trùng
+			// Kiểm tra username/email trùng
 			if (userDAO.existsByUsername(username)) {
 				out.print("{\"success\":false, \"error\":\"Tên đăng nhập đã tồn tại!\"}");
 				return;
@@ -185,7 +190,7 @@ public class AuthServlet extends HttpServlet {
 				return;
 			}
 
-			//  Upload ảnh
+			// Upload ảnh
 			if (avatarPart != null && avatarPart.getSize() > 0) {
 				String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
 				java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
@@ -195,10 +200,10 @@ public class AuthServlet extends HttpServlet {
 				avatarFileName = "default-avatar.png";
 			}
 
-			//  Mã hóa mật khẩu
+			// Mã hóa mật khẩu
 			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-			//  Lưu user mới (ACTIVE)
+			// Lưu user mới (ACTIVE)
 			Users u = new Users();
 			u.setUsername(username);
 			u.setPassword(hashedPassword);
@@ -211,7 +216,7 @@ public class AuthServlet extends HttpServlet {
 			u.setCreateAt(LocalDateTime.now());
 			userDAO.insert(u);
 
-			//  Dọn session
+			// Dọn session
 			session.removeAttribute("otp_code");
 			session.removeAttribute("otp_email");
 			session.removeAttribute("otp_time");
@@ -225,7 +230,7 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-	// ===================== 3️ LOGIN =====================
+	// ===================== LOGIN =====================
 	private void login(HttpServletRequest req, HttpServletResponse resp, PrintWriter out) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 
@@ -243,22 +248,29 @@ public class AuthServlet extends HttpServlet {
 				return;
 			}
 
-		user.setLastLoginAt(LocalDateTime.now());
-		userDAO.update(user);
+			user.setLastLoginAt(LocalDateTime.now());
+			userDAO.update(user);
 
-		HttpSession session = req.getSession();
-		session.setAttribute("currentUser", user);
+			HttpSession session = req.getSession();
+			session.setAttribute("currentUser", user);
 
 		// Generate JWT token
 		String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
 		session.setAttribute("token", token);
+		
+		// Lưu token vào cookie (1 giờ)
+		Cookie tokenCookie = new Cookie("authToken", token);
+		tokenCookie.setHttpOnly(false); // Cho phép JS đọc
+		tokenCookie.setPath("/");
+		tokenCookie.setMaxAge(3600); // 1 giờ
+		resp.addCookie(tokenCookie);
 
 		// Return token to client
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("username", user.getUsername());
 		response.put("role", user.getRole());
-		response.put("token", token); // ✅ Trả token về client
+		response.put("token", token); // Trả token về client
 		out.print(gson.toJson(response));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -266,7 +278,7 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-	// ===================== 4️ VERIFY OTP (DÙNG RIÊNG, TUỲ OPTION)
+	// ===================== VERIFY OTP (DÙNG RIÊNG, TUỲ OPTION)
 
 	private void verifyOtp(HttpServletRequest req, HttpServletResponse resp, PrintWriter out) throws IOException {
 		HttpSession session = req.getSession();
@@ -280,94 +292,94 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-    // ===================== 5️ FORGOT PASSWORD (GỬI OTP) =====================
+    // ===================== FORGOT PASSWORD (GỬI OTP) =====================
     private void forgotPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();
 
-        String email = req.getParameter("email");
-        if (email == null || email.isBlank()) {
-            out.print("{\"success\":false, \"error\":\"Email không hợp lệ!\"}");
-            return;
-        }
+		String email = req.getParameter("email");
+		if (email == null || email.isBlank()) {
+			out.print("{\"success\":false, \"error\":\"Email không hợp lệ!\"}");
+			return;
+		}
 
-        if (!userDAO.existsByEmail(email)) {
-            out.print("{\"success\":false, \"error\":\"Email không tồn tại!\"}");
-            return;
-        }
+		if (!userDAO.existsByEmail(email)) {
+			out.print("{\"success\":false, \"error\":\"Email không tồn tại!\"}");
+			return;
+		}
 
-        String otp = OtpUtil.generateOtp();
-        HttpSession session = req.getSession();
-        session.setAttribute("otp_code", otp);
-        session.setAttribute("otp_email", email);
-        session.setAttribute("otp_time", System.currentTimeMillis());
+		String otp = OtpUtil.generateOtp();
+		HttpSession session = req.getSession();
+		session.setAttribute("otp_code", otp);
+		session.setAttribute("otp_email", email);
+		session.setAttribute("otp_time", System.currentTimeMillis());
 
-        MailService mailService = new MailServiceImpl();
-        mailService.send(email, "UTESHOP - OTP đặt lại mật khẩu",
-                "Mã OTP của bạn là: " + otp + "\nMã có hiệu lực trong 5 phút.\n\nUTESHOP Team.");
+		MailService mailService = new MailServiceImpl();
+		mailService.send(email, "UTESHOP - OTP đặt lại mật khẩu",
+				"Mã OTP của bạn là: " + otp + "\nMã có hiệu lực trong 5 phút.\n\nUTESHOP Team.");
 
-        out.print("{\"success\":true, \"message\":\"Đã gửi OTP đến email!\"}");
-    }
+		out.print("{\"success\":true, \"message\":\"Đã gửi OTP đến email!\"}");
+	}
 
-    // ===================== 6️ RESET PASSWORD (XÁC THỰC OTP) =====================
+    // ===================== RESET PASSWORD (XÁC THỰC OTP) =====================
     private void resetPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();
 
-        String email = req.getParameter("email");
-        String otpInput = req.getParameter("otp");
-        String newPassword = req.getParameter("newPassword");
-        String confirmPassword = req.getParameter("confirmPassword");
+		String email = req.getParameter("email");
+		String otpInput = req.getParameter("otp");
+		String newPassword = req.getParameter("newPassword");
+		String confirmPassword = req.getParameter("confirmPassword");
 
-        if (email == null || otpInput == null || newPassword == null || confirmPassword == null ||
-            email.isBlank() || otpInput.isBlank() || newPassword.isBlank() || confirmPassword.isBlank()) {
-            out.print("{\"success\":false, \"error\":\"Thiếu thông tin!\"}");
-            return;
-        }
+		if (email == null || otpInput == null || newPassword == null || confirmPassword == null ||
+				email.isBlank() || otpInput.isBlank() || newPassword.isBlank() || confirmPassword.isBlank()) {
+			out.print("{\"success\":false, \"error\":\"Thiếu thông tin!\"}");
+			return;
+		}
 
-        if (!newPassword.equals(confirmPassword)) {
-            out.print("{\"success\":false, \"error\":\"Mật khẩu xác nhận không khớp!\"}");
-            return;
-        }
+		if (!newPassword.equals(confirmPassword)) {
+			out.print("{\"success\":false, \"error\":\"Mật khẩu xác nhận không khớp!\"}");
+			return;
+		}
 
-        HttpSession session = req.getSession();
-        String otpSession = (String) session.getAttribute("otp_code");
-        String otpEmail = (String) session.getAttribute("otp_email");
-        Long otpTime = (Long) session.getAttribute("otp_time");
+		HttpSession session = req.getSession();
+		String otpSession = (String) session.getAttribute("otp_code");
+		String otpEmail = (String) session.getAttribute("otp_email");
+		Long otpTime = (Long) session.getAttribute("otp_time");
 
-        if (otpSession == null || otpEmail == null || otpTime == null) {
-            out.print("{\"success\":false, \"error\":\"OTP chưa được gửi hoặc đã hết hạn!\"}");
-            return;
-        }
-        if (!email.equals(otpEmail)) {
-            out.print("{\"success\":false, \"error\":\"Email không trùng với email nhận OTP!\"}");
-            return;
-        }
-        if (!otpInput.equals(otpSession)) {
-            out.print("{\"success\":false, \"error\":\"Mã OTP không đúng!\"}");
-            return;
-        }
-        if (System.currentTimeMillis() - otpTime > 5 * 60 * 1000) {
-            out.print("{\"success\":false, \"error\":\"OTP đã hết hạn!\"}");
-            return;
-        }
+		if (otpSession == null || otpEmail == null || otpTime == null) {
+			out.print("{\"success\":false, \"error\":\"OTP chưa được gửi hoặc đã hết hạn!\"}");
+			return;
+		}
+		if (!email.equals(otpEmail)) {
+			out.print("{\"success\":false, \"error\":\"Email không trùng với email nhận OTP!\"}");
+			return;
+		}
+		if (!otpInput.equals(otpSession)) {
+			out.print("{\"success\":false, \"error\":\"Mã OTP không đúng!\"}");
+			return;
+		}
+		if (System.currentTimeMillis() - otpTime > 5 * 60 * 1000) {
+			out.print("{\"success\":false, \"error\":\"OTP đã hết hạn!\"}");
+			return;
+		}
 
-        Users user = userDAO.findByEmail(email);
-        if (user == null) {
-            out.print("{\"success\":false, \"error\":\"Email không tồn tại!\"}");
-            return;
-        }
+		Users user = userDAO.findByEmail(email);
+		if (user == null) {
+			out.print("{\"success\":false, \"error\":\"Email không tồn tại!\"}");
+			return;
+		}
 
-        String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        user.setPassword(hashed);
-        userDAO.update(user);
+		String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+		user.setPassword(hashed);
+		userDAO.update(user);
 
-        session.removeAttribute("otp_code");
-        session.removeAttribute("otp_email");
-        session.removeAttribute("otp_time");
+		session.removeAttribute("otp_code");
+		session.removeAttribute("otp_email");
+		session.removeAttribute("otp_time");
 
-        // Gửi kèm email để frontend điền sẵn vào form login
-        out.print("{\"success\":true, \"message\":\"Đổi mật khẩu thành công!\", \"email\":\"" + email + "\"}");
-    }
+		// Gửi kèm email để frontend điền sẵn vào form login
+		out.print("{\"success\":true, \"message\":\"Đổi mật khẩu thành công!\", \"email\":\"" + email + "\"}");
+	}
 
 }

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <!DOCTYPE html>
 <html>
@@ -201,7 +201,7 @@
                                 <div class="col-auto">
                                     <c:choose>
                                         <c:when test="${not empty item.product.images && item.product.images.size() > 0}">
-                                            <img src="${item.product.images[0].url}" 
+                                            <img src="${pageContext.request.contextPath}/image?fname=${item.product.images[0].dirImage}" 
                                                  alt="${item.product.productName}" 
                                                  class="product-image">
                                         </c:when>
@@ -310,8 +310,9 @@
                 
                 <c:if test="${not empty cartItems && cartItems.size() > 0}">
                     <a href="${pageContext.request.contextPath}/checkout" 
-                       class="btn btn-danger w-100 py-3 mt-4 mb-3">
-                        <i class="fas fa-credit-card me-2"></i>Tiến hành thanh toán
+                       class="btn btn-primary w-100 py-3 fw-bold mb-3"
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        <i class="fas fa-credit-card me-2"></i>Thanh toán ngay
                     </a>
                 </c:if>
                 

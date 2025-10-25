@@ -38,8 +38,8 @@ public class ProductDTO {
         dto.setUnitPrice(p.getUnitPrice());
         dto.setStockQuantity(p.getStockQuantity());
         dto.setDescription(p.getDescribe());
-        dto.setCategory(p.getCategory() != null ? p.getCategory().getCategoryName() : "N/A");
-        dto.setBrand(p.getBrand() != null ? p.getBrand().getBrandName() : "N/A");
+        dto.setCategory(p.getCategory().getCategoryName());
+        dto.setBrand(p.getBrand().getBrandName());
         dto.setRating(p.getRating());
         dto.setSoldCount(p.getSoldCount() != null ? p.getSoldCount() : 0L);
         dto.setReviewCount(p.getReviewCount() != null ? p.getReviewCount() : 0L);

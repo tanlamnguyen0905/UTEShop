@@ -1,7 +1,10 @@
 package ute.dao.inter;
 
 import java.util.List;
+
+import ute.dto.ProductDTO;
 import ute.entities.Favorite;
+import ute.entities.Product;
 
 public interface FavoriteDao {
     Favorite insert(Favorite favorite);
@@ -10,5 +13,5 @@ public interface FavoriteDao {
 
     boolean existsByUserAndProduct(Long userId, Long productId);
 
-    List<Favorite> findByUserId(Long userId);
+    List<ProductDTO> findByUserId(Long userId);
 }

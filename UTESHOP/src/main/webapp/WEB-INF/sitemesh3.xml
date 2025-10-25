@@ -2,7 +2,10 @@
 <sitemesh>
 
     <!-- Decorator cho admin -->
-    <mapping path="/admin/*" decorator="/admin.jsp" />
+    <mapping path="/api/admin/*" decorator="/admin.jsp" />
+    
+    <!-- Decorator cho shipper -->
+    <mapping path="/api/shipper*" decorator="/shipper.jsp" />
 
     <!-- Decorator cho user -->
     <mapping path="/home/user*" decorator="/user.jsp" />
@@ -10,8 +13,9 @@
     <!-- Decorator mặc định cho web -->
     <mapping path="/*" decorator="/web.jsp" />
 
-    <!-- Exclude API -->
+	    <!-- Exclude các đường dẫn không cần decorate -->
     <mapping path="/api*" exclude="true" />
+    <mapping path="/auth/logout" exclude="true" />
 
     <!-- Exclude static files để tránh decorate -->
     <mapping path="/*.css" exclude="true" />

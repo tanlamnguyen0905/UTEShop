@@ -29,23 +29,23 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getOrCreateCart(Long userId) {
         Cart cart = cartDao.findCartByUserId(userId);
-        
+
         if (cart == null) {
             // Tạo cart mới cho user
             Users user = userDao.findById(userId);
             if (user == null) {
-                throw new RuntimeException("User not found with id: " + userId);
+                throw new RuntimeException("Không tìm thấy người dùng");
             }
-            
+
             cart = Cart.builder()
                     .user(user)
                     .totalPrice(0.0)
                     .build();
-            
+
             cartDao.createCart(cart);
             cart = cartDao.findCartByUserId(userId);
         }
-        
+
         return cart;
     }
 
@@ -58,49 +58,48 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addToCart(Long userId, Long productId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
         }
-        
+
         // Lấy hoặc tạo giỏ hàng
         Cart cart = getOrCreateCart(userId);
-        
+
         // Tìm sản phẩm
         Product product = productDao.findById(productId.intValue());
         if (product == null) {
-            throw new RuntimeException("Product not found with id: " + productId);
+            throw new RuntimeException("Không tìm thấy sản phẩm");
         }
-        
+
         // Kiểm tra tồn kho
         if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+            throw new RuntimeException("Sản phẩm tạm hết hàng!");
         }
-        
+
         // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
         CartDetail existingDetail = cartDao.findCartDetailByCartAndProduct(cart.getCartID(), productId);
-        
+
         if (existingDetail != null) {
             // Cập nhật số lượng
             int newQuantity = existingDetail.getQuantity() + quantity;
-            
+
             if (newQuantity > product.getStockQuantity()) {
-                throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+                throw new RuntimeException("Sản phẩm tạm hết hàng! ");
             }
-            
+
             existingDetail.setQuantity(newQuantity);
             cartDao.updateCartDetail(existingDetail);
         } else {
-            
-            
+
             CartDetail cartDetail = CartDetail.builder()
                     .cart(cart)
                     .product(product)
                     .quantity(quantity)
                     .unitPrice(product.getUnitPrice())
                     .build();
-            
+
             cartDao.addCartDetail(cartDetail);
         }
-        
+
         // Cập nhật tổng giá của cart
         updateCartTotal(cart.getCartID());
     }
@@ -108,29 +107,29 @@ public class CartServiceImpl implements CartService {
     @Override
     public void updateCartItemQuantity(Long cartDetailId, int quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+            throw new IllegalArgumentException("Số lượng không thể là số âm");
         }
-        
+
         CartDetail cartDetail = cartDao.findCartDetailById(cartDetailId);
         if (cartDetail == null) {
-            throw new RuntimeException("Cart item not found with id: " + cartDetailId);
+            throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
-        
+
         if (quantity == 0) {
             // Xóa item nếu quantity = 0
             removeFromCart(cartDetailId);
             return;
         }
-        
+
         // Kiểm tra tồn kho
         Product product = cartDetail.getProduct();
         if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+            throw new RuntimeException("Sản phẩm tạm hết hàng! ");
         }
-        
+
         cartDetail.setQuantity(quantity);
         cartDao.updateCartDetail(cartDetail);
-        
+
         // Cập nhật tổng giá
         updateCartTotal(cartDetail.getCart().getCartID());
     }
@@ -139,12 +138,12 @@ public class CartServiceImpl implements CartService {
     public void removeFromCart(Long cartDetailId) {
         CartDetail cartDetail = cartDao.findCartDetailById(cartDetailId);
         if (cartDetail == null) {
-            throw new RuntimeException("Cart item not found with id: " + cartDetailId);
+            throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
-        
+
         Long cartId = cartDetail.getCart().getCartID();
         cartDao.deleteCartDetail(cartDetailId);
-        
+
         // Cập nhật tổng giá
         updateCartTotal(cartId);
     }
@@ -165,13 +164,13 @@ public class CartServiceImpl implements CartService {
         if (cart == null) {
             return 0.0;
         }
-        
+
         List<CartDetail> cartDetails = cartDao.findCartDetailsByCartId(cart.getCartID());
-        
+
         double total = cartDetails.stream()
                 .mapToDouble(detail -> detail.getUnitPrice() * detail.getQuantity())
                 .sum();
-        
+
         return total;
     }
 
@@ -183,17 +182,17 @@ public class CartServiceImpl implements CartService {
         }
         return cartDao.getTotalItemsInCart(cart.getCartID());
     }
-    
+
     /**
      * Helper method để cập nhật tổng giá của cart
      */
     private void updateCartTotal(Long cartId) {
         List<CartDetail> cartDetails = cartDao.findCartDetailsByCartId(cartId);
-        
+
         double total = cartDetails.stream()
                 .mapToDouble(detail -> detail.getUnitPrice() * detail.getQuantity())
                 .sum();
-        
+
         // Lấy Cart trực tiếp từ EntityManager thay vì qua CartDetail
         EntityManager em = JPAConfig.getEntityManager();
         try {

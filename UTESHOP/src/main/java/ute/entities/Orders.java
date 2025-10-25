@@ -32,31 +32,31 @@ public class Orders {
 
     private Double amount;
     private LocalDateTime orderDate;
-    
+
     @Column(name = "TotalDiscount", nullable = false)
     Double totalDiscount;
 
     @Column(nullable = false)
     private String phoneNumber;
-    
+
     @Column(name = "ShippingFee", nullable = false)
     @Builder.Default
     Double shippingFee = 25000.0;
 
     @Column(name = "recipientName", nullable = false, columnDefinition = "NVARCHAR(255)")
     private String recipientName;
-    
+
     @Column(name = "orderStatus", nullable = false, columnDefinition = "NVARCHAR(100)")
     @Builder.Default
     private String orderStatus = "Đang chờ";
-    
+
     @Column(name = "paymentStatus", nullable = false, columnDefinition = "NVARCHAR(100)")
     @Builder.Default
     private String paymentStatus = "Chưa thanh toán";
-    
+
     @Column(name = "notes", columnDefinition = "NVARCHAR(MAX)")
     private String notes;
-    
+
     @ManyToOne
     @JoinColumn(name = "userID")
     private Users user;
@@ -71,13 +71,13 @@ public class Orders {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
-    
+
     @ManyToOne
     @JoinColumn(name = "userCouponID")
     private UserCoupon userCoupon;
 
     @PrePersist
     protected void onPersist() {
-    this.orderDate = LocalDateTime.now();
-}
+        this.orderDate = LocalDateTime.now();
+    }
 }

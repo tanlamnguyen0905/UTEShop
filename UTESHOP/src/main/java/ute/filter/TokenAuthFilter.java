@@ -14,8 +14,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import ute.utils.JwtUtil;
 
 /**
@@ -24,90 +26,110 @@ import ute.utils.JwtUtil;
  * - Role-based access control
  * - CORS support
  */
-@WebFilter(urlPatterns = {"/*"})
+@WebFilter(urlPatterns = { "/*" })
 public class TokenAuthFilter implements Filter {
-    
+
     private final Gson gson = new Gson();
-    
+
     // Các route được bỏ qua (public, static resources, login/register)
     private static final List<String> EXCLUDED_PATHS = List.of(
-        "/auth/", "/public/", "/assets/", "/uploads/", 
-        "/css/", "/js/", "/images/", "/user/", "/home", 
-        "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
-        "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
+            "/auth/", "/public/", "/assets/", "/uploads/",
+            "/css/", "/js/", "/images/", "/user/", "/home",
+            "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
+            "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
     );
-    
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        
+
         String path = req.getRequestURI();
-        
+
         // CORS headers
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        
+
         // Handle preflight requests
         if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
         
-        // 1️⃣ Bỏ qua các đường dẫn public và static resources
+        //  Bỏ qua các đường dẫn public và static resources
         if (isExcludedPath(path)) {
             chain.doFilter(request, response);
             return;
         }
         
-        // 2️⃣ Chỉ kiểm tra token cho /api/*
+        // Chỉ kiểm tra token cho /api/*
         if (!path.startsWith(req.getContextPath() + "/api/")) {
             chain.doFilter(request, response);
             return;
         }
         
-        // 3️⃣ Get Authorization header
-        String authHeader = req.getHeader("Authorization");
+        //  Lấy token từ nhiều nguồn (ưu tiên: Cookie > Header > Session)
+        String token = null;
         
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(res, 401, "Missing or invalid Authorization header");
+        // Kiểm tra cookie trước (tự động gửi với mọi request)
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("authToken".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    System.out.println("[AUTH] Token from Cookie");
+                    break;
+                }
+            }
+        }
+        
+        // Nếu không có cookie, kiểm tra Authorization header
+        if (token == null) {
+            String authHeader = req.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                System.out.println("[AUTH] Token from Header");
+            }
+        }
+        
+        // Nếu không có token, báo lỗi
+        if (token == null) {
+            sendError(req, res, 401, "Missing authentication token");
             return;
         }
         
-        // 4️⃣ Extract and validate token
-        String token = authHeader.substring(7);
-        
+        //  Validate token
         if (!JwtUtil.validateToken(token)) {
-            sendError(res, 401, "Invalid or expired token");
+            sendError(req, res, 401, "Invalid or expired token");
             return;
         }
         
-        // 5️⃣ Extract user info from token
+        // Extract user info from token
         String username = JwtUtil.extractUsername(token);
         String role = JwtUtil.extractRole(token);
         Long userId = JwtUtil.extractUserId(token);
-        
+
         // Log for debugging
-        System.out.println("✅ JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
+        System.out.println(" JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
         
-        // 6️⃣ Role-based access control
+        //  Role-based access control
         if (!hasAccess(path, role)) {
-            sendError(res, 403, "Access denied. You don't have permission to access this resource.");
+            sendError(req, res, 403, "Access denied. You do not have permission to access this resource.");
             return;
         }
         
-        // 7️⃣ Set user attributes for controller
+        //  Set user attributes for controller
         req.setAttribute("tokenUsername", username);
         req.setAttribute("tokenRole", role);
         req.setAttribute("tokenUserId", userId);
         
-        // ✅ Proceed to controller
+        //  Proceed to controller
         chain.doFilter(request, response);
     }
-    
+
     /**
      * Check if path should skip token validation
      */
@@ -119,47 +141,51 @@ public class TokenAuthFilter implements Filter {
         }
         return false;
     }
-    
+
     /**
      * Role-based access control
+     * Hierarchy: ADMIN > MANAGER > SHIPPER > USER
      */
     private boolean hasAccess(String path, String role) {
         if (role == null) {
             return false;
         }
-        
+
         String pathLower = path.toLowerCase();
         String roleUpper = role.toUpperCase();
-        
+
         switch (roleUpper) {
             case "ADMIN":
-                return true; // Admin has full access
+                // Admin has full access to everything
+                return true;
                 
             case "MANAGER":
-                // Manager can access manager and user APIs
+                // Manager has access to: manager APIs + user APIs
                 return pathLower.contains("/api/manager") || 
                        pathLower.contains("/api/user");
                 
             case "SHIPPER":
-                // Shipper can only access shipper APIs
-                return pathLower.contains("/api/shipper");
+                // Shipper has access to: shipper APIs + user APIs
+                return pathLower.contains("/api/shipper") || 
+                       pathLower.contains("/api/user");
                 
             case "USER":
                 // User can only access user APIs
                 return pathLower.contains("/api/user");
-                
+
             default:
                 return false;
         }
     }
-    
+
     /**
-     * Send JSON error response
+     * Send error response (JSON for API clients, HTML page for browsers)
      */
     private void sendError(HttpServletResponse res, int status, String message) throws IOException {
         res.setStatus(status);
-        res.setContentType("application/json;charset=UTF-8");
         
+        // Nếu không có ServletRequest, trả JSON mặc định
+        res.setContentType("application/json;charset=UTF-8");
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
         error.put("error", message);
@@ -167,5 +193,30 @@ public class TokenAuthFilter implements Filter {
         PrintWriter out = res.getWriter();
         out.print(gson.toJson(error));
     }
+    
+    /**
+     * Send error response with request context (can forward to error pages)
+     */
+    private void sendError(HttpServletRequest req, HttpServletResponse res, int status, String message) throws IOException, ServletException {
+        // Kiểm tra xem request có từ browser không (Accept header chứa text/html)
+        String acceptHeader = req.getHeader("Accept");
+        boolean isBrowserRequest = acceptHeader != null && acceptHeader.contains("text/html");
+        
+        if (isBrowserRequest) {
+            // Forward đến error page đẹp cho browser
+            res.setStatus(status);
+            req.setAttribute("errorMessage", message);
+            
+            String errorPage = "/WEB-INF/views/error/" + status + ".jsp";
+            try {
+                req.getRequestDispatcher(errorPage).forward(req, res);
+            } catch (Exception e) {
+                // Fallback to JSON nếu không tìm thấy error page
+                sendError(res, status, message);
+            }
+        } else {
+            // Trả JSON cho API clients
+            sendError(res, status, message);
+        }
+    }
 }
-

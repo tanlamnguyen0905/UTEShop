@@ -15,13 +15,14 @@ import ute.entities.Categories;
 import ute.service.inter.CategoriesService;
 import ute.service.impl.CategoriesServiceImpl;
 
-@WebServlet(urlPatterns = { "/admin/categories/searchpaginated", "/admin/categories/saveOrUpdate",
-        "/admin/categories/delete", "/admin/categories/view" })
+@WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
+        "/api/admin/categories/delete", "/api/admin/categories/view" })
 @MultipartConfig(
         fileSizeThreshold = 10240,    // 10KB
         maxFileSize = 10485760,       // 10MB
         maxRequestSize = 20971520     // 20MB
 )
+@MultipartConfig
 public class CategoriesController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -33,7 +34,7 @@ public class CategoriesController extends HttpServlet {
 
         String uri = req.getRequestURI();
 
-        if (uri.contains("/admin/categories/searchpaginated")) {
+        if (uri.contains("/api/admin/categories/searchpaginated")) {
 
             int page = 1;
             int size = 6;
@@ -75,22 +76,22 @@ public class CategoriesController extends HttpServlet {
 
             req.getRequestDispatcher("/WEB-INF/views/admin/categories/searchpaginated.jsp").forward(req, resp);
 
-        } else if (uri.contains("/admin/categories/saveOrUpdate")) {
+        } else if (uri.contains("/api/admin/categories/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
                 Categories category = categoriesService.findById(Long.parseLong(idStr));
                 req.setAttribute("category", category);
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-        } else if (uri.contains("/admin/categories/view")) {
+        } else if (uri.contains("/api/admin/categories/view")) {
             String idStr = req.getParameter("id");
             Categories category = categoriesService.findById(Long.parseLong(idStr));
             req.setAttribute("category", category);
-            req.getRequestDispatcher("/views/admin/categories/view.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views//admin/categories/view.jsp").forward(req, resp);
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
             categoriesService.delete(Long.parseLong(idStr));
-            resp.sendRedirect(req.getContextPath() + "/admin/categories/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
         }
     }
 
@@ -98,7 +99,7 @@ public class CategoriesController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
 
-        if (uri.contains("/admin/categories/saveOrUpdate")) {
+        if (uri.contains("/api/admin/categories/saveOrUpdate")) {
             Categories category = new Categories();
 
             // Get text parameters from the multipart form
@@ -233,7 +234,7 @@ public class CategoriesController extends HttpServlet {
             }
 
             req.getSession().setAttribute("message", message);
-            resp.sendRedirect(req.getContextPath() + "/admin/categories/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
         }
     }
 }

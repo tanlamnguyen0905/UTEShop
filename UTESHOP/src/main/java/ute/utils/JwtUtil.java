@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class JwtUtil {
 	private static final String SECRET_KEY = "UTESHOP_SUPER_SECRET_KEY_2025_AUTH_JWT_SECURITY";
-	private static final long EXPIRATION = 86400000; // 1 ngày
+	private static final long EXPIRATION = 3600000; // 1 giờ (60 phút × 60 giây × 1000 ms)
 
 	private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
