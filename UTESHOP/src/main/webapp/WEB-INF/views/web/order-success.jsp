@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -213,7 +212,7 @@
                 <div class="info-row">
                     <span class="info-label">Ngày đặt:</span>
                     <span class="info-value">
-                        <c:out value="${order.orderDate.format(java.time.format.DateTimeFormatter.ofPattern('dd/MM/yyyy HH:mm'))}"/>
+                        ${formattedOrderDate}
                     </span>
                 </div>
                 
@@ -242,7 +241,38 @@
                 
                 <div class="info-row">
                     <span class="info-label">Trạng thái:</span>
-                    <span class="status-badge status-pending">${order.orderStatus}</span>
+                    <c:choose>
+                        <c:when test="${order.orderStatus eq 'Đang chờ'}">
+                            <span class="badge bg-warning text-dark" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-clock me-1"></i>Chờ xác nhận
+                            </span>
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'Đang xử lý'}">
+                            <span class="badge text-white" style="background-color: #fd7e14; font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-hourglass-half me-1"></i>Đang xử lý
+                            </span>
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'Đang giao'}">
+                            <span class="badge bg-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-shipping-fast me-1"></i>Đang giao
+                            </span>
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'Đã giao'}">
+                            <span class="badge bg-success" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-check-circle me-1"></i>Hoàn thành
+                            </span>
+                        </c:when>
+                        <c:when test="${order.orderStatus eq 'Đã hủy'}">
+                            <span class="badge bg-danger" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-times-circle me-1"></i>Đã hủy
+                            </span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="badge bg-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                ${order.orderStatus}
+                            </span>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 
                 <div class="info-row">
@@ -288,7 +318,7 @@
                         <div class="timeline-content">
                             <div class="fw-bold">Đơn hàng đã được đặt</div>
                             <div class="text-muted small">
-                                <c:out value="${order.orderDate.format(java.time.format.DateTimeFormatter.ofPattern('dd/MM/yyyy HH:mm'))}"/>
+                                ${formattedOrderDate}
                             </div>
                         </div>
                     </div>

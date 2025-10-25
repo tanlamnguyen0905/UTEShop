@@ -3,7 +3,7 @@
 <!-- Top Navigation -->
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow">
     <!-- Logo / Brand -->
-    <a class="navbar-brand ps-3 d-flex align-items-center" href="${pageContext.request.contextPath}/admin/dashboard">
+    <a class="navbar-brand ps-3 d-flex align-items-center" href="${pageContext.request.contextPath}/api/admin/dashboard">
         <i class="fas fa-store me-2"></i>
         <span class="fw-bold">UTESHOP Admin</span>
     </a>

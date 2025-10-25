@@ -2,7 +2,10 @@
 <sitemesh>
 
     <!-- Decorator cho admin -->
-    <mapping path="/admin/*" decorator="/admin.jsp" />
+    <mapping path="/api/admin/*" decorator="/admin.jsp" />
+    
+    <!-- Decorator cho shipper -->
+    <mapping path="/api/shipper*" decorator="/shipper.jsp" />
 
     <!-- Decorator cho user -->
     <mapping path="/home/user*" decorator="/user.jsp" />

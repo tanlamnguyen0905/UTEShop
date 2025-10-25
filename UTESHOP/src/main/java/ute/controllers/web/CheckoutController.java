@@ -1,6 +1,7 @@
 package ute.controllers.web;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -56,6 +57,14 @@ public class CheckoutController extends HttpServlet {
             if (orderId != null) {
                 Orders order = orderService.findById(orderId);
                 req.setAttribute("order", order);
+                
+                // Format date for JSP display
+                if (order != null && order.getOrderDate() != null) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    String formattedDate = order.getOrderDate().format(formatter);
+                    req.setAttribute("formattedOrderDate", formattedDate);
+                }
+                
                 session.removeAttribute("lastOrderId");
             }
             req.getRequestDispatcher("/WEB-INF/views/web/order-success.jsp").forward(req, resp);

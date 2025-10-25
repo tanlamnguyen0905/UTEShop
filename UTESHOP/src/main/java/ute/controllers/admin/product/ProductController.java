@@ -27,8 +27,8 @@ import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
 @MultipartConfig
-@WebServlet(urlPatterns = { "/admin/products/searchpaginated", "/admin/products/saveOrUpdate",
-        "/admin/products/delete", "/admin/products/view", "/admin/products/export" })
+@WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
+        "/api/admin/products/delete", "/api/admin/products/view", "/api/admin/products/export" })
 public class ProductController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public class ProductController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
 
-        if (uri.contains("/admin/products/export")) {
+        if (uri.contains("/api/admin/products/export")) {
             // Xuất file Excel cho tất cả sản phẩm (hoặc filtered nếu cần)
             String searchKeyword = req.getParameter("searchKeyword");
             List<Product> products;
@@ -107,7 +107,7 @@ public class ProductController extends HttpServlet {
             return;  // Kết thúc response ở đây
         }
 
-        if (uri.contains("/admin/products/searchpaginated")) {
+        if (uri.contains("/api/admin/products/searchpaginated")) {
 
             int page = 1;
             int size = 6;
@@ -149,7 +149,7 @@ public class ProductController extends HttpServlet {
 
             req.getRequestDispatcher("/WEB-INF/views/admin/products/searchpaginated.jsp").forward(req, resp);
 
-        } else if (uri.contains("/admin/products/saveOrUpdate")) {
+        } else if (uri.contains("/api/admin/products/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             Product product = null;
             if (idStr != null && !idStr.isEmpty()) {
@@ -164,7 +164,7 @@ public class ProductController extends HttpServlet {
             req.setAttribute("brandsList", brandsList);
 
             req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-        } else if (uri.contains("/admin/products/view")) {
+        } else if (uri.contains("/api/admin/products/view")) {
             String idStr = req.getParameter("id");
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
@@ -172,7 +172,7 @@ public class ProductController extends HttpServlet {
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
-            resp.sendRedirect(req.getContextPath() + "/admin/products/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
     }
 
@@ -365,7 +365,7 @@ public class ProductController extends HttpServlet {
             }
 
             req.getSession().setAttribute("message", message);
-            resp.sendRedirect(req.getContextPath() + "/admin/products/searchpaginated");
+            resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
     }
 

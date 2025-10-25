@@ -202,7 +202,7 @@ public class UserController extends HttpServlet {
         // Kiểm tra email đã tồn tại
         if (email != null && !email.equals(currentUser.getEmail())) {
             if (userDao.existsByEmail(email)) {
-                req.setAttribute("error", "❌ Email đã được sử dụng bởi tài khoản khác!");
+                req.setAttribute("error", "Email đã được sử dụng bởi tài khoản khác!");
                 req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
                 return;
             }
@@ -226,7 +226,7 @@ public class UserController extends HttpServlet {
         userDao.update(currentUser);
         req.getSession().setAttribute("currentUser", currentUser);
 
-        req.setAttribute("success", "✅ Cập nhật thông tin thành công!");
+        req.setAttribute("success", "Cập nhật thông tin thành công!");
         req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
     }
 
@@ -238,7 +238,7 @@ public class UserController extends HttpServlet {
 
         // Kiểm tra mật khẩu hiện tại
         if (!BCrypt.checkpw(currentPassword, currentUser.getPassword())) {
-            req.setAttribute("error", "❌ Mật khẩu hiện tại không chính xác!");
+            req.setAttribute("error", "Mật khẩu hiện tại không chính xác!");
             req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
             return;
         }
@@ -249,7 +249,7 @@ public class UserController extends HttpServlet {
         userDao.update(currentUser);
         req.getSession().setAttribute("currentUser", currentUser);
 
-        req.setAttribute("success", "✅ Đổi mật khẩu thành công! Hệ thống sẽ quay lại hồ sơ sau ít giây...");
+        req.setAttribute("success", "Đổi mật khẩu thành công! Hệ thống sẽ quay lại hồ sơ sau ít giây...");
         req.getRequestDispatcher("/WEB-INF/views/user/change-password.jsp").forward(req, resp);
     }
 

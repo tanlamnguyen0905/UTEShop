@@ -34,7 +34,7 @@ public class CartServiceImpl implements CartService {
             // Tạo cart mới cho user
             Users user = userDao.findById(userId);
             if (user == null) {
-                throw new RuntimeException("User not found with id: " + userId);
+                throw new RuntimeException("Không tìm thấy người dùng");
             }
             
             cart = Cart.builder()
@@ -58,7 +58,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addToCart(Long userId, Long productId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
         }
         
         // Lấy hoặc tạo giỏ hàng
@@ -67,12 +67,12 @@ public class CartServiceImpl implements CartService {
         // Tìm sản phẩm
         Product product = productDao.findById(productId.intValue());
         if (product == null) {
-            throw new RuntimeException("Product not found with id: " + productId);
+            throw new RuntimeException("Không tìm thấy sản phẩm");
         }
         
         // Kiểm tra tồn kho
         if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+            throw new RuntimeException("Sản phẩm tạm hết hàng!");
         }
         
         // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
@@ -83,7 +83,7 @@ public class CartServiceImpl implements CartService {
             int newQuantity = existingDetail.getQuantity() + quantity;
             
             if (newQuantity > product.getStockQuantity()) {
-                throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+                throw new RuntimeException("Sản phẩm tạm hết hàng! ");
             }
             
             existingDetail.setQuantity(newQuantity);
@@ -108,12 +108,12 @@ public class CartServiceImpl implements CartService {
     @Override
     public void updateCartItemQuantity(Long cartDetailId, int quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+            throw new IllegalArgumentException("Số lượng không thể là số âm");
         }
         
         CartDetail cartDetail = cartDao.findCartDetailById(cartDetailId);
         if (cartDetail == null) {
-            throw new RuntimeException("Cart item not found with id: " + cartDetailId);
+            throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
         
         if (quantity == 0) {
@@ -125,7 +125,7 @@ public class CartServiceImpl implements CartService {
         // Kiểm tra tồn kho
         Product product = cartDetail.getProduct();
         if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock. Available: " + product.getStockQuantity());
+            throw new RuntimeException("Sản phẩm tạm hết hàng! ");
         }
         
         cartDetail.setQuantity(quantity);
@@ -139,7 +139,7 @@ public class CartServiceImpl implements CartService {
     public void removeFromCart(Long cartDetailId) {
         CartDetail cartDetail = cartDao.findCartDetailById(cartDetailId);
         if (cartDetail == null) {
-            throw new RuntimeException("Cart item not found with id: " + cartDetailId);
+            throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
         
         Long cartId = cartDetail.getCart().getCartID();

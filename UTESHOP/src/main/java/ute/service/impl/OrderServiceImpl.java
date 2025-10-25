@@ -87,8 +87,8 @@ public class OrderServiceImpl implements OrderService {
                     .totalDiscount(totalDiscount)
                     .shippingFee(25000.0)  // Default shipping fee
                     .orderDate(LocalDateTime.now())
-                    .orderStatus("PENDING")
-                    .paymentStatus("UNPAID")
+                    .orderStatus("Đang chờ")
+                    .paymentStatus("Chưa thanh toán")
                     .phoneNumber(address.getPhone())
                     .recipientName(address.getName())
                     .notes(notes)
@@ -185,8 +185,8 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException("Đơn hàng không tồn tại!");
             }
             
-            // Chỉ cho phép hủy đơn hàng ở trạng thái PENDING
-            if (!"PENDING".equals(order.getOrderStatus())) {
+            // Chỉ cho phép hủy đơn hàng ở trạng thái Đang chờ
+            if (!"Đang chờ".equals(order.getOrderStatus())) {
                 throw new RuntimeException("Không thể hủy đơn hàng ở trạng thái " + order.getOrderStatus());
             }
             
@@ -199,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
             }
             
             // Cập nhật trạng thái đơn hàng
-            order.setOrderStatus("CANCELLED");
+            order.setOrderStatus("Đã hủy");
             order.setNotes((order.getNotes() != null ? order.getNotes() + "\n" : "") + 
                           "Lý do hủy: " + reason);
             em.merge(order);
