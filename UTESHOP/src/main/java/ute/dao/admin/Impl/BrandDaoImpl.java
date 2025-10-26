@@ -45,12 +45,12 @@ public class BrandDaoImpl implements BrandDao {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         EntityManager em = JPAConfig.getEntityManager();
         var trans = em.getTransaction();
         try {
             trans.begin();
-            Brand b = em.find(Brand.class, (long) id);
+            Brand b = em.find(Brand.class, id);
             if (b != null) {
                 em.remove(b);
             }
@@ -64,10 +64,10 @@ public class BrandDaoImpl implements BrandDao {
     }
 
     @Override
-    public Brand findById(int id) {
+    public Brand findById(Long id) {  // FIX: Long
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            return em.find(Brand.class, (long) id);
+            return em.find(Brand.class, id);
         } finally {
             em.close();
         }

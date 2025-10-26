@@ -225,7 +225,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="section-title mb-0">Sản phẩm mới nhất</h5>
-                        <a href="${pageContext.request.contextPath}/admin/products/searchpaginated" class="btn btn-sm btn-outline-primary">
+                        <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-sm btn-outline-primary">
                             Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -272,7 +272,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="section-title mb-0">Sản phẩm bán chạy</h5>
-                        <a href="${pageContext.request.contextPath}/admin/products/searchpaginated" class="btn btn-sm btn-outline-success">
+                        <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-sm btn-outline-success">
                             Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -324,13 +324,13 @@
                     <h5 class="section-title">Thao tác nhanh</h5>
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <a href="${pageContext.request.contextPath}/admin/products/saveOrUpdate" class="btn btn-primary w-100 quick-action-btn">
+                            <a href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate" class="btn btn-primary w-100 quick-action-btn">
                                 <i class="fas fa-plus-circle fa-2x d-block mb-2"></i>
                                 Thêm sản phẩm mới
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated" class="btn btn-success w-100 quick-action-btn">
+                            <a href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated" class="btn btn-success w-100 quick-action-btn">
                                 <i class="fas fa-folder-plus fa-2x d-block mb-2"></i>
                                 Quản lý danh mục
                             </a>

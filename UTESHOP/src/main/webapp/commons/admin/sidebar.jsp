@@ -53,11 +53,22 @@
                     </nav>
                 </div>
 
-                <!-- Brands -->
-                <a class="nav-link" href="#">
+                <!-- Brands with submenu -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseBrands">
                     <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
                     Thương hiệu
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
+                <div class="collapse" id="collapseBrands">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/brands/searchpaginated">
+                            <i class="fas fa-list me-1"></i> Danh sách thương hiệu
+                        </a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/brands/saveOrUpdate">
+                            <i class="fas fa-plus me-1"></i> Thêm thương hiệu
+                        </a>
+                    </nav>
+                </div>
 
                 <!-- QUẢN LÝ BÁN HÀNG -->
                 <div class="sb-sidenav-menu-heading">Quản lý bán hàng</div>
@@ -112,17 +123,12 @@
                     Người dùng
                 </a>
 
-                <!-- GIAO DIỆN & NỘI DUNG -->
-                <div class="sb-sidenav-menu-heading">Giao diện & Nội dung</div>
-
                 <!-- Banners -->
                 <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/banners">
                     <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
                     Banner quảng cáo
                 </a>
 
-                <!-- BAO CÁO & THỐNG KÊ -->
-                <div class="sb-sidenav-menu-heading">Báo cáo & Thống kê</div>
 
                 <!-- Reports with submenu -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseReports">

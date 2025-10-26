@@ -3,6 +3,7 @@ package ute.service.admin.inter;
 import java.util.List;
 
 import ute.dto.ProductDTO;
+import ute.entities.Image;
 import ute.entities.Product;
 import ute.utils.ProductFilter;
 import ute.utils.ProductPage;
@@ -61,4 +62,6 @@ public interface ProductService {
     // Pagination by name
     List<Product> findByNamePaginated(String name, int firstResult, int maxResults);
     long countByName(String name);
+    Image findImageById(Long id);
+    void deleteImage(Image image);
 }
