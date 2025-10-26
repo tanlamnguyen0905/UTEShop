@@ -78,10 +78,9 @@ public class DeliveryDaoImpl implements DeliveryDao {
             TypedQuery<Delivery> query = em.createQuery(
                 "SELECT d FROM Delivery d " +
                 "LEFT JOIN FETCH d.order o " +
-                "LEFT JOIN FETCH o.orderDetails od " +
-                "LEFT JOIN FETCH od.product p " +
                 "LEFT JOIN FETCH o.address " +
-                "LEFT JOIN FETCH o.user " +
+                "LEFT JOIN FETCH o.orderDetails od " +
+                "LEFT JOIN FETCH od.product " +
                 "LEFT JOIN FETCH d.shipper " +
                 "WHERE d.deliveryID = :deliveryId",
                 Delivery.class
@@ -96,13 +95,51 @@ public class DeliveryDaoImpl implements DeliveryDao {
     }
 
     @Override
-    public Delivery findByOrderId(Long orderId) {
+    public List<Delivery> findByShipperId(Long shipperId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Delivery> query = em.createQuery(
                 "SELECT d FROM Delivery d " +
                 "LEFT JOIN FETCH d.order o " +
-                "LEFT JOIN FETCH d.shipper " +
+                "LEFT JOIN FETCH o.address " +
+                "WHERE d.shipper.userID = :shipperId " +
+                "ORDER BY d.assignedDate DESC",
+                Delivery.class
+            );
+            query.setParameter("shipperId", shipperId);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Delivery> findByShipperIdAndStatus(Long shipperId, String status) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Delivery> query = em.createQuery(
+                "SELECT d FROM Delivery d " +
+                "LEFT JOIN FETCH d.order o " +
+                "LEFT JOIN FETCH o.address " +
+                "WHERE d.shipper.userID = :shipperId " +
+                "AND d.deliveryStatus = :status " +
+                "ORDER BY d.assignedDate DESC",
+                Delivery.class
+            );
+            query.setParameter("shipperId", shipperId);
+            query.setParameter("status", status);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Delivery findByOrderId(Long orderId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Delivery> query = em.createQuery(
+                "SELECT d FROM Delivery d " +
                 "WHERE d.order.orderID = :orderId",
                 Delivery.class
             );
@@ -116,123 +153,17 @@ public class DeliveryDaoImpl implements DeliveryDao {
     }
 
     @Override
-    public List<Delivery> findByShipperId(Long shipperId) {
-        EntityManager em = JPAConfig.getEntityManager();
-        try {
-            TypedQuery<Delivery> query = em.createQuery(
-                "SELECT DISTINCT d FROM Delivery d " +
-                "LEFT JOIN FETCH d.order o " +
-                "LEFT JOIN FETCH o.orderDetails od " +
-                "LEFT JOIN FETCH od.product p " +
-                "LEFT JOIN FETCH o.address " +
-                "LEFT JOIN FETCH o.user " +
-                "LEFT JOIN FETCH o.paymentMethod " +
-                "WHERE d.shipper.userID = :shipperId " +
-                "ORDER BY d.assignedDate DESC",
-                Delivery.class
-            );
-            query.setParameter("shipperId", shipperId);
-            List<Delivery> deliveries = query.getResultList();
-            
-            // Initialize images for each product
-            for (Delivery delivery : deliveries) {
-                if (delivery.getOrder().getOrderDetails() != null) {
-                    for (ute.entities.OrderDetail detail : delivery.getOrder().getOrderDetails()) {
-                        if (detail.getProduct() != null && detail.getProduct().getImages() != null) {
-                            detail.getProduct().getImages().size();
-                        }
-                    }
-                }
-            }
-            
-            return deliveries;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public List<Delivery> findByStatus(String status) {
-        EntityManager em = JPAConfig.getEntityManager();
-        try {
-            TypedQuery<Delivery> query = em.createQuery(
-                "SELECT d FROM Delivery d " +
-                "LEFT JOIN FETCH d.order " +
-                "LEFT JOIN FETCH d.shipper " +
-                "WHERE d.deliveryStatus = :status " +
-                "ORDER BY d.assignedDate DESC",
-                Delivery.class
-            );
-            query.setParameter("status", status);
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public List<Delivery> findByShipperIdAndStatus(Long shipperId, String status) {
-        EntityManager em = JPAConfig.getEntityManager();
-        try {
-            TypedQuery<Delivery> query = em.createQuery(
-                "SELECT DISTINCT d FROM Delivery d " +
-                "LEFT JOIN FETCH d.order o " +
-                "LEFT JOIN FETCH o.orderDetails od " +
-                "LEFT JOIN FETCH od.product p " +
-                "LEFT JOIN FETCH o.address " +
-                "LEFT JOIN FETCH o.user " +
-                "LEFT JOIN FETCH o.paymentMethod " +
-                "WHERE d.shipper.userID = :shipperId AND d.deliveryStatus = :status " +
-                "ORDER BY d.assignedDate DESC",
-                Delivery.class
-            );
-            query.setParameter("shipperId", shipperId);
-            query.setParameter("status", status);
-            List<Delivery> deliveries = query.getResultList();
-            
-            // Initialize images for each product
-            for (Delivery delivery : deliveries) {
-                if (delivery.getOrder().getOrderDetails() != null) {
-                    for (ute.entities.OrderDetail detail : delivery.getOrder().getOrderDetails()) {
-                        if (detail.getProduct() != null && detail.getProduct().getImages() != null) {
-                            detail.getProduct().getImages().size();
-                        }
-                    }
-                }
-            }
-            
-            return deliveries;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
     public List<Delivery> findAll() {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Delivery> query = em.createQuery(
                 "SELECT d FROM Delivery d " +
-                "LEFT JOIN FETCH d.order " +
+                "LEFT JOIN FETCH d.order o " +
                 "LEFT JOIN FETCH d.shipper " +
                 "ORDER BY d.assignedDate DESC",
                 Delivery.class
             );
             return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public long count() {
-        EntityManager em = JPAConfig.getEntityManager();
-        try {
-            TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(d) FROM Delivery d",
-                Long.class
-            );
-            return query.getSingleResult();
         } finally {
             em.close();
         }
@@ -258,7 +189,8 @@ public class DeliveryDaoImpl implements DeliveryDao {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(d) FROM Delivery d WHERE d.shipper.userID = :shipperId AND d.deliveryStatus = :status",
+                "SELECT COUNT(d) FROM Delivery d " +
+                "WHERE d.shipper.userID = :shipperId AND d.deliveryStatus = :status",
                 Long.class
             );
             query.setParameter("shipperId", shipperId);
@@ -268,25 +200,4 @@ public class DeliveryDaoImpl implements DeliveryDao {
             em.close();
         }
     }
-
-    @Override
-    public List<Delivery> findByShipperIdPaginated(Long shipperId, int offset, int limit) {
-        EntityManager em = JPAConfig.getEntityManager();
-        try {
-            TypedQuery<Delivery> query = em.createQuery(
-                "SELECT d FROM Delivery d " +
-                "LEFT JOIN FETCH d.order " +
-                "WHERE d.shipper.userID = :shipperId " +
-                "ORDER BY d.assignedDate DESC",
-                Delivery.class
-            );
-            query.setParameter("shipperId", shipperId);
-            query.setFirstResult(offset);
-            query.setMaxResults(limit);
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-    }
 }
-

@@ -26,10 +26,9 @@ import ute.service.inter.CategoriesService;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
-@MultipartConfig(
-        fileSizeThreshold = 10240,    // 10KB
-        maxFileSize = 10485760,       // 10MB
-        maxRequestSize = 20971520     // 20MB
+@MultipartConfig(fileSizeThreshold = 10240, // 10KB
+        maxFileSize = 10485760, // 10MB
+        maxRequestSize = 20971520 // 20MB
 )
 
 @WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
@@ -65,7 +64,8 @@ public class ProductController extends HttpServlet {
 
             // Tạo header row
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục", "Thương hiệu", "Ngày nhập"};
+            String[] columns = { "ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục",
+                    "Thương hiệu", "Ngày nhập" };
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -82,13 +82,17 @@ public class ProductController extends HttpServlet {
                 row.createCell(0).setCellValue(product.getProductID());
                 row.createCell(1).setCellValue(product.getProductName());
                 row.createCell(2).setCellValue(product.getDescribe() != null ? product.getDescribe() : "");
-                row.createCell(3).setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
-                row.createCell(4).setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
+                row.createCell(3)
+                        .setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
+                row.createCell(4)
+                        .setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
                 row.createCell(5).setCellValue(product.getSoldCount() != null ? product.getSoldCount().longValue() : 0);
                 row.createCell(6).setCellValue(product.getReviewCount() + " (" + product.getRating() + "/5)");
-                row.createCell(7).setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
+                row.createCell(7)
+                        .setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
                 row.createCell(8).setCellValue(product.getBrand() != null ? product.getBrand().getBrandName() : "N/A");
-                row.createCell(9).setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
+                row.createCell(9)
+                        .setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
             }
 
             // Auto-size columns
@@ -108,7 +112,7 @@ public class ProductController extends HttpServlet {
             try (OutputStream out = resp.getOutputStream()) {
                 workbook.write(out);
             }
-            return;  // Kết thúc response ở đây
+            return; // Kết thúc response ở đây
         }
 
         if (uri.contains("/api/admin/products/searchpaginated")) {
@@ -273,8 +277,10 @@ public class ProductController extends HttpServlet {
                         // Get webapp root path for reliable file storage
                         String webAppRoot = getServletContext().getRealPath("/");
                         if (webAppRoot == null) {
-                            // Fallback for environments where getRealPath returns null (e.g., some cloud setups)
-                            req.setAttribute("error", "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
+                            // Fallback for environments where getRealPath returns null (e.g., some cloud
+                            // setups)
+                            req.setAttribute("error",
+                                    "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
                             loadDropdowns(req);
                             req.setAttribute("product", tempProduct);
                             req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
@@ -282,14 +288,16 @@ public class ProductController extends HttpServlet {
                         }
 
                         // Ensure uploads directory exists under assets/images/products
-                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images" + File.separator + "products";
+                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images"
+                                + File.separator + "products";
                         File uploadDir = new File(uploadPath);
                         if (!uploadDir.exists()) {
                             if (!uploadDir.mkdirs()) {
                                 req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
                                 loadDropdowns(req);
                                 req.setAttribute("product", tempProduct);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
+                                        resp);
                                 return;
                             }
                         }
@@ -300,7 +308,8 @@ public class ProductController extends HttpServlet {
                         if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
                             fileExtension = fileName.substring(lastDotIndex);
                         }
-                        String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
+                        String uniqueFileName = System.currentTimeMillis() + "_"
+                                + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
                         String filePath = uploadPath + File.separator + uniqueFileName;
 
                         // Save the file
@@ -327,7 +336,8 @@ public class ProductController extends HttpServlet {
                                 req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
                                 loadDropdowns(req);
                                 req.setAttribute("product", tempProduct);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
+                                        resp);
                                 return;
                             }
                         } catch (IOException e) {
@@ -362,7 +372,8 @@ public class ProductController extends HttpServlet {
             List<Product> existingProducts = productService.findByName(productName.trim());
             boolean isDuplicate = false;
             for (Product existing : existingProducts) {
-                if (existing.getProductName().equals(productName.trim()) && !Objects.equals(existing.getProductID(), id)) {
+                if (existing.getProductName().equals(productName.trim())
+                        && !Objects.equals(existing.getProductID(), id)) {
                     isDuplicate = true;
                     break;
                 }

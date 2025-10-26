@@ -24,6 +24,8 @@
     <mapping path="/*.jpg" exclude="true" />
     <mapping path="/*.gif" exclude="true" />
     <mapping path="/images/*" exclude="true" />
+    <mapping path="/image" exclude="true" />
     <mapping path="/templates/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
 
 </sitemesh>

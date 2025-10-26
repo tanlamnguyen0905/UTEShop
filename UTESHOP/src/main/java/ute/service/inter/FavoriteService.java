@@ -14,4 +14,6 @@ public interface FavoriteService {
 
     List<ProductDTO> findByUserId(Long userId);
 
+    void clearFavorite(Long userId);
+
 }

@@ -1,7 +1,6 @@
 package ute.controllers.shipper;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,58 +11,75 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import ute.dao.impl.OrderDaoImpl;
-import ute.dto.DeliveryDTO;
+import ute.entities.Delivery;
 import ute.entities.Orders;
 import ute.entities.Users;
 import ute.service.impl.DeliveryServiceImpl;
 
 @WebServlet(urlPatterns = {
-    "/api/shipper/dashboard",
-    "/api/shipper/deliveries",
-    "/api/shipper/delivery/detail",
-    "/api/shipper/delivery/complete",
-    "/api/shipper/delivery/fail",
-    "/api/shipper/order/accept"
+    "/api/shipper/feed",
+    "/api/shipper/my-deliveries",
+    "/api/shipper/delivery-detail",
+    "/api/shipper/delivery-action"
 })
 public class ShipperController extends HttpServlet {
     
-    private static final long serialVersionUID = 1L;
-    
-    private final DeliveryServiceImpl deliveryService;
-    private final OrderDaoImpl orderDao;
-    
-    public ShipperController() {
-        this.deliveryService = new DeliveryServiceImpl();
-        this.orderDao = new OrderDaoImpl();
-    }
+    private OrderDaoImpl orderDao = new OrderDaoImpl();
+    private DeliveryServiceImpl deliveryService = new DeliveryServiceImpl();
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
         
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
+        HttpSession session = req.getSession(false);
         
-        String uri = req.getRequestURI();
-        HttpSession session = req.getSession();
+        // Kiểm tra session
+        if (session == null) {
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
         
-        // Filter đã kiểm tra authentication và role, chỉ cần lấy user
         Users currentUser = (Users) session.getAttribute("currentUser");
         
-        Long shipperId = currentUser.getUserID();
+        // Kiểm tra đăng nhập
+        if (currentUser == null) {
+            session.setAttribute("error", "Vui lòng đăng nhập!");
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
+        
+        // Kiểm tra quyền shipper (case-insensitive)
+        if (currentUser.getRole() == null || 
+            !currentUser.getRole().equalsIgnoreCase("shipper")) {
+            session.setAttribute("error", "Bạn không có quyền truy cập trang này!");
+            resp.sendRedirect(req.getContextPath() + "/home");
+            return;
+        }
+        
+        String path = req.getServletPath();
         
         try {
-            if (uri.contains("/api/shipper/dashboard")) {
-                showDashboard(req, resp, shipperId);
-            } else if (uri.contains("/api/shipper/deliveries")) {
-                showDeliveries(req, resp, shipperId);
-            } else if (uri.contains("/api/shipper/delivery/detail")) {
-                showDeliveryDetail(req, resp, shipperId);
+            switch (path) {
+                case "/api/shipper/feed":
+                    handleFeed(req, resp, currentUser);
+                    break;
+                    
+                case "/api/shipper/my-deliveries":
+                    handleMyDeliveries(req, resp, currentUser);
+                    break;
+                    
+                case "/api/shipper/delivery-detail":
+                    handleDeliveryDetail(req, resp, currentUser, session);
+                    break;
+                    
+                default:
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            req.setAttribute("error", "Lỗi: " + e.getMessage());
-            req.getRequestDispatcher("/WEB-INF/views/shipper/error.jsp").forward(req, resp);
+            session.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/api/shipper/feed");
         }
     }
     
@@ -71,161 +87,192 @@ public class ShipperController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
         
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
+        HttpSession session = req.getSession(false);
         
-        String uri = req.getRequestURI();
-        HttpSession session = req.getSession();
+        // Kiểm tra session
+        if (session == null) {
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
         
-        // Filter đã kiểm tra authentication và role, chỉ cần lấy user
         Users currentUser = (Users) session.getAttribute("currentUser");
-        Long shipperId = currentUser.getUserID();
         
-        try {
-            if (uri.contains("/api/shipper/delivery/complete")) {
-                completeDelivery(req, resp);
-            } else if (uri.contains("/api/shipper/delivery/fail")) {
-                failDelivery(req, resp);
-            } else if (uri.contains("/api/shipper/order/accept")) {
-                acceptOrder(req, resp, shipperId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.setAttribute("error", "Lỗi: " + e.getMessage());
-            resp.sendRedirect(req.getContextPath() + "/api/shipper/dashboard");
+        // Kiểm tra đăng nhập
+        if (currentUser == null) {
+            session.setAttribute("error", "Vui lòng đăng nhập!");
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            return;
+        }
+        
+        // Kiểm tra quyền shipper (case-insensitive)
+        if (currentUser.getRole() == null || 
+            !currentUser.getRole().equalsIgnoreCase("shipper")) {
+            session.setAttribute("error", "Bạn không có quyền truy cập trang này!");
+            resp.sendRedirect(req.getContextPath() + "/home");
+            return;
+        }
+        
+        String path = req.getServletPath();
+        
+        if ("/api/shipper/delivery-action".equals(path)) {
+            handleDeliveryAction(req, resp, currentUser, session);
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
     
-    private void showDashboard(HttpServletRequest req, HttpServletResponse resp, Long shipperId) 
+    /**
+     * Xử lý trang feed - danh sách đơn hàng có sẵn
+     */
+    private void handleFeed(HttpServletRequest req, HttpServletResponse resp, Users currentUser) 
             throws ServletException, IOException {
         
-        // Thống kê số lượng đơn hàng theo trạng thái
-        long totalDeliveries = deliveryService.countByShipperId(shipperId);
-        long deliveringCount = deliveryService.countByShipperIdAndStatus(shipperId, "Đang giao hàng");
-        long completedCount = deliveryService.countByShipperIdAndStatus(shipperId, "Đã giao hàng");
+        // Lấy các đơn hàng "Đã xác nhận" chưa có shipper nhận
+        List<Orders> availableOrders = orderDao.findConfirmedOrders();
+        long count = orderDao.countConfirmedOrders();
         
-        // Lấy đơn hàng chưa có shipper (available orders)
-        List<Orders> confirmedOrders = orderDao.findConfirmedOrders();
-        long confirmedCount = orderDao.countConfirmedOrders();
+        // Set attributes
+        req.setAttribute("availableOrders", availableOrders);
+        req.setAttribute("count", count);
+        req.setAttribute("pageTitle", "Đơn hàng có sẵn");
+        req.setAttribute("currentPage", "feed");
         
-        // Lấy danh sách đơn hàng đang giao của shipper này
-        List<DeliveryDTO> activeDeliveries = deliveryService.findByShipperIdAndStatus(shipperId, "Đang giao hàng");
-        
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("totalDeliveries", totalDeliveries);
-        stats.put("deliveringCount", deliveringCount);
-        stats.put("completedCount", completedCount);
-        stats.put("confirmedCount", confirmedCount);
-        
-        req.setAttribute("stats", stats);
-        req.setAttribute("confirmedOrders", confirmedOrders);
-        req.setAttribute("activeDeliveries", activeDeliveries);
-        
-        req.getRequestDispatcher("/WEB-INF/views/shipper/dashboard.jsp").forward(req, resp);
+        // Forward tới JSP
+        req.getRequestDispatcher("/WEB-INF/views/shipper/feed.jsp").forward(req, resp);
     }
     
-    private void showDeliveries(HttpServletRequest req, HttpServletResponse resp, Long shipperId) 
+    /**
+     * Xử lý trang my-deliveries - đơn giao hàng của shipper
+     */
+    private void handleMyDeliveries(HttpServletRequest req, HttpServletResponse resp, Users currentUser) 
             throws ServletException, IOException {
         
+        Long shipperId = currentUser.getUserID();
         String statusFilter = req.getParameter("status");
-        List<DeliveryDTO> deliveries;
         
-        if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+        // Lấy danh sách delivery
+        List<Delivery> deliveries;
+        if (statusFilter != null && !statusFilter.isEmpty()) {
             deliveries = deliveryService.findByShipperIdAndStatus(shipperId, statusFilter);
         } else {
             deliveries = deliveryService.findByShipperId(shipperId);
         }
         
+        // Lấy thống kê
+        Map<String, Long> stats = deliveryService.getShipperStats(shipperId);
+        
+        // Set attributes
         req.setAttribute("deliveries", deliveries);
-        req.setAttribute("currentStatus", statusFilter);
+        req.setAttribute("stats", stats);
+        req.setAttribute("statusFilter", statusFilter);
+        req.setAttribute("pageTitle", statusFilter != null ? statusFilter : "Đơn của tôi");
+        req.setAttribute("currentPage", "my-deliveries");
         
-        req.getRequestDispatcher("/WEB-INF/views/shipper/deliveries.jsp").forward(req, resp);
-    }
-    
-    private void showDeliveryDetail(HttpServletRequest req, HttpServletResponse resp, Long shipperId) 
-            throws ServletException, IOException {
-        
-        String deliveryIdParam = req.getParameter("id");
-        if (deliveryIdParam == null || deliveryIdParam.trim().isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/api/shipper/deliveries");
-            return;
-        }
-        
-        Long deliveryId = Long.parseLong(deliveryIdParam);
-        DeliveryDTO delivery = deliveryService.findById(deliveryId);
-        
-        if (delivery == null) {
-            req.setAttribute("error", "Đơn giao hàng không tồn tại!");
-            req.getRequestDispatcher("/WEB-INF/views/shipper/error.jsp").forward(req, resp);
-            return;
-        }
-        
-        // Kiểm tra quyền truy cập
-        if (!delivery.getShipperID().equals(shipperId)) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền xem đơn hàng này!");
-            return;
-        }
-        
-        req.setAttribute("delivery", delivery);
-        req.getRequestDispatcher("/WEB-INF/views/shipper/delivery-detail.jsp").forward(req, resp);
-    }
-    
-    private void completeDelivery(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
-        
-        Long deliveryId = Long.parseLong(req.getParameter("deliveryId"));
-        deliveryService.completeDelivery(deliveryId);
-        
-        HttpSession session = req.getSession();
-        session.setAttribute("success", "Đã hoàn thành giao hàng!");
-        
-        resp.sendRedirect(req.getContextPath() + "/api/shipper/delivery/detail?id=" + deliveryId);
-    }
-    
-    private void failDelivery(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
-        
-        Long deliveryId = Long.parseLong(req.getParameter("deliveryId"));
-        String failureReason = req.getParameter("failureReason");
-        
-        if (failureReason == null || failureReason.trim().isEmpty()) {
-            failureReason = "Không liên lạc được với khách hàng";
-        }
-        
-        deliveryService.failDelivery(deliveryId, failureReason);
-        
-        HttpSession session = req.getSession();
-        session.setAttribute("warning", "Đã báo giao hàng thất bại!");
-        
-        resp.sendRedirect(req.getContextPath() + "/api/shipper/delivery/detail?id=" + deliveryId);
+        // Forward tới JSP
+        req.getRequestDispatcher("/WEB-INF/views/shipper/my-deliveries.jsp").forward(req, resp);
     }
     
     /**
-     * Shipper nhận đơn hàng
+     * Xử lý trang delivery-detail - chi tiết đơn giao hàng
      */
-    private void acceptOrder(HttpServletRequest req, HttpServletResponse resp, Long shipperId) 
+    private void handleDeliveryDetail(HttpServletRequest req, HttpServletResponse resp, 
+                                      Users currentUser, HttpSession session) 
             throws ServletException, IOException {
         
-        HttpSession session = req.getSession();
-        
         try {
-            String orderIdStr = req.getParameter("orderId");
-            if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
-                throw new IllegalArgumentException("Order ID không hợp lệ");
+            Long deliveryId = Long.parseLong(req.getParameter("id"));
+            Delivery delivery = deliveryService.findById(deliveryId);
+            
+            if (delivery == null) {
+                session.setAttribute("error", "Không tìm thấy đơn giao hàng!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                return;
             }
             
-            Long orderId = Long.parseLong(orderIdStr);
+            // Kiểm tra xem delivery có thuộc về shipper này không
+            if (!delivery.getShipper().getUserID().equals(currentUser.getUserID())) {
+                session.setAttribute("error", "Bạn không có quyền xem đơn giao hàng này!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                return;
+            }
             
-            // Gán đơn hàng cho shipper
-            deliveryService.assignOrderToShipper(orderId, shipperId, "Shipper đã nhận đơn");
-            
-            session.setAttribute("success", "Đã nhận đơn hàng thành công!");
+            req.setAttribute("delivery", delivery);
+            req.setAttribute("pageTitle", "Chi tiết đơn #" + delivery.getDeliveryID());
+            req.setAttribute("currentPage", "delivery-detail");
+            req.getRequestDispatcher("/WEB-INF/views/shipper/delivery-detail.jsp").forward(req, resp);
             
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("error", "Lỗi khi nhận đơn: " + e.getMessage());
+            session.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
         }
+    }
+    
+    /**
+     * Xử lý các actions POST - nhận đơn, cập nhật trạng thái
+     */
+    private void handleDeliveryAction(HttpServletRequest req, HttpServletResponse resp, 
+                                      Users currentUser, HttpSession session) 
+            throws ServletException, IOException {
         
-        resp.sendRedirect(req.getContextPath() + "/api/shipper/dashboard");
+        String action = req.getParameter("action");
+        
+        try {
+            if ("accept".equals(action)) {
+                // Nhận đơn hàng
+                Long orderId = Long.parseLong(req.getParameter("orderId"));
+                Long shipperId = currentUser.getUserID();
+                
+                Delivery delivery = deliveryService.acceptOrder(orderId, shipperId);
+                
+                session.setAttribute("success", "Đã nhận đơn hàng thành công!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                
+            } else if ("update-status".equals(action)) {
+                // Cập nhật trạng thái
+                Long deliveryId = Long.parseLong(req.getParameter("deliveryId"));
+                String newStatus = req.getParameter("status");
+                String notes = req.getParameter("notes");
+                
+                deliveryService.updateDeliveryStatus(deliveryId, newStatus, notes);
+                
+                session.setAttribute("success", "Đã cập nhật trạng thái thành công!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                
+            } else if ("complete".equals(action)) {
+                // Đánh dấu hoàn thành
+                Long deliveryId = Long.parseLong(req.getParameter("deliveryId"));
+                
+                deliveryService.markAsCompleted(deliveryId);
+                
+                session.setAttribute("success", "Đã hoàn thành giao hàng!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                
+            } else if ("fail".equals(action)) {
+                // Đánh dấu thất bại
+                Long deliveryId = Long.parseLong(req.getParameter("deliveryId"));
+                String failureReason = req.getParameter("failureReason");
+                
+                deliveryService.markAsFailed(deliveryId, failureReason);
+                
+                session.setAttribute("success", "Đã đánh dấu giao hàng thất bại!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/my-deliveries");
+                
+            } else {
+                session.setAttribute("error", "Hành động không hợp lệ!");
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/feed");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            
+            String referer = req.getHeader("Referer");
+            if (referer != null && !referer.isEmpty()) {
+                resp.sendRedirect(referer);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/api/shipper/feed");
+            }
+        }
     }
 }
