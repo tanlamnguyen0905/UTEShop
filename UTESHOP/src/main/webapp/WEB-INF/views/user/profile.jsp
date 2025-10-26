@@ -475,6 +475,7 @@
                                             </small>
                                         </div>
                                         <div class="d-flex align-items-center gap-2">
+                                            <!-- Order Status Badge -->
                                             <c:choose>
                                                 <c:when test="${order.orderStatus eq 'Đang chờ'}">
                                                     <span class="badge bg-warning text-dark" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
@@ -504,6 +505,25 @@
                                                 <c:otherwise>
                                                     <span class="badge bg-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
                                                         ${order.orderStatus}
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            
+                                            <!-- Payment Status Badge -->
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus eq 'Đã thanh toán'}">
+                                                    <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                        <i class="fas fa-check-circle me-1"></i>Đã thanh toán
+                                                    </span>
+                                                </c:when>
+                                                <c:when test="${order.paymentStatus eq 'Chưa thanh toán'}">
+                                                    <span class="badge bg-warning text-dark" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                        <i class="fas fa-money-bill-wave me-1"></i>Chưa thanh toán
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                        ${order.paymentStatus}
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
