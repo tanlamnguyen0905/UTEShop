@@ -2,9 +2,12 @@ package ute.service.admin.Impl;
 
 import java.util.List;
 
+import ute.dao.admin.Impl.ImageDaoImpl;
 import ute.dao.admin.Impl.ProductDaoImpl;
+import ute.dao.admin.inter.ImageDao;
 import ute.dao.admin.inter.ProductDao;
 import ute.dto.ProductDTO;
+import ute.entities.Image;
 import ute.entities.Product;
 import ute.service.admin.inter.ProductService;
 import ute.utils.ProductFilter;
@@ -132,5 +135,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public long countByName(String name) {
         return productDao.countByName(name);
+    }
+    ImageDao imageDao = new ImageDaoImpl();
+    @Override
+    public Image findImageById(Long id) {
+        return imageDao.findImageById(id);
+    }
+
+    @Override
+    public void deleteImage(Image image) {
+        imageDao.deleteImage(image);
     }
 }

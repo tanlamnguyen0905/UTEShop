@@ -1,7 +1,6 @@
 package ute.dao.admin.Impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

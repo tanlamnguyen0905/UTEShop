@@ -17,7 +17,7 @@ import ute.entities.OrderDetail;
 import ute.entities.Orders;
 import ute.entities.PaymentMethod;
 import ute.entities.Product;
-import ute.entities.UserCoupon;
+import ute.entities.Voucher;
 import ute.entities.Users;
 import ute.service.inter.OrderService;
 
@@ -65,9 +65,9 @@ public class OrderServiceImpl implements OrderService {
             
             // 4. Xử lý coupon (nếu có)
             double totalDiscount = 0.0;
-            UserCoupon userCoupon = null;
+            Voucher userCoupon = null;
             if (userCouponId != null) {
-                userCoupon = em.find(UserCoupon.class, userCouponId);
+                userCoupon = em.find(Voucher.class, userCouponId);
                 if (userCoupon != null && isValidCoupon(userCoupon)) {
                     double discountAmount = totalAmount * (userCoupon.getDiscountPercent() / 100);
                     if (userCoupon.getMaxDiscountAmount() != null && 
@@ -78,7 +78,24 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             
-            // 5. Tạo đơn hàng
+            // 5. Xác định trạng thái thanh toán dựa trên phương thức
+            String paymentStatus = "Chưa thanh toán"; // Mặc định
+            if (paymentMethod.getName() != null) {
+                String methodName = paymentMethod.getName().toLowerCase();
+                // COD (Cash On Delivery) - Thanh toán khi nhận hàng
+                if (methodName.contains("cod") || 
+                    methodName.contains("tiền mặt") || 
+                    methodName.contains("khi nhận hàng")) {
+                    paymentStatus = "Chưa thanh toán";
+                } else {
+                    // Các phương thức thanh toán online khác
+                    // (Chuyển khoản, ví điện tử, thẻ tín dụng)
+                    // Giả định đã thanh toán trước
+                    paymentStatus = "Đã thanh toán";
+                }
+            }
+            
+            // 6. Tạo đơn hàng
             Orders order = Orders.builder()
                     .user(user)
                     .address(address)
@@ -88,14 +105,14 @@ public class OrderServiceImpl implements OrderService {
                     .shippingFee(25000.0)  // Default shipping fee
                     .orderDate(LocalDateTime.now())
                     .orderStatus("Đang chờ")
-                    .paymentStatus("Chưa thanh toán")
+                    .paymentStatus(paymentStatus)
                     .phoneNumber(address.getPhone())
                     .recipientName(address.getName())
                     .notes(notes)
-                    .userCoupon(userCoupon)
+                    .voucher(userCoupon)
                     .build();
             
-            // 6. Tạo order details từ cart items
+            // 7. Tạo order details từ cart items
             List<OrderDetail> orderDetails = new ArrayList<>();
             for (CartDetail cartItem : cart.getCartDetails()) {
                 Product product = cartItem.getProduct();
@@ -123,10 +140,10 @@ public class OrderServiceImpl implements OrderService {
             
             order.setOrderDetails(orderDetails);
             
-            // 7. Lưu đơn hàng
+            // 8. Lưu đơn hàng
             em.persist(order);
             
-            // 8. Xóa giỏ hàng sau khi đặt hàng thành công
+            // 9. Xóa giỏ hàng sau khi đặt hàng thành công
             cartDao.clearCart(cart.getCartID());
             
             trans.commit();
@@ -144,12 +161,12 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    private boolean isValidCoupon(UserCoupon coupon) {
+    private boolean isValidCoupon(Voucher coupon) {
         LocalDateTime now = LocalDateTime.now();
-        return coupon.getUserCouponStart() != null && 
-               coupon.getUserCouponEnd() != null &&
-               now.isAfter(coupon.getUserCouponStart()) && 
-               now.isBefore(coupon.getUserCouponEnd());
+        return coupon.getStartDate() != null &&
+               coupon.getEndDate() != null &&
+               now.isAfter(coupon.getStartDate()) &&
+               now.isBefore(coupon.getEndDate());
     }
 
     @Override

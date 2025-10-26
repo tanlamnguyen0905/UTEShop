@@ -22,7 +22,7 @@
         <class>ute.entities.PaymentMethod</class>
         <class>ute.entities.Product</class>
         <class>ute.entities.Review</class>
-        <class>ute.entities.UserCoupon</class>
+        <class>ute.entities.Voucher</class>
 
         <properties>
             <!-- JDBC config cho SQL Server -->

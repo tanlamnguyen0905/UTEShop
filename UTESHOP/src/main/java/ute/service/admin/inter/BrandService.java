@@ -8,8 +8,8 @@ public interface BrandService {
     // ======== CRUD cơ bản ========
     void insert(Brand brand);
     void update(Brand brand);
-    void delete(Long id);
-    Brand findById(Long id);
+    void delete(Long id);  // FIX: Long
+    Brand findById(Long id);  // FIX: Long
     List<Brand> findAll();
 
     // ======== Các hàm mở rộng thường dùng ========

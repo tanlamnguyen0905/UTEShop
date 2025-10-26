@@ -20,14 +20,6 @@
             <img src="${imgUrl}" class="card-img-top rounded-4" alt="${p.productName}"
                  style="height: 250px; object-fit: cover;">
         </a>
-        
-        <!-- Quick Add to Cart Button -->
-        <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 m-2 btn-quick-add"
-                onclick="addToCart(${p.productID}, 1)"
-                title="Thêm vào giỏ hàng"
-                style="opacity: 0; transition: opacity 0.3s;">
-            <i class="bi bi-cart-plus"></i>
-        </button>
     </div>
     
     <div class="card-body p-3">
@@ -89,14 +81,36 @@
         <c:if test="${p.stockQuantity <= 0}">
             <span class="badge bg-secondary mt-1">Hết hàng</span>
         </c:if>
+        
+        <!-- Action Buttons -->
+        <div class="mt-3">
+            <c:choose>
+                <c:when test="${p.stockQuantity > 0}">
+                    <!-- Nút Giỏ hàng - Full width -->
+                    <button class="btn btn-outline-primary btn-sm w-100 mb-2" 
+                            onclick="addToCart(${p.productID}, 1)"
+                            title="Thêm vào giỏ hàng">
+                        <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
+                    </button>
+                    
+                    <!-- Nút Mua ngay - Full width, nổi bật -->
+                    <button class="btn btn-buy-now btn-sm w-100" 
+                            onclick="buyNow(${p.productID})"
+                            title="Mua ngay">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>Mua ngay
+                    </button>
+                </c:when>
+                <c:otherwise>
+                    <button class="btn btn-secondary btn-sm w-100" disabled>
+                        <i class="bi bi-x-circle me-1"></i>Hết hàng
+                    </button>
+                </c:otherwise>
+            </c:choose>
+        </div>
     </div>
 </div>
 
 <style>
-    .product-card:hover .btn-quick-add {
-        opacity: 1 !important;
-    }
-    
     .product-card .product-name {
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -109,5 +123,71 @@
     .product-card:hover {
         transform: translateY(-5px);
         transition: transform 0.3s ease;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Nút Mua ngay - Gradient cam/đỏ nổi bật */
+    .btn-buy-now {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn-buy-now:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #ff7043 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.5);
+    }
+    
+    .btn-buy-now:active {
+        transform: translateY(0);
     }
 </style>
+
+<script>
+    function buyNow(productId) {
+        <c:choose>
+            <c:when test="${not empty sessionScope.currentUser}">
+                // Đã đăng nhập - thêm vào giỏ và chuyển checkout
+                addToCart(productId, 1, function(success) {
+                    if (success) {
+                        window.location.href = '${pageContext.request.contextPath}/checkout';
+                    }
+                });
+            </c:when>
+            <c:otherwise>
+                // Chưa đăng nhập - lưu ý định mua ngay và hiện modal login
+                sessionStorage.setItem('buyNowProductId', productId);
+                sessionStorage.setItem('redirectAfterLogin', 'checkout');
+                showLoginModal();
+            </c:otherwise>
+        </c:choose>
+    }
+    
+    // Kiểm tra khi trang load - xử lý sau khi login thành công
+    <c:if test="${not empty sessionScope.currentUser}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const buyNowProductId = sessionStorage.getItem('buyNowProductId');
+            const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+            
+            if (buyNowProductId && redirectAfterLogin === 'checkout') {
+                // Người dùng vừa login và muốn mua ngay
+                sessionStorage.removeItem('buyNowProductId');
+                sessionStorage.removeItem('redirectAfterLogin');
+                
+                // Thêm vào giỏ hàng và chuyển đến checkout
+                addToCart(parseInt(buyNowProductId), 1, function(success) {
+                    if (success) {
+                        setTimeout(function() {
+                            window.location.href = '${pageContext.request.contextPath}/checkout';
+                        }, 500);
+                    }
+                });
+            }
+        });
+    </c:if>
+</script>

@@ -16,12 +16,14 @@ import ute.service.inter.CategoriesService;
 import ute.utils.Constant;
 import ute.service.impl.CategoriesServiceImpl;
 
-@WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
-        "/api/admin/categories/delete", "/api/admin/categories/view" })
 @MultipartConfig(fileSizeThreshold = 10240, // 10KB
         maxFileSize = 10485760, // 10MB
         maxRequestSize = 20971520 // 20MB
 )
+
+@WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
+        "/api/admin/categories/delete", "/api/admin/categories/view" })
+
 public class CategoriesController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -78,24 +80,38 @@ public class CategoriesController extends HttpServlet {
         } else if (uri.contains("/api/admin/categories/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
-                Categories category = categoriesService.findById(Long.parseLong(idStr));
-                req.setAttribute("category", category);
+                try {
+                    Categories category = categoriesService.findById(Long.parseLong(idStr));
+                    req.setAttribute("category", category);
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
+                }
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/categories/view")) {
             String idStr = req.getParameter("id");
-            Categories category = categoriesService.findById(Long.parseLong(idStr));
-            req.setAttribute("category", category);
-            req.getRequestDispatcher("/views//admin/categories/view.jsp").forward(req, resp);
+            try {
+                Categories category = categoriesService.findById(Long.parseLong(idStr));
+                req.setAttribute("category", category);
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "ID không hợp lệ!");
+            }
+            req.getRequestDispatcher("/WEB-INF/views/admin/categories/view.jsp").forward(req, resp); // Fix path: bỏ
+                                                                                                     // double slash
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
-            categoriesService.delete(Long.parseLong(idStr));
+            try {
+                categoriesService.delete(Long.parseLong(idStr));
+            } catch (NumberFormatException e) {
+                // Log nếu cần, nhưng vẫn redirect
+            }
             resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8"); // FIX: Đảm bảo đọc UTF-8 cho tiếng Việt
         String uri = req.getRequestURI();
 
         if (uri.contains("/api/admin/categories/saveOrUpdate")) {
@@ -108,9 +124,21 @@ public class CategoriesController extends HttpServlet {
             String categoryName = req.getParameter("categoryName");
             String description = req.getParameter("description");
 
-            Long id = (idStr != null && !idStr.isEmpty()) ? Long.parseLong(idStr) : null;
-            if (id != null) {
-                category = categoriesService.findById(id);
+            Long id = null;
+            if (idStr != null && !idStr.isEmpty()) {
+                try {
+                    id = Long.parseLong(idStr);
+                    category = categoriesService.findById(id);
+                    if (category == null) {
+                        req.setAttribute("error", "Danh mục không tồn tại!");
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
+                    req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                    return;
+                }
             }
 
             // ⚠️ Kiểm tra tên danh mục
