@@ -15,7 +15,7 @@
 
                 <!-- QUẢN LÝ SẢN PHẨM -->
                 <div class="sb-sidenav-menu-heading">Quản lý sản phẩm</div>
-                
+
                 <!-- Products with submenu -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseProducts">
                     <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
@@ -61,28 +61,51 @@
 
                 <!-- QUẢN LÝ BÁN HÀNG -->
                 <div class="sb-sidenav-menu-heading">Quản lý bán hàng</div>
-                
+
                 <!-- Orders -->
                 <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/orders">
                     <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                     Đơn hàng
                 </a>
 
-                <!-- Vouchers -->
-                <a class="nav-link" href="#">
-                    <div class="sb-nav-link-icon"><i class="fas fa-ticket-alt"></i></div>
-                    Voucher / Mã giảm giá
+                <!-- Voucher -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseUserCoupon">
+                    <div class="sb-nav-link-icon"><i class="fas fa-gift"></i></div>
+                    Mã Giảm Giá
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
+                <div class="collapse" id="collapseUserCoupon">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/voucher/searchpaginated">
+                            <i class="fas fa-list me-1"></i> Danh sách Voucher
+                        </a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/voucher/saveOrUpdate">
+                            <i class="fas fa-plus me-1"></i> Thêm Voucher
+                        </a>
+                    </nav>
+                </div>
 
-                <!-- Reviews -->
-                <a class="nav-link" href="#">
-                    <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
-                    Đánh giá
+
+                <!-- Danh Gia -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseReview">
+                    <div class="sb-nav-link-icon"><i class="fas fa-gift"></i></div>
+                    Đánh Giá
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
+                <div class="collapse" id="collapseReview">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/review/searchpaginated">
+                            <i class="fas fa-list me-1"></i> Danh sách đánh giá
+                        </a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/review/exportExcel">
+                            <i class="fas fa-plus me-1"></i> Xuất đánh giá
+                        </a>
+                    </nav>
+                </div>
 
                 <!-- QUẢN LÝ NGƯỜI DÙNG -->
                 <div class="sb-sidenav-menu-heading">Quản lý người dùng</div>
-                
+
                 <!-- Users -->
                 <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/users">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
@@ -91,7 +114,7 @@
 
                 <!-- GIAO DIỆN & NỘI DUNG -->
                 <div class="sb-sidenav-menu-heading">Giao diện & Nội dung</div>
-                
+
                 <!-- Banners -->
                 <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/banners">
                     <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
@@ -100,7 +123,7 @@
 
                 <!-- BAO CÁO & THỐNG KÊ -->
                 <div class="sb-sidenav-menu-heading">Báo cáo & Thống kê</div>
-                
+
                 <!-- Reports with submenu -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseReports">
                     <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
@@ -123,7 +146,7 @@
 
                 <!-- CÀI ĐẶT -->
                 <div class="sb-sidenav-menu-heading">Hệ thống</div>
-                
+
                 <!-- Settings -->
                 <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/settings">
                     <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
@@ -135,7 +158,7 @@
 
         <div class="sb-sidenav-footer">
             <div class="small">Đăng nhập:</div>
-            <% 
+            <%
                 String username = (String) session.getAttribute("username");
                 if (username == null) {
                     username = "Admin";
