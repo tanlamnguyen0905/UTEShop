@@ -79,7 +79,7 @@
                             <div class="row">
                                 <c:forEach var="image" items="${product.images}">
                                     <div class="col-md-4 mb-3">
-                                        <img src="${pageContext.request.contextPath}/assets/${image.dirImage}"
+                                        <img src="${pageContext.request.contextPath}/image?fname=${image.dirImage}"
                                              alt="${product.productName}"
                                              class="img-thumbnail w-100" style="height: 150px;"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
@@ -95,10 +95,10 @@
                 </div>
 
                 <div class="d-flex gap-2 mt-4">
-                    <a href="${pageContext.request.contextPath}/admin/products/saveOrUpdate?id=${product.productID}" class="btn btn-warning">
+                    <a href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate?id=${product.productID}" class="btn btn-warning">
                         <i class="fas fa-edit me-2"></i>Sửa
                     </a>
-                    <a href="${pageContext.request.contextPath}/admin/products/searchpaginated" class="btn btn-secondary">
+                    <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
                     </a>
                 </div>
@@ -110,7 +110,7 @@
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle me-2"></i>Sản phẩm không tồn tại!
         </div>
-        <a href="${pageContext.request.contextPath}/admin/products/searchpaginated" class="btn btn-secondary">
+        <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
         </a>
     </c:if>

@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import ute.entities.Categories;
 import ute.service.inter.CategoriesService;
+import ute.utils.Constant;
 import ute.service.impl.CategoriesServiceImpl;
 
 @WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
@@ -98,20 +99,21 @@ public class CategoriesController extends HttpServlet {
         String uri = req.getRequestURI();
 
         if (uri.contains("/api/admin/categories/saveOrUpdate")) {
+            req.setCharacterEncoding("UTF-8");
+            resp.setCharacterEncoding("UTF-8");
+
             Categories category = new Categories();
 
-            // Get text parameters from the multipart form
             String idStr = req.getParameter("id");
             String categoryName = req.getParameter("categoryName");
             String description = req.getParameter("description");
 
-            Long id = null;
-            if (idStr != null && !idStr.isEmpty()) {
-                id = Long.parseLong(idStr);
+            Long id = (idStr != null && !idStr.isEmpty()) ? Long.parseLong(idStr) : null;
+            if (id != null) {
                 category = categoriesService.findById(id);
             }
 
-            // Validate required fields
+            // ⚠️ Kiểm tra tên danh mục
             if (categoryName == null || categoryName.trim().isEmpty()) {
                 req.setAttribute("error", "Tên danh mục không được để trống!");
                 req.setAttribute("category", category);
@@ -119,110 +121,8 @@ public class CategoriesController extends HttpServlet {
                 return;
             }
 
-            category.setCategoryName(categoryName.trim());
-            category.setDescription(description != null ? description.trim() : null);
-
-            // Handle file upload
-            Part filePart = req.getPart("image"); // Get the file part
-            String image = null;
-            boolean fileUploadSuccess = false;
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = filePart.getSubmittedFileName();
-                if (fileName != null && !fileName.trim().isEmpty()) {
-                    // Validate file type (basic check for images)
-                    String contentType = filePart.getContentType();
-                    if (contentType != null && contentType.startsWith("image/")) {
-                        // Get webapp root path for reliable file storage
-                        String webAppRoot = getServletContext().getRealPath("/");
-                        if (webAppRoot == null) {
-                            // Fallback for environments where getRealPath returns null (e.g., some cloud
-                            // setups)
-                            webAppRoot = System.getProperty("java.io.tmpdir");
-                            req.setAttribute("error",
-                                    "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
-                            req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
-                                    resp);
-                            return;
-                        }
-
-                        // Ensure uploads directory exists
-                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images"
-                                + File.separator + "categories";
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            if (!uploadDir.mkdirs()) {
-                                req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
-                                req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
-                                        resp);
-                                return;
-                            }
-                        }
-
-                        // Generate unique filename to avoid conflicts
-                        String fileExtension = "";
-                        int lastDotIndex = fileName.lastIndexOf(".");
-                        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
-                            fileExtension = fileName.substring(lastDotIndex);
-                        }
-                        String uniqueFileName = System.currentTimeMillis() + "_"
-                                + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
-                        String filePath = uploadPath + File.separator + uniqueFileName;
-
-                        // Save the file
-                        try {
-                            filePart.write(filePath);
-                            // Verify file was written successfully
-                            File savedFile = new File(filePath);
-                            if (savedFile.exists() && savedFile.length() > 0) {
-                                fileUploadSuccess = true;
-                                image = "images/categories/" + uniqueFileName; // Store relative path in the database
-                            } else {
-                                // Clean up empty file
-                                if (savedFile.exists()) {
-                                    savedFile.delete();
-                                }
-                                req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
-                                req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
-                                        resp);
-                                return;
-                            }
-                        } catch (IOException e) {
-                            // Clean up on error
-                            File errorFile = new File(filePath);
-                            if (errorFile.exists()) {
-                                errorFile.delete();
-                            }
-                            req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
-                            req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req,
-                                    resp);
-                            return;
-                        }
-                    } else {
-                        req.setAttribute("error", "Chỉ chấp nhận file ảnh (image/*)!");
-                        req.setAttribute("category", category);
-                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                        return;
-                    }
-                } else {
-                    req.setAttribute("error", "Tên file không hợp lệ!");
-                    req.setAttribute("category", category);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            if (!fileUploadSuccess && id != null) {
-                // If no new image is uploaded, keep the existing image
-                image = category.getImage();
-            }
-
-            category.setImage(image);
-
-            // Check for duplicate category name
-            Categories existing = categoriesService.findByNameExact(categoryName);
+            // ⚠️ Kiểm tra trùng tên
+            Categories existing = categoriesService.findByNameExact(categoryName.trim());
             if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
                 req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
                 req.setAttribute("category", category);
@@ -230,17 +130,60 @@ public class CategoriesController extends HttpServlet {
                 return;
             }
 
-            String message;
-            if (id != null) {
-                categoriesService.update(category);
-                message = "Category is Edited!";
+            // Gán dữ liệu cơ bản
+            category.setCategoryName(categoryName.trim());
+            category.setDescription(description != null ? description.trim() : null);
+
+            // 🖼️ Xử lý upload ảnh (sử dụng Constant.Dir)
+            Part filePart = req.getPart("image");
+            if (filePart != null && filePart.getSize() > 0) {
+                try {
+                    String uploadDir = Constant.Dir + File.separator + "categories";
+                    File dir = new File(uploadDir);
+                    if (!dir.exists())
+                        dir.mkdirs();
+
+                    String fileName = System.currentTimeMillis() + "_"
+                            + filePart.getSubmittedFileName().replaceAll("[^a-zA-Z0-9.]", "_");
+
+                    filePart.write(uploadDir + File.separator + fileName);
+
+                    category.setImage(fileName);
+
+                    System.out.println("✅ Ảnh danh mục đã upload: " + fileName);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
+                    req.setAttribute("category", category);
+                    req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                    return;
+                }
+            } else if (id != null && category.getImage() != null) {
+                // Giữ ảnh cũ khi không upload mới
+                category.setImage(category.getImage());
             } else {
-                categoriesService.save(category);
-                message = "Category is Saved!";
+                // Ảnh mặc định khi thêm mới
+                category.setImage("logo.png");
             }
 
-            req.getSession().setAttribute("message", message);
-            resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
+            // 💾 Lưu hoặc cập nhật
+            try {
+                if (id != null) {
+                    categoriesService.update(category);
+                    req.getSession().setAttribute("message", "Cập nhật danh mục thành công!");
+                } else {
+                    categoriesService.save(category);
+                    req.getSession().setAttribute("message", "Thêm danh mục mới thành công!");
+                }
+                resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Lỗi khi lưu danh mục: " + e.getMessage());
+                req.setAttribute("category", category);
+                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+            }
         }
     }
+
 }

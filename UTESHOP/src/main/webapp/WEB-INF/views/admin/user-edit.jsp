@@ -29,7 +29,7 @@
         <!-- Page header -->
         <h1 class="mt-4 mb-1">Chỉnh sửa người dùng</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/api/admin/dashboard">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/api/admin/users">Người dùng</a></li>
             <li class="breadcrumb-item active">Chỉnh sửa #${user.userID}</li>
         </ol>

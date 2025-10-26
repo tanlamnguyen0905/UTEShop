@@ -22,7 +22,7 @@
             ${empty category.categoryID ? 'Thêm danh mục' : 'Sửa danh mục'}
         </div>
         <div class="card-body">
-            <form method="POST" action="${pageContext.request.contextPath}/admin/categories/saveOrUpdate" enctype="multipart/form-data">
+            <form method="POST" action="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate" enctype="multipart/form-data">
                 <c:if test="${not empty category.categoryID}">
                     <input type="hidden" name="id" value="${category.categoryID}">
                 </c:if>
@@ -43,7 +43,7 @@
                     <small class="form-text text-muted">Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 10MB.</small>
                     <c:if test="${not empty category.image}">
                         <div class="mt-2">
-                            <img src="${pageContext.request.contextPath}/assets/${category.image}"
+                            <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
                                  alt="${category.categoryName}"
                                  width="50" height="50" class="img-thumbnail"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
@@ -54,7 +54,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Lưu</button>
-                <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated" class="btn btn-secondary">Hủy</a>
+                <a href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated" class="btn btn-secondary">Hủy</a>
             </form>
         </div>
     </div>

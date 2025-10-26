@@ -77,7 +77,7 @@
             <i class="fas fa-search me-2"></i>Tìm kiếm sản phẩm
         </div>
         <div class="card-body">
-            <form method="GET" action="${pageContext.request.contextPath}/admin/products/searchpaginated" class="row g-3">
+            <form method="GET" action="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="row g-3">
                 <div class="col-md-4">
                     <input type="text" name="searchKeyword" class="form-control" placeholder="Nhập tên sản phẩm..." value="${searchKeyword}">
                 </div>
@@ -94,12 +94,12 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a href="${pageContext.request.contextPath}/admin/products/export?searchKeyword=${searchKeyword}" class="btn btn-success w-100">
+                    <a href="${pageContext.request.contextPath}/api/admin/products/export?searchKeyword=${searchKeyword}" class="btn btn-success w-100">
                         <i class="fas fa-download me-2"></i>Xuất Excel
                     </a>
                 </div>
                 <div class="col-md-2">
-                    <a href="${pageContext.request.contextPath}/admin/products/saveOrUpdate" class="btn btn-info w-100">
+                    <a href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate" class="btn btn-info w-100">
                         <i class="fas fa-plus me-2"></i>Thêm sản phẩm mới
                     </a>
                 </div>
@@ -136,7 +136,7 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${not empty product.images && not empty product.images[0]}">
-                                        <img src="${pageContext.request.contextPath}/assets/${product.images[0].dirImage}"
+                                        <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}"
                                              alt="${product.productName}"
                                              width="50" height="50"
                                              class="img-thumbnail"
@@ -160,13 +160,13 @@
                             <td>${product.reviewCount} (${product.rating}/5)</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="${pageContext.request.contextPath}/admin/products/view?id=${product.productID}" class="btn btn-info btn-sm">
+                                    <a href="${pageContext.request.contextPath}/api/admin/products/view?id=${product.productID}" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/admin/products/saveOrUpdate?id=${product.productID}" class="btn btn-warning btn-sm">
+                                    <a href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate?id=${product.productID}" class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/admin/products/delete?id=${product.productID}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                    <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>

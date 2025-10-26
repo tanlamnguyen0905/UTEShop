@@ -23,6 +23,7 @@ import ute.service.admin.Impl.ProductServiceImpl;
 import ute.service.admin.inter.ProductService;
 import ute.service.impl.CategoriesServiceImpl;
 import ute.service.inter.CategoriesService;
+import ute.utils.Constant;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
@@ -155,7 +156,7 @@ public class ProductController extends HttpServlet {
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
-        } else if (uri.contains("/admin/products/delete")) {
+        } else if (uri.contains("/api/admin/products/delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
@@ -167,7 +168,7 @@ public class ProductController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
 
-        if (uri.contains("/admin/products/saveOrUpdate")) {
+        if (uri.contains("/api/admin/products/saveOrUpdate")) {
             Product product = new Product();
             String idStr = req.getParameter("id");
             String productName = req.getParameter("productName");
@@ -265,101 +266,75 @@ public class ProductController extends HttpServlet {
             product.setBrand(brand);
 
             // Handle file upload
+            // 🖼️ Xử lý upload ảnh sản phẩm (theo kiểu Constant.Dir)
             Part filePart = req.getPart("image");
             boolean fileUploadSuccess = false;
+
             if (filePart != null && filePart.getSize() > 0) {
-                String fileName = filePart.getSubmittedFileName();
-                if (fileName != null && !fileName.trim().isEmpty()) {
-                    // Validate file type (basic check for images)
+                try {
+                    // Sử dụng thư mục gốc cố định
+                    String uploadDir = Constant.Dir + File.separator + "products";
+                    File dir = new File(uploadDir);
+                    if (!dir.exists())
+                        dir.mkdirs();
+
+                    // Kiểm tra loại file
                     String contentType = filePart.getContentType();
-                    if (contentType != null && contentType.startsWith("image/")) {
-                        // Get webapp root path for reliable file storage
-                        String webAppRoot = getServletContext().getRealPath("/");
-                        if (webAppRoot == null) {
-                            // Fallback for environments where getRealPath returns null (e.g., some cloud
-                            // setups)
-                            req.setAttribute("error",
-                                    "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
-                            loadDropdowns(req);
-                            req.setAttribute("product", tempProduct);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                            return;
-                        }
-
-                        // Ensure uploads directory exists under assets/images/products
-                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images"
-                                + File.separator + "products";
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            if (!uploadDir.mkdirs()) {
-                                req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
-                                loadDropdowns(req);
-                                req.setAttribute("product", tempProduct);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
-                                        resp);
-                                return;
-                            }
-                        }
-
-                        // Generate unique filename to avoid conflicts
-                        String fileExtension = "";
-                        int lastDotIndex = fileName.lastIndexOf(".");
-                        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
-                            fileExtension = fileName.substring(lastDotIndex);
-                        }
-                        String uniqueFileName = System.currentTimeMillis() + "_"
-                                + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
-                        String filePath = uploadPath + File.separator + uniqueFileName;
-
-                        // Save the file
-                        try {
-                            filePart.write(filePath);
-                            // Verify file was written successfully
-                            File savedFile = new File(filePath);
-                            if (savedFile.exists() && savedFile.length() > 0) {
-                                fileUploadSuccess = true;
-                                // Create Image entity
-                                Image image = new Image();
-                                image.setDirImage("images/products/" + uniqueFileName);
-                                image.setProduct(product);
-                                // Add to product's images list
-                                if (product.getImages() == null) {
-                                    product.setImages(new ArrayList<>());
-                                }
-                                product.getImages().add(image);
-                            } else {
-                                // Clean up empty file
-                                if (savedFile.exists()) {
-                                    savedFile.delete();
-                                }
-                                req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
-                                loadDropdowns(req);
-                                req.setAttribute("product", tempProduct);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
-                                        resp);
-                                return;
-                            }
-                        } catch (IOException e) {
-                            // Clean up on error
-                            File errorFile = new File(filePath);
-                            if (errorFile.exists()) {
-                                errorFile.delete();
-                            }
-                            req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
-                            loadDropdowns(req);
-                            req.setAttribute("product", tempProduct);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                            return;
-                        }
-                    } else {
+                    if (contentType == null || !contentType.startsWith("image/")) {
                         req.setAttribute("error", "Chỉ chấp nhận file ảnh (image/*)!");
                         loadDropdowns(req);
                         req.setAttribute("product", tempProduct);
                         req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                         return;
                     }
-                } else {
-                    req.setAttribute("error", "Tên file không hợp lệ!");
+
+                    // Tạo tên file an toàn
+                    String rawFileName = filePart.getSubmittedFileName();
+                    String safeFileName = System.currentTimeMillis() + "_"
+                            + rawFileName.replaceAll("[^a-zA-Z0-9.]", "_");
+                    String filePath = uploadDir + File.separator + safeFileName;
+
+                    // Lưu file vào ổ đĩa
+                    filePart.write(filePath);
+
+                    // Kiểm tra file sau khi ghi
+                    File savedFile = new File(filePath);
+                    if (savedFile.exists() && savedFile.length() > 0) {
+                        fileUploadSuccess = true;
+
+                        // Tạo đối tượng ảnh để lưu DB
+                        Image image = new Image();
+                        image.setDirImage(safeFileName);
+                        image.setProduct(product);
+
+                        if (product.getImages() == null) {
+                            product.setImages(new ArrayList<>());
+                        }
+                        product.getImages().add(image);
+
+                        System.out.println("✅ Ảnh sản phẩm đã upload: " + safeFileName);
+                    } else {
+                        // Xóa file rỗng nếu có
+                        if (savedFile.exists())
+                            savedFile.delete();
+
+                        req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
+                        loadDropdowns(req);
+                        req.setAttribute("product", tempProduct);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
+                    loadDropdowns(req);
+                    req.setAttribute("product", tempProduct);
+                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
                     loadDropdowns(req);
                     req.setAttribute("product", tempProduct);
                     req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);

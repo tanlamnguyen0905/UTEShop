@@ -66,7 +66,7 @@
             <i class="fas fa-edit me-2"></i>${empty product.productID ? 'Thêm sản phẩm' : 'Sửa sản phẩm'}
         </div>
         <div class="card-body">
-            <form method="POST" action="${pageContext.request.contextPath}/admin/products/saveOrUpdate" enctype="multipart/form-data">
+            <form method="POST" action="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate" enctype="multipart/form-data">
                 <c:if test="${not empty product.productID}">
                     <input type="hidden" name="id" value="${product.productID}">
                 </c:if>
@@ -123,7 +123,7 @@
                         <div class="mt-2 d-flex flex-wrap">
                             <c:forEach var="image" items="${product.images}">
                                 <div class="me-2 mb-2">
-                                    <img src="${pageContext.request.contextPath}/assets/${image.dirImage}"
+                                    <img src="${pageContext.request.contextPath}/image?fname=${image.dirImage}"
                                          alt="${product.productName}"
                                          width="50" height="50" class="img-thumbnail"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
@@ -139,7 +139,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-2"></i>${empty product.productID ? 'Thêm' : 'Cập nhật'}
                     </button>
-                    <a href="${pageContext.request.contextPath}/admin/products/searchpaginated" class="btn btn-secondary">
+                    <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-secondary">
                         <i class="fas fa-times me-2"></i>Hủy
                     </a>
                 </div>
