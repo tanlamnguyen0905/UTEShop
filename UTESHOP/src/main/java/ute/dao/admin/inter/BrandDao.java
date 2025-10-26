@@ -8,8 +8,10 @@ public interface BrandDao {
     // ======== CRUD cơ bản ========
     void insert(Brand brand);
     void update(Brand brand);
-    void delete(int id);
-    Brand findById(int id);
+    void delete(Long id);
+    Brand findById(Long id);
+
+
     List<Brand> findAll();
 
     // ======== Các hàm mở rộng thường dùng ========
