@@ -78,7 +78,24 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             
-            // 5. Tạo đơn hàng
+            // 5. Xác định trạng thái thanh toán dựa trên phương thức
+            String paymentStatus = "Chưa thanh toán"; // Mặc định
+            if (paymentMethod.getName() != null) {
+                String methodName = paymentMethod.getName().toLowerCase();
+                // COD (Cash On Delivery) - Thanh toán khi nhận hàng
+                if (methodName.contains("cod") || 
+                    methodName.contains("tiền mặt") || 
+                    methodName.contains("khi nhận hàng")) {
+                    paymentStatus = "Chưa thanh toán";
+                } else {
+                    // Các phương thức thanh toán online khác
+                    // (Chuyển khoản, ví điện tử, thẻ tín dụng)
+                    // Giả định đã thanh toán trước
+                    paymentStatus = "Đã thanh toán";
+                }
+            }
+            
+            // 6. Tạo đơn hàng
             Orders order = Orders.builder()
                     .user(user)
                     .address(address)
@@ -88,14 +105,14 @@ public class OrderServiceImpl implements OrderService {
                     .shippingFee(25000.0)  // Default shipping fee
                     .orderDate(LocalDateTime.now())
                     .orderStatus("Đang chờ")
-                    .paymentStatus("Chưa thanh toán")
+                    .paymentStatus(paymentStatus)
                     .phoneNumber(address.getPhone())
                     .recipientName(address.getName())
                     .notes(notes)
                     .userCoupon(userCoupon)
                     .build();
             
-            // 6. Tạo order details từ cart items
+            // 7. Tạo order details từ cart items
             List<OrderDetail> orderDetails = new ArrayList<>();
             for (CartDetail cartItem : cart.getCartDetails()) {
                 Product product = cartItem.getProduct();
@@ -123,10 +140,10 @@ public class OrderServiceImpl implements OrderService {
             
             order.setOrderDetails(orderDetails);
             
-            // 7. Lưu đơn hàng
+            // 8. Lưu đơn hàng
             em.persist(order);
             
-            // 8. Xóa giỏ hàng sau khi đặt hàng thành công
+            // 9. Xóa giỏ hàng sau khi đặt hàng thành công
             cartDao.clearCart(cart.getCartID());
             
             trans.commit();

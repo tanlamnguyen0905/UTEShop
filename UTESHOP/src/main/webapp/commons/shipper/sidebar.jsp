@@ -14,36 +14,36 @@
         <!-- Navigation -->
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link ${param.page == 'dashboard' ? 'active' : ''}" 
-                   href="${pageContext.request.contextPath}/api/shipper/dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
+                <a class="nav-link ${param.page == 'feed' ? 'active' : ''}" 
+                   href="${pageContext.request.contextPath}/api/shipper/feed">
+                    <i class="fas fa-box-open"></i>
+                    Đơn hàng có sẵn
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link ${param.page == 'deliveries' ? 'active' : ''}" 
-                   href="${pageContext.request.contextPath}/api/shipper/deliveries">
-                    <i class="fas fa-box"></i>
-                    Đơn giao hàng
+                <a class="nav-link ${param.page == 'my-deliveries' ? 'active' : ''}" 
+                   href="${pageContext.request.contextPath}/api/shipper/my-deliveries">
+                    <i class="fas fa-truck"></i>
+                    Đơn của tôi
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" 
-                   href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đang giao hàng">
-                    <i class="fas fa-truck"></i>
+                   href="${pageContext.request.contextPath}/api/shipper/my-deliveries?status=Đang giao hàng">
+                    <i class="fas fa-shipping-fast"></i>
                     Đang giao
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" 
-                   href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đã giao hàng">
+                   href="${pageContext.request.contextPath}/api/shipper/my-deliveries?status=Đã giao hàng">
                     <i class="fas fa-check-circle"></i>
                     Đã hoàn thành
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" 
-                   href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Giao hàng thất bại">
+                   href="${pageContext.request.contextPath}/api/shipper/my-deliveries?status=Giao hàng thất bại">
                     <i class="fas fa-times-circle"></i>
                     Thất bại
                 </a>

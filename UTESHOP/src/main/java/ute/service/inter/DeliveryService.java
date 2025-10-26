@@ -1,72 +1,53 @@
 package ute.service.inter;
 
 import java.util.List;
-import ute.dto.DeliveryDTO;
+import ute.entities.Delivery;
 
 public interface DeliveryService {
     
     /**
-     * Gán đơn hàng cho shipper
+     * Shipper nhận đơn hàng (tạo delivery mới)
      */
-    DeliveryDTO assignOrderToShipper(Long orderId, Long shipperId, String notes);
+    Delivery acceptOrder(Long orderId, Long shipperId);
     
     /**
-     * Shipper xác nhận giao hàng thành công
+     * Cập nhật trạng thái giao hàng
      */
-    void completeDelivery(Long deliveryId);
+    void updateDeliveryStatus(Long deliveryId, String newStatus, String notes);
     
     /**
-     * Shipper báo giao hàng thất bại
+     * Đánh dấu đã giao hàng thành công
      */
-    void failDelivery(Long deliveryId, String failureReason);
+    void markAsCompleted(Long deliveryId);
     
     /**
-     * Cập nhật trạng thái delivery
+     * Đánh dấu giao hàng thất bại
      */
-    void updateDeliveryStatus(Long deliveryId, String newStatus);
-    
-    /**
-     * Cập nhật ghi chú
-     */
-    void updateNotes(Long deliveryId, String notes);
+    void markAsFailed(Long deliveryId, String failureReason);
     
     /**
      * Tìm delivery theo ID
      */
-    DeliveryDTO findById(Long deliveryId);
-    
-    /**
-     * Tìm delivery theo OrderID
-     */
-    DeliveryDTO findByOrderId(Long orderId);
+    Delivery findById(Long deliveryId);
     
     /**
      * Tìm tất cả delivery của shipper
      */
-    List<DeliveryDTO> findByShipperId(Long shipperId);
+    List<Delivery> findByShipperId(Long shipperId);
     
     /**
-     * Tìm delivery theo shipper và trạng thái
+     * Tìm delivery theo trạng thái của shipper
      */
-    List<DeliveryDTO> findByShipperIdAndStatus(Long shipperId, String status);
+    List<Delivery> findByShipperIdAndStatus(Long shipperId, String status);
     
     /**
-     * Tìm tất cả delivery
-     */
-    List<DeliveryDTO> findAll();
-    
-    /**
-     * Đếm số delivery của shipper
-     */
-    long countByShipperId(Long shipperId);
-    
-    /**
-     * Đếm số delivery theo trạng thái của shipper
+     * Đếm số delivery theo trạng thái
      */
     long countByShipperIdAndStatus(Long shipperId, String status);
     
     /**
-     * Tìm delivery của shipper với phân trang
+     * Lấy thống kê delivery của shipper
      */
-    List<DeliveryDTO> findByShipperIdPaginated(Long shipperId, int page, int pageSize);
+    java.util.Map<String, Long> getShipperStats(Long shipperId);
 }
+

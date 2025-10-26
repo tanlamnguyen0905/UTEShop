@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:include page="/WEB-INF/views/auth/login.jsp" />
 <jsp:include page="/WEB-INF/views/auth/register.jsp" />
@@ -80,13 +81,13 @@
 													<div class="text-muted" style="font-size: 0.75rem;">${sessionScope.currentUser.email}</div>
 												</div>
 												<c:choose>
-													<c:when test="${sessionScope.currentUser.role == 'ADMIN'}">
+													<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'admin'}">
 														<span class="badge bg-danger">Admin</span>
 													</c:when>
-													<c:when test="${sessionScope.currentUser.role == 'MANAGER'}">
+													<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'manager'}">
 														<span class="badge bg-warning text-dark">Manager</span>
 													</c:when>
-													<c:when test="${sessionScope.currentUser.role == 'SHIPPER'}">
+													<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'shipper'}">
 														<span class="badge bg-info">Shipper</span>
 													</c:when>
 													<c:otherwise>
@@ -104,7 +105,7 @@
 										<!-- Menu theo role -->
 										<c:choose>
 											<%-- ADMIN Menu --%>
-											<c:when test="${sessionScope.currentUser.role == 'ADMIN'}">
+											<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'admin'}">
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/dashboard">
 													<i class="fa-solid fa-gauge-high me-2 text-danger"></i> Trang quản trị
 												</a></li>
@@ -120,7 +121,7 @@
 											</c:when>
 
 											<%-- MANAGER Menu --%>
-											<c:when test="${sessionScope.currentUser.role == 'MANAGER'}">
+											<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'manager'}">
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/manager/dashboard">
 													<i class="fa-solid fa-chart-line me-2 text-warning"></i> Trang quản lý
 												</a></li>
@@ -136,12 +137,18 @@
 											</c:when>
 
 											<%-- SHIPPER Menu --%>
-											<c:when test="${sessionScope.currentUser.role == 'SHIPPER'}">
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/dashboard">
-													<i class="fa-solid fa-truck-fast me-2 text-info"></i> Trang vận chuyển
+											<c:when test="${fn:toLowerCase(sessionScope.currentUser.role) == 'shipper'}">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/feed">
+													<i class="fa-solid fa-box-open me-2 text-info"></i> Đơn hàng có sẵn
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/deliveries?status=Đã%20giao%20hàng">
-													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Lịch sử giao hàng
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/my-deliveries">
+													<i class="fa-solid fa-truck-fast me-2 text-info"></i> Đơn của tôi
+												</a></li>
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/my-deliveries?status=Đang%20giao%20hàng">
+													<i class="fa-solid fa-shipping-fast me-2 text-info"></i> Đang giao hàng
+												</a></li>
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/shipper/my-deliveries?status=Đã%20giao%20hàng">
+													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Đã hoàn thành
 												</a></li>
 											</c:when>
 

@@ -225,37 +225,41 @@ public class OrderDaoImpl implements OrderDao {
             em.close();
         }
     }
-    
+
     @Override
     public List<Orders> findConfirmedOrders() {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            // Tìm orders đã xác nhận nhưng chưa có trong bảng Delivery
+            // Tìm các đơn hàng "Đã xác nhận" và chưa có delivery
             TypedQuery<Orders> query = em.createQuery(
                 "SELECT DISTINCT o FROM Orders o " +
-                "LEFT JOIN FETCH o.user " +
                 "LEFT JOIN FETCH o.address " +
-                "WHERE o.orderStatus = 'Đã xác nhận' " +
+                "LEFT JOIN FETCH o.user " +
+                "LEFT JOIN FETCH o.orderDetails od " +
+                "LEFT JOIN FETCH od.product " +
+                "WHERE o.orderStatus = :status " +
                 "AND NOT EXISTS (SELECT d FROM Delivery d WHERE d.order.orderID = o.orderID) " +
-                "ORDER BY o.orderDate ASC",
+                "ORDER BY o.orderDate DESC",
                 Orders.class
             );
+            query.setParameter("status", "Đã xác nhận");
             return query.getResultList();
         } finally {
             em.close();
         }
     }
-    
+
     @Override
     public long countConfirmedOrders() {
         EntityManager em = JPAConfig.getEntityManager();
         try {
             TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(o) FROM Orders o " +
-                "WHERE o.orderStatus = 'Đã xác nhận' " +
+                "WHERE o.orderStatus = :status " +
                 "AND NOT EXISTS (SELECT d FROM Delivery d WHERE d.order.orderID = o.orderID)",
                 Long.class
             );
+            query.setParameter("status", "Đã xác nhận");
             return query.getSingleResult();
         } finally {
             em.close();

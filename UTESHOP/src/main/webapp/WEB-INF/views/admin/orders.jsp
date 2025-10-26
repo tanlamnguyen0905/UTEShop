@@ -213,7 +213,8 @@
                                     <th>Số điện thoại</th>
                                     <th>Địa chỉ</th>
                                     <th>Giá trị</th>
-                                    <th>Trạng thái</th>
+                                    <th>Trạng thái đơn</th>
+                                    <th>Thanh toán</th>
                                     <th>Ngày đặt</th>
                                     <th>Thao tác</th>
                                 </tr>
@@ -282,6 +283,25 @@
                                                 <c:otherwise>
                                                     <span class="badge badge-order-status bg-secondary">
                                                         ${order.orderStatus}
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'Đã thanh toán'}">
+                                                    <span class="badge badge-order-status bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Đã thanh toán
+                                                    </span>
+                                                </c:when>
+                                                <c:when test="${order.paymentStatus == 'Chưa thanh toán'}">
+                                                    <span class="badge badge-order-status bg-warning text-dark">
+                                                        <i class="fas fa-money-bill-wave me-1"></i>Chưa thanh toán
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge badge-order-status bg-secondary">
+                                                        ${order.paymentStatus}
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
