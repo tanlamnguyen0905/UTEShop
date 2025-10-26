@@ -47,16 +47,16 @@ public class AuthServlet extends HttpServlet {
 			HttpSession session = req.getSession(false);
 			if (session != null)
 				session.invalidate();
-			
+
 			// Chuyển đến trang logout để xóa token trong localStorage
 			req.getRequestDispatcher("/WEB-INF/views/auth/logout.jsp").forward(req, resp);
 			return;
-        } else if ("/auth/forgot-password".equals(path)) {
-            req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
-        } else if ("/auth/reset-password".equals(path)) {
-            req.getRequestDispatcher("/WEB-INF/views/auth/reset-password.jsp").forward(req, resp);
-        } else if ("/auth/check-exist".equals(path)) {
-            checkUserExist(req, resp);
+		} else if ("/auth/forgot-password".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/forgot-password.jsp").forward(req, resp);
+		} else if ("/auth/reset-password".equals(path)) {
+			req.getRequestDispatcher("/WEB-INF/views/auth/reset-password.jsp").forward(req, resp);
+		} else if ("/auth/check-exist".equals(path)) {
+			checkUserExist(req, resp);
 		}
 	}
 
@@ -77,7 +77,8 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI =====================
+	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI
+	// =====================
 	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
@@ -254,24 +255,24 @@ public class AuthServlet extends HttpServlet {
 			HttpSession session = req.getSession();
 			session.setAttribute("currentUser", user);
 
-		// Generate JWT token
-		String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-		session.setAttribute("token", token);
-		
-		// Lưu token vào cookie (1 giờ)
-		Cookie tokenCookie = new Cookie("authToken", token);
-		tokenCookie.setHttpOnly(false); // Cho phép JS đọc
-		tokenCookie.setPath("/");
-		tokenCookie.setMaxAge(3600); // 1 giờ
-		resp.addCookie(tokenCookie);
+			// Generate JWT token
+			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
+			session.setAttribute("token", token);
 
-		// Return token to client
-		Map<String, Object> response = new HashMap<>();
-		response.put("success", true);
-		response.put("username", user.getUsername());
-		response.put("role", user.getRole());
-		response.put("token", token); // Trả token về client
-		out.print(gson.toJson(response));
+			// Lưu token vào cookie (1 giờ)
+			Cookie tokenCookie = new Cookie("authToken", token);
+			tokenCookie.setHttpOnly(false); // Cho phép JS đọc
+			tokenCookie.setPath("/");
+			tokenCookie.setMaxAge(3600); // 1 giờ
+			resp.addCookie(tokenCookie);
+
+			// Return token to client
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", true);
+			response.put("username", user.getUsername());
+			response.put("role", user.getRole());
+			response.put("token", token); // Trả token về client
+			out.print(gson.toJson(response));
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("{\"success\":false, \"error\":\"Lỗi máy chủ: " + e.getMessage() + "\"}");
@@ -292,10 +293,10 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 
-    // ===================== FORGOT PASSWORD (GỬI OTP) =====================
-    private void forgotPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = resp.getWriter();
+	// ===================== FORGOT PASSWORD (GỬI OTP) =====================
+	private void forgotPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		resp.setContentType("application/json;charset=UTF-8");
+		PrintWriter out = resp.getWriter();
 
 		String email = req.getParameter("email");
 		if (email == null || email.isBlank()) {
@@ -321,10 +322,10 @@ public class AuthServlet extends HttpServlet {
 		out.print("{\"success\":true, \"message\":\"Đã gửi OTP đến email!\"}");
 	}
 
-    // ===================== RESET PASSWORD (XÁC THỰC OTP) =====================
-    private void resetPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        resp.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = resp.getWriter();
+	// ===================== RESET PASSWORD (XÁC THỰC OTP) =====================
+	private void resetPassword(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+		resp.setContentType("application/json;charset=UTF-8");
+		PrintWriter out = resp.getWriter();
 
 		String email = req.getParameter("email");
 		String otpInput = req.getParameter("otp");

@@ -136,15 +136,17 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${not empty product.images && not empty product.images[0]}">
-                                        <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}" 
-                                             alt="${product.productName}" 
-                                             width="50" height="50" 
-                                             class="img-thumbnail">
+                                        <img src="${pageContext.request.contextPath}/assets/${product.images[0].dirImage}"
+                                             alt="${product.productName}"
+                                             width="50" height="50"
+                                             class="img-thumbnail"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span style="display:none; color: #6c757d;">Không tải được ảnh</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <img src="${pageContext.request.contextPath}/assets/images/logo.png" 
-                                             alt="No image" 
-                                             width="50" height="50" 
+                                        <img src="${pageContext.request.contextPath}/assets/images/logo.png"
+                                             alt="No image"
+                                             width="50" height="50"
                                              class="img-thumbnail">
                                     </c:otherwise>
                                 </c:choose>

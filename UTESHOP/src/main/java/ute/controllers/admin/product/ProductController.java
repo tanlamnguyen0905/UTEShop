@@ -26,7 +26,10 @@ import ute.service.inter.CategoriesService;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
-@MultipartConfig
+@MultipartConfig(fileSizeThreshold = 10240, // 10KB
+        maxFileSize = 10485760, // 10MB
+        maxRequestSize = 20971520 // 20MB
+)
 @WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
         "/api/admin/products/delete", "/api/admin/products/view", "/api/admin/products/export" })
 public class ProductController extends HttpServlet {
@@ -60,7 +63,8 @@ public class ProductController extends HttpServlet {
 
             // Tạo header row
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục", "Thương hiệu", "Ngày nhập"};
+            String[] columns = { "ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục",
+                    "Thương hiệu", "Ngày nhập" };
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -77,13 +81,17 @@ public class ProductController extends HttpServlet {
                 row.createCell(0).setCellValue(product.getProductID());
                 row.createCell(1).setCellValue(product.getProductName());
                 row.createCell(2).setCellValue(product.getDescribe() != null ? product.getDescribe() : "");
-                row.createCell(3).setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
-                row.createCell(4).setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
+                row.createCell(3)
+                        .setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
+                row.createCell(4)
+                        .setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
                 row.createCell(5).setCellValue(product.getSoldCount() != null ? product.getSoldCount().longValue() : 0);
                 row.createCell(6).setCellValue(product.getReviewCount() + " (" + product.getRating() + "/5)");
-                row.createCell(7).setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
+                row.createCell(7)
+                        .setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
                 row.createCell(8).setCellValue(product.getBrand() != null ? product.getBrand().getBrandName() : "N/A");
-                row.createCell(9).setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
+                row.createCell(9)
+                        .setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
             }
 
             // Auto-size columns
@@ -102,74 +110,52 @@ public class ProductController extends HttpServlet {
             // Write to output stream
             try (OutputStream out = resp.getOutputStream()) {
                 workbook.write(out);
-                workbook.close();
             }
-            return;  // Kết thúc response ở đây
+            return; // Kết thúc response ở đây
         }
 
         if (uri.contains("/api/admin/products/searchpaginated")) {
 
             int page = 1;
             int size = 6;
-
             if (req.getParameter("page") != null) {
                 page = Integer.parseInt(req.getParameter("page"));
             }
             if (req.getParameter("size") != null) {
                 size = Integer.parseInt(req.getParameter("size"));
             }
-
             String searchKeyword = req.getParameter("searchKeyword");
-            boolean isSearch = false;
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                searchKeyword = searchKeyword.trim();
-                isSearch = true;
-            } else {
-                searchKeyword = null;
-            }
-
-            int firstResult = (page - 1) * size;
-
             List<Product> productList;
             long totalProducts;
-            if (isSearch) {
-                productList = productService.findByNamePaginated(searchKeyword, firstResult, size);
-                totalProducts = productService.countByName(searchKeyword);
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                productList = productService.findByNamePaginated(searchKeyword.trim(), (page - 1) * size, size);
+                totalProducts = productService.countByName(searchKeyword.trim());
             } else {
                 productList = productService.findPage(page, size);
-                totalProducts = productService.count();
+                totalProducts = (int) productService.count();
             }
             int totalPages = (int) Math.ceil((double) totalProducts / size);
-
             req.setAttribute("productList", productList);
+            req.setAttribute("totalProducts", totalProducts);
             req.setAttribute("currentPage", page);
             req.setAttribute("totalPages", totalPages);
             req.setAttribute("size", size);
             req.setAttribute("searchKeyword", searchKeyword);
-
             req.getRequestDispatcher("/WEB-INF/views/admin/products/searchpaginated.jsp").forward(req, resp);
 
         } else if (uri.contains("/api/admin/products/saveOrUpdate")) {
             String idStr = req.getParameter("id");
-            Product product = null;
             if (idStr != null && !idStr.isEmpty()) {
-                product = productService.findById(Long.parseLong(idStr));
+                Product product = productService.findById(Long.parseLong(idStr));
+                req.setAttribute("product", product);
             }
-            req.setAttribute("product", product);
-
-            // Load lists for dropdowns
-            List<Categories> categoriesList = categoriesService.findAll();
-            List<Brand> brandsList = brandService.findAll();
-            req.setAttribute("categoriesList", categoriesList);
-            req.setAttribute("brandsList", brandsList);
-
             req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/products/view")) {
             String idStr = req.getParameter("id");
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
-        } else if (uri.contains("delete")) {
+        } else if (uri.contains("/admin/products/delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
@@ -179,14 +165,10 @@ public class ProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-
         String uri = req.getRequestURI();
 
         if (uri.contains("/admin/products/saveOrUpdate")) {
             Product product = new Product();
-
-            // Get text parameters from the form
             String idStr = req.getParameter("id");
             String productName = req.getParameter("productName");
             String describe = req.getParameter("describe");
@@ -196,17 +178,19 @@ public class ProductController extends HttpServlet {
             String brandIdStr = req.getParameter("brandId");
 
             Long id = null;
+            Product tempProduct = new Product();
             if (idStr != null && !idStr.isEmpty()) {
                 id = Long.parseLong(idStr);
                 product = productService.findById(id);
+                if (product == null) {
+                    req.setAttribute("error", "Sản phẩm không tồn tại!");
+                    loadDropdowns(req);
+                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                    return;
+                }
+                tempProduct = product;
             }
 
-            // TẠO TEMP PRODUCT ĐỂ GIỮ GIÁ TRỊ FORM KHI LỖI
-            Product tempProduct = new Product();
-            tempProduct.setProductName(productName != null ? productName.trim() : "");
-            tempProduct.setDescribe(describe != null ? describe.trim() : "");
-
-            // Validate required fields
             if (productName == null || productName.trim().isEmpty()) {
                 req.setAttribute("error", "Tên sản phẩm không được để trống!");
                 loadDropdowns(req);
@@ -215,45 +199,22 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
-            if (unitPriceStr == null || unitPriceStr.trim().isEmpty()) {
-                req.setAttribute("error", "Giá sản phẩm không được để trống!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            if (stockQuantityStr == null || stockQuantityStr.trim().isEmpty()) {
-                req.setAttribute("error", "Số lượng tồn kho không được để trống!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
-                req.setAttribute("error", "Vui lòng chọn danh mục!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            if (brandIdStr == null || brandIdStr.trim().isEmpty()) {
-                req.setAttribute("error", "Vui lòng chọn thương hiệu!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            double unitPrice;
-            int stockQuantity;
+            Double unitPrice;
             try {
-                unitPrice = Double.parseDouble(unitPriceStr.trim());
-                stockQuantity = Integer.parseInt(stockQuantityStr.trim());
+                unitPrice = Double.parseDouble(unitPriceStr);
             } catch (NumberFormatException e) {
-                req.setAttribute("error", "Giá và số lượng phải là số hợp lệ!");
+                req.setAttribute("error", "Giá sản phẩm không hợp lệ!");
+                loadDropdowns(req);
+                req.setAttribute("product", tempProduct);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                return;
+            }
+
+            Integer stockQuantity;
+            try {
+                stockQuantity = Integer.parseInt(stockQuantityStr);
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "Số lượng tồn kho không hợp lệ!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
                 req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
@@ -305,44 +266,113 @@ public class ProductController extends HttpServlet {
 
             // Handle file upload
             Part filePart = req.getPart("image");
+            boolean fileUploadSuccess = false;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = filePart.getSubmittedFileName();
-                // Ensure uploads directory exists
-                String uploadPath = ute.utils.Constant.Dir + File.separator + "uploads";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
+                if (fileName != null && !fileName.trim().isEmpty()) {
+                    // Validate file type (basic check for images)
+                    String contentType = filePart.getContentType();
+                    if (contentType != null && contentType.startsWith("image/")) {
+                        // Get webapp root path for reliable file storage
+                        String webAppRoot = getServletContext().getRealPath("/");
+                        if (webAppRoot == null) {
+                            // Fallback for environments where getRealPath returns null (e.g., some cloud
+                            // setups)
+                            req.setAttribute("error",
+                                    "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
+                            loadDropdowns(req);
+                            req.setAttribute("product", tempProduct);
+                            req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                            return;
+                        }
+
+                        // Ensure uploads directory exists under assets/images/products
+                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images"
+                                + File.separator + "products";
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            if (!uploadDir.mkdirs()) {
+                                req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
+                                loadDropdowns(req);
+                                req.setAttribute("product", tempProduct);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
+                                        resp);
+                                return;
+                            }
+                        }
+
+                        // Generate unique filename to avoid conflicts
+                        String fileExtension = "";
+                        int lastDotIndex = fileName.lastIndexOf(".");
+                        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+                            fileExtension = fileName.substring(lastDotIndex);
+                        }
+                        String uniqueFileName = System.currentTimeMillis() + "_"
+                                + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
+                        String filePath = uploadPath + File.separator + uniqueFileName;
+
+                        // Save the file
+                        try {
+                            filePart.write(filePath);
+                            // Verify file was written successfully
+                            File savedFile = new File(filePath);
+                            if (savedFile.exists() && savedFile.length() > 0) {
+                                fileUploadSuccess = true;
+                                // Create Image entity
+                                Image image = new Image();
+                                image.setDirImage("images/products/" + uniqueFileName);
+                                image.setProduct(product);
+                                // Add to product's images list
+                                if (product.getImages() == null) {
+                                    product.setImages(new ArrayList<>());
+                                }
+                                product.getImages().add(image);
+                            } else {
+                                // Clean up empty file
+                                if (savedFile.exists()) {
+                                    savedFile.delete();
+                                }
+                                req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
+                                loadDropdowns(req);
+                                req.setAttribute("product", tempProduct);
+                                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req,
+                                        resp);
+                                return;
+                            }
+                        } catch (IOException e) {
+                            // Clean up on error
+                            File errorFile = new File(filePath);
+                            if (errorFile.exists()) {
+                                errorFile.delete();
+                            }
+                            req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
+                            loadDropdowns(req);
+                            req.setAttribute("product", tempProduct);
+                            req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                            return;
+                        }
+                    } else {
+                        req.setAttribute("error", "Chỉ chấp nhận file ảnh (image/*)!");
+                        loadDropdowns(req);
+                        req.setAttribute("product", tempProduct);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+                } else {
+                    req.setAttribute("error", "Tên file không hợp lệ!");
+                    loadDropdowns(req);
+                    req.setAttribute("product", tempProduct);
+                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                    return;
                 }
-                
-                // Generate unique filename to avoid conflicts
-                String fileExtension = "";
-                if (fileName.lastIndexOf(".") > 0) {
-                    fileExtension = fileName.substring(fileName.lastIndexOf("."));
-                }
-                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-                String filePath = uploadPath + File.separator + uniqueFileName;
-                
-                // Save the file
-                filePart.write(filePath);
-                
-                // Create Image entity
-                Image image = Image.builder()
-                        .dirImage("uploads/" + uniqueFileName)
-                        .product(product)
-                        .build();
-                
-                // Add to product's images list
-                if (product.getImages() == null) {
-                    product.setImages(new ArrayList<>());
-                }
-                product.getImages().add(image);
             }
 
             // Check for duplicate product name (exact match)
             List<Product> existingProducts = productService.findByName(productName.trim());
             boolean isDuplicate = false;
             for (Product existing : existingProducts) {
-                if (existing.getProductName().equals(productName.trim()) && !Objects.equals(existing.getProductID(), id)) {
+                if (existing.getProductName().equals(productName.trim())
+                        && !Objects.equals(existing.getProductID(), id)) {
                     isDuplicate = true;
                     break;
                 }

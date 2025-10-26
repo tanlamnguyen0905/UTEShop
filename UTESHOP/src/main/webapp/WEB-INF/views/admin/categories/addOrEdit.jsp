@@ -40,11 +40,14 @@
                 <div class="mb-3">
                     <label class="form-label">Hình ảnh:</label>
                     <input type="file" name="image" class="form-control" accept="image/*">
+                    <small class="form-text text-muted">Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 10MB.</small>
                     <c:if test="${not empty category.image}">
                         <div class="mt-2">
                             <img src="${pageContext.request.contextPath}/assets/${category.image}"
                                  alt="${category.categoryName}"
-                                 width="50" height="50" class="img-thumbnail">
+                                 width="50" height="50" class="img-thumbnail"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <span style="display:none; color: #6c757d;">Không tải được ảnh hiện tại</span>
                             <small>Hình ảnh hiện tại</small>
                         </div>
                     </c:if>

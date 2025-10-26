@@ -76,8 +76,12 @@
                                     <c:if test="${not empty category.image}">
                                         <img src="${pageContext.request.contextPath}/assets/${category.image}"
                                              alt="${category.categoryName}"
-                                             width="50" height="50" class="img-thumbnail">
-
+                                             width="50" height="50" class="img-thumbnail"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span style="display:none; color: #6c757d; font-size: 0.875em;">Không tải được ảnh</span>
+                                    </c:if>
+                                    <c:if test="${empty category.image}">
+                                        <span class="text-muted">Không có ảnh</span>
                                     </c:if>
                                 </td>
                                 <td>${category.products != null ? category.products.size() : 0}</td>
