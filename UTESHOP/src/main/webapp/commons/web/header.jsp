@@ -151,20 +151,16 @@
 													<i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Đã hoàn thành
 												</a></li>
 											</c:when>
-
-											<%-- USER Menu --%>
-											<c:otherwise>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/user/favorites">
-													<i class="fa-solid fa-heart me-2 text-success"></i> Yêu thích
-												</a></li>
-											</c:otherwise>
 										</c:choose>
 
 										<li>
 											<hr class="dropdown-divider">
 										</li>
 
-										<!-- Logout -->
+						                <!-- Menu items chung tiếp -->
+										<li><a class="dropdown-item" href="${pageContext.request.contextPath}/user/favorites">
+													<i class="fa-solid fa-heart me-2 text-success"></i> Yêu thích
+												</a></li>
 										<li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/auth/logout">
 											<i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
 										</a></li>
