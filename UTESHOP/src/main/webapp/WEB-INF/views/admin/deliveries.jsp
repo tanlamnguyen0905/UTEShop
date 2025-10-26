@@ -11,7 +11,7 @@
         <!-- Page header -->
         <h1 class="mt-4">Quản lý giao hàng</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/api/admin/dashboard">Dashboard</a></li>
             <li class="breadcrumb-item active">Giao hàng</li>
         </ol>
 
@@ -162,7 +162,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="${pageContext.request.contextPath}/admin/delivery/assign" method="post">
+                <form action="${pageContext.request.contextPath}/api/admin/delivery/assign" method="post">
                     <div class="modal-body">
                         <input type="hidden" name="orderId" id="modalOrderId">
                         

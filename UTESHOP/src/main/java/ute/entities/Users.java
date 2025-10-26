@@ -35,6 +35,6 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Orders> orders;
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<UserCoupon> userCoupons;
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    // private List<UserCoupon> userCoupons;
 }

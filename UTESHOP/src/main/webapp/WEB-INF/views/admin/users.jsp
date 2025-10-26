@@ -25,7 +25,7 @@
             <div>
                 <h1 class="h3 mb-0">Quản lý người dùng</h1>
                 <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/api/admin/dashboard">Dashboard</a></li>
                     <li class="breadcrumb-item active">Người dùng</li>
                 </ol>
             </div>

@@ -1,8 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
 <head>
-    <title>Danh sách danh mục - Admin</title>
+    <title>Danh sách banner - Admin</title>
     <style>
         /* Custom CSS để tránh header che khuất */
         .admin-content {
@@ -12,7 +13,7 @@
 </head>
 <body>
 <div class="container-fluid px-4 admin-content">
-    <h1 class="mt-5 mb-4">Danh sách danh mục</h1>  <!-- Tăng mt-5 để thêm khoảng cách -->
+    <h1 class="mt-5 mb-4">Danh sách banner</h1>  <!-- Tăng mt-5 để thêm khoảng cách -->
 
     <!-- Hiển thị thông báo -->
     <c:if test="${not empty sessionScope.message}">
@@ -26,25 +27,25 @@
     </c:if>
 
     <!-- Form tìm kiếm -->
-    <form method="GET" action="${pageContext.request.contextPath}/api/admin/categories/searchpaginated" class="mb-4">
+    <form method="GET" action="${pageContext.request.contextPath}/api/admin/banner" class="mb-4">
         <div class="row">
             <div class="col-md-4">
-                <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm theo tên danh mục" value="${searchKeyword}">
+                <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm theo tên banner" value="${searchKeyword}">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
             <div class="col-md-6 text-end">
-                <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate" class="btn btn-success">Thêm mới</a>
+                <a href="${pageContext.request.contextPath}/api/admin/banner/saveOrUpdate" class="btn btn-success">Thêm mới</a>
             </div>
         </div>
     </form>
 
     <!-- Handle empty data -->
     <c:choose>
-        <c:when test="${empty categoryList or categoryList.size() == 0}">
+        <c:when test="${empty bannerList or bannerList.size() == 0}">
             <div class="alert alert-info">
-                Không có dữ liệu danh mục. <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate">Thêm danh mục mới</a>.
+                Không có dữ liệu banner. <a href="${pageContext.request.contextPath}/api/admin/banner/saveOrUpdate">Thêm banner mới</a>.
             </div>
         </c:when>
         <c:otherwise>
@@ -52,14 +53,14 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-table me-1"></i>
-                    Danh sách danh mục
+                    Danh sách banner
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Tên danh mục</th>
+                            <th>Tên banner</th>
                             <th>Mô tả</th>
                             <th>Hình ảnh</th>
                             <th>Số sản phẩm</th>
@@ -67,28 +68,28 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach var="category" items="${categoryList}">
+                        <c:forEach var="banner" items="${bannerList}">
                             <tr>
-                                <td>${category.categoryID}</td>
-                                <td>${category.categoryName}</td>
-                                <td>${category.description}</td>
+                                <td>${banner.bannerID}</td>
+                                <td>${banner.bannerName}</td>
+                                <td>${banner.description}</td>
                                 <td>
-                                    <c:if test="${not empty category.image}">
-                                        <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
-                                             alt="${category.categoryName}"
-                                             width="50" height="50" class="img-thumbnail"
+                                    <c:if test="${not empty banner.bannerImage}">
+                                        <img src="${pageContext.request.contextPath}/image?fname=${banner.bannerImage}"
+                                             alt="${banner.bannerName}"
+                                             width="100" height="100" class="img-thumbnail"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                         <span style="display:none; color: #6c757d; font-size: 0.875em;">Không tải được ảnh</span>
                                     </c:if>
-                                    <c:if test="${empty category.image}">
+                                    <c:if test="${empty banner.bannerImage}">
                                         <span class="text-muted">Không có ảnh</span>
                                     </c:if>
                                 </td>
-                                <td>${category.products != null ? category.products.size() : 0}</td>
+                                <td>${banner.products != null ? banner.products.size() : 0}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/api/admin/categories/view?id=${category.categoryID}" class="btn btn-info btn-sm">Xem</a>
-                                    <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate?id=${category.categoryID}" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="${pageContext.request.contextPath}/api/admin/categories/delete?id=${category.categoryID}" class="btn btn-danger btn-sm" onclick="return confirm('Xóa danh mục này?')">Xóa</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/banner/view?id=${banner.bannerID}" class="btn btn-info btn-sm">Xem</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/banner/saveOrUpdate?id=${banner.bannerID}" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/banner/delete?id=${banner.bannerID}" class="btn btn-danger btn-sm" onclick="return confirm('Xóa banner này?')">Xóa</a>
                                 </td>
                             </tr>
                         </c:forEach>
