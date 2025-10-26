@@ -26,12 +26,12 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public void delete(Long id) {
-        brandDao.delete(id.intValue());
+        brandDao.delete(id);
     }
 
     @Override
     public Brand findById(Long id) {
-        return brandDao.findById(id.intValue());
+        return brandDao.findById(id);
     }
 
     @Override

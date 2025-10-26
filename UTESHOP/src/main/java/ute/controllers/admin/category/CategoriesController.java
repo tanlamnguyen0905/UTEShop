@@ -15,6 +15,12 @@ import ute.entities.Categories;
 import ute.service.inter.CategoriesService;
 import ute.service.impl.CategoriesServiceImpl;
 
+@MultipartConfig(
+        fileSizeThreshold = 10240,    // 10KB
+        maxFileSize = 10485760,       // 10MB
+        maxRequestSize = 20971520     // 20MB
+)
+
 @WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
         "/api/admin/categories/delete", "/api/admin/categories/view" })
 
@@ -74,24 +80,37 @@ public class CategoriesController extends HttpServlet {
         } else if (uri.contains("/api/admin/categories/saveOrUpdate")) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
-                Categories category = categoriesService.findById(Long.parseLong(idStr));
-                req.setAttribute("category", category);
+                try {
+                    Categories category = categoriesService.findById(Long.parseLong(idStr));
+                    req.setAttribute("category", category);
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
+                }
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/categories/view")) {
             String idStr = req.getParameter("id");
-            Categories category = categoriesService.findById(Long.parseLong(idStr));
-            req.setAttribute("category", category);
-            req.getRequestDispatcher("/views//admin/categories/view.jsp").forward(req, resp);
+            try {
+                Categories category = categoriesService.findById(Long.parseLong(idStr));
+                req.setAttribute("category", category);
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "ID không hợp lệ!");
+            }
+            req.getRequestDispatcher("/WEB-INF/views/admin/categories/view.jsp").forward(req, resp);  // Fix path: bỏ double slash
         } else if (uri.contains("delete")) {
             String idStr = req.getParameter("id");
-            categoriesService.delete(Long.parseLong(idStr));
+            try {
+                categoriesService.delete(Long.parseLong(idStr));
+            } catch (NumberFormatException e) {
+                // Log nếu cần, nhưng vẫn redirect
+            }
             resp.sendRedirect(req.getContextPath() + "/api/admin/categories/searchpaginated");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");  // FIX: Đảm bảo đọc UTF-8 cho tiếng Việt
         String uri = req.getRequestURI();
 
         if (uri.contains("/api/admin/categories/saveOrUpdate")) {
@@ -104,8 +123,19 @@ public class CategoriesController extends HttpServlet {
 
             Long id = null;
             if (idStr != null && !idStr.isEmpty()) {
-                id = Long.parseLong(idStr);
-                category = categoriesService.findById(id);
+                try {
+                    id = Long.parseLong(idStr);
+                    category = categoriesService.findById(id);
+                    if (category == null) {
+                        req.setAttribute("error", "Danh mục không tồn tại!");
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
+                    req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                    return;
+                }
             }
 
             // Validate required fields
@@ -119,39 +149,75 @@ public class CategoriesController extends HttpServlet {
             category.setCategoryName(categoryName.trim());
             category.setDescription(description != null ? description.trim() : null);
 
-            // Handle file upload
             Part filePart = req.getPart("image"); // Get the file part
-            String image = null;
+            String image = (id != null) ? category.getImage() : null; // Default to existing on update, null for new
+
             if (filePart != null && filePart.getSize() > 0) {
-                String fileName = filePart.getSubmittedFileName();
+                String submittedFileName = filePart.getSubmittedFileName();
+                if (submittedFileName == null || submittedFileName.isEmpty()) {
+                    // No file, skip
+                } else {
+                    // Sanitize: Extract basename only, reject paths
+                    String baseName = submittedFileName;
+                    int lastSeparator = baseName.lastIndexOf(File.separatorChar);
+                    if (lastSeparator > 0) {
+                        baseName = baseName.substring(lastSeparator + 1);
+                    }
+                    // Remove invalid chars, keep extension (an toàn cho filesystem)
+                    baseName = baseName.replaceAll("[^a-zA-Z0-9._-]", "_");
 
-                // Ensure uploads directory exists
-                String uploadPath = ute.utils.Constant.Dir + File.separator + "uploads";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
+                    // Validate type (basic, only images)
+                    String contentType = filePart.getContentType();
+                    if (!contentType.startsWith("image/")) {
+                        req.setAttribute("error", "Chỉ chấp nhận file hình ảnh!");
+                        req.setAttribute("category", category);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    if (filePart.getSize() > 5 * 1024 * 1024) {
+                        req.setAttribute("error", "File quá lớn (tối đa 5MB)!");
+                        req.setAttribute("category", category);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    String uploadPath = ute.utils.Constant.Dir + File.separator + "images" + File.separator + "categories";
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+                        req.setAttribute("error", "Không thể tạo thư mục images/categories!");
+                        req.setAttribute("category", category);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    String fileName = baseName;
+                    String filePath = uploadPath + File.separator + fileName;
+
+                    try {
+                        filePart.write(filePath);
+                        File savedFile = new File(filePath);  // Verify save
+                        if (savedFile.exists() && savedFile.length() > 0) {
+                            image = "images/categories/" + fileName;
+                        } else {
+                            req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
+                            req.setAttribute("category", category);
+                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                            return;
+                        }
+                    } catch (IOException e) {
+                        req.setAttribute("error", "Lỗi khi lưu file: " + e.getMessage());
+                        req.setAttribute("category", category);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
                 }
-
-                // Generate unique filename to avoid conflicts
-                String fileExtension = "";
-                if (fileName.lastIndexOf(".") > 0) {
-                    fileExtension = fileName.substring(fileName.lastIndexOf("."));
-                }
-                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-                String filePath = uploadPath + File.separator + uniqueFileName;
-
-                // Save the file
-                filePart.write(filePath);
-                image = "uploads/" + uniqueFileName; // Store relative path in the database
-            } else if (id != null) {
-                // If no new image is uploaded, keep the existing image
-                image = category.getImage();
             }
 
             category.setImage(image);
 
             // Check for duplicate category name
-            Categories existing = categoriesService.findByNameExact(categoryName);
+            Categories existing = categoriesService.findByNameExact(categoryName.trim());  // Trim ở đây để khớp
             if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
                 req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
                 req.setAttribute("category", category);
@@ -162,10 +228,10 @@ public class CategoriesController extends HttpServlet {
             String message;
             if (id != null) {
                 categoriesService.update(category);
-                message = "Category is Edited!";
+                message = "Danh mục đã được cập nhật!";  // Thống nhất tiếng Việt
             } else {
                 categoriesService.save(category);
-                message = "Category is Saved!";
+                message = "Danh mục đã được lưu!";
             }
 
             req.getSession().setAttribute("message", message);
