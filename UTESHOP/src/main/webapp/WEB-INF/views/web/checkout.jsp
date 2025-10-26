@@ -261,7 +261,7 @@
                                 <c:otherwise>
                                     <div class="alert alert-warning">
                                         Bạn chưa có địa chỉ giao hàng. 
-                                        <a href="${pageContext.request.contextPath}/account/addresses">Thêm địa chỉ mới</a>
+                                        <a href="${pageContext.request.contextPath}/user/profile">Thêm địa chỉ mới</a>
                                     </div>
                                 </c:otherwise>
                             </c:choose>

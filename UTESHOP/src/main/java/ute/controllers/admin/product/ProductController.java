@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,10 +30,12 @@ import ute.utils.Constant;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
-@MultipartConfig(fileSizeThreshold = 10240, // 10KB
-        maxFileSize = 10485760, // 10MB
-        maxRequestSize = 20971520 // 20MB
+@MultipartConfig(
+        fileSizeThreshold = 10240,    // 10KB
+        maxFileSize = 10485760,       // 10MB
+        maxRequestSize = 20971520     // 20MB
 )
+
 @WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
         "/api/admin/products/delete", "/api/admin/products/view", "/api/admin/products/export" })
 public class ProductController extends HttpServlet {
@@ -64,8 +69,7 @@ public class ProductController extends HttpServlet {
 
             // Tạo header row
             Row headerRow = sheet.createRow(0);
-            String[] columns = { "ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục",
-                    "Thương hiệu", "Ngày nhập" };
+            String[] columns = {"ID", "Tên sản phẩm", "Mô tả", "Giá", "Tồn kho", "Đã bán", "Đánh giá", "Danh mục", "Thương hiệu", "Ngày nhập"};
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(columns[i]);
@@ -82,17 +86,13 @@ public class ProductController extends HttpServlet {
                 row.createCell(0).setCellValue(product.getProductID());
                 row.createCell(1).setCellValue(product.getProductName());
                 row.createCell(2).setCellValue(product.getDescribe() != null ? product.getDescribe() : "");
-                row.createCell(3)
-                        .setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
-                row.createCell(4)
-                        .setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
+                row.createCell(3).setCellValue(product.getUnitPrice() != null ? product.getUnitPrice().doubleValue() : 0);
+                row.createCell(4).setCellValue(product.getStockQuantity() != null ? product.getStockQuantity().intValue() : 0);
                 row.createCell(5).setCellValue(product.getSoldCount() != null ? product.getSoldCount().longValue() : 0);
                 row.createCell(6).setCellValue(product.getReviewCount() + " (" + product.getRating() + "/5)");
-                row.createCell(7)
-                        .setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
+                row.createCell(7).setCellValue(product.getCategory() != null ? product.getCategory().getCategoryName() : "N/A");
                 row.createCell(8).setCellValue(product.getBrand() != null ? product.getBrand().getBrandName() : "N/A");
-                row.createCell(9)
-                        .setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
+                row.createCell(9).setCellValue(product.getImportDate() != null ? product.getImportDate().toString() : "");
             }
 
             // Auto-size columns
@@ -112,7 +112,7 @@ public class ProductController extends HttpServlet {
             try (OutputStream out = resp.getOutputStream()) {
                 workbook.write(out);
             }
-            return; // Kết thúc response ở đây
+            return;  // Kết thúc response ở đây
         }
 
         if (uri.contains("/api/admin/products/searchpaginated")) {
@@ -145,20 +145,41 @@ public class ProductController extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/admin/products/searchpaginated.jsp").forward(req, resp);
 
         } else if (uri.contains("/api/admin/products/saveOrUpdate")) {
+            // FIX: Thêm loadDropdowns để dropdown có data khi mở form
+            loadDropdowns(req);
+
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.isEmpty()) {
-                Product product = productService.findById(Long.parseLong(idStr));
-                req.setAttribute("product", product);
+                try {
+                    Long id = Long.parseLong(idStr);
+                    Product product = productService.findById(id);
+                    if (product != null) {
+                        req.setAttribute("product", product);
+                    } else {
+                        req.setAttribute("error", "Sản phẩm không tồn tại!");
+                    }
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
+                }
             }
+            // Nếu có error, vẫn forward để hiển thị
             req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/products/view")) {
             String idStr = req.getParameter("id");
-            Product product = productService.findById(Long.parseLong(idStr));
-            req.setAttribute("product", product);
+            try {
+                Product product = productService.findById(Long.parseLong(idStr));
+                req.setAttribute("product", product);
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "ID không hợp lệ!");
+            }
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
         } else if (uri.contains("/api/admin/products/delete")) {
             String idStr = req.getParameter("id");
-            productService.delete(Long.parseLong(idStr));
+            try {
+                productService.delete(Long.parseLong(idStr));
+            } catch (NumberFormatException e) {
+                // Log error nếu cần, nhưng vẫn redirect
+            }
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
     }
@@ -181,15 +202,22 @@ public class ProductController extends HttpServlet {
             Long id = null;
             Product tempProduct = new Product();
             if (idStr != null && !idStr.isEmpty()) {
-                id = Long.parseLong(idStr);
-                product = productService.findById(id);
-                if (product == null) {
-                    req.setAttribute("error", "Sản phẩm không tồn tại!");
+                try {
+                    id = Long.parseLong(idStr);
+                    product = productService.findById(id);
+                    if (product == null) {
+                        req.setAttribute("error", "Sản phẩm không tồn tại!");
+                        loadDropdowns(req);
+                        req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                        return;
+                    }
+                    tempProduct = product;
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "ID không hợp lệ!");
                     loadDropdowns(req);
                     req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                     return;
                 }
-                tempProduct = product;
             }
 
             if (productName == null || productName.trim().isEmpty()) {
@@ -238,7 +266,16 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
-            Long categoryId = Long.parseLong(categoryIdStr.trim());
+            Long categoryId;
+            try {
+                categoryId = Long.parseLong(categoryIdStr.trim());
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "ID danh mục không hợp lệ!");
+                loadDropdowns(req);
+                req.setAttribute("product", tempProduct);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                return;
+            }
             Categories category = categoriesService.findById(categoryId);
             if (category == null) {
                 req.setAttribute("error", "Danh mục không tồn tại!");
@@ -248,7 +285,16 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
-            Long brandId = Long.parseLong(brandIdStr.trim());
+            Long brandId;
+            try {
+                brandId = Long.parseLong(brandIdStr.trim());
+            } catch (NumberFormatException e) {
+                req.setAttribute("error", "ID thương hiệu không hợp lệ!");
+                loadDropdowns(req);
+                req.setAttribute("product", tempProduct);
+                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                return;
+            }
             Brand brand = brandService.findById(brandId);
             if (brand == null) {
                 req.setAttribute("error", "Thương hiệu không tồn tại!");
@@ -342,12 +388,19 @@ public class ProductController extends HttpServlet {
                 }
             }
 
+            // Thêm ảnh mới vào product (sẽ persist trong service)
+            if (fileUploadSuccess && !newImages.isEmpty()) {
+                if (product.getImages() == null) {
+                    product.setImages(new ArrayList<>());
+                }
+                product.getImages().addAll(newImages);
+            }
+
             // Check for duplicate product name (exact match)
             List<Product> existingProducts = productService.findByName(productName.trim());
             boolean isDuplicate = false;
             for (Product existing : existingProducts) {
-                if (existing.getProductName().equals(productName.trim())
-                        && !Objects.equals(existing.getProductID(), id)) {
+                if (existing.getProductName().equals(productName.trim()) && !Objects.equals(existing.getProductID(), id)) {
                     isDuplicate = true;
                     break;
                 }
@@ -362,10 +415,10 @@ public class ProductController extends HttpServlet {
 
             String message;
             if (id != null) {
-                productService.update(product);
+                productService.update(product);  // Service sẽ persist images
                 message = "Product is Edited!";
             } else {
-                productService.insert(product);
+                productService.insert(product);  // Service sẽ persist images
                 message = "Product is Saved!";
             }
 

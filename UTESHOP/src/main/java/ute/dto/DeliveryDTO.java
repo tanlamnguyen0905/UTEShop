@@ -22,7 +22,7 @@ public class DeliveryDTO {
     private String notes;
     private String failureReason;
     
-    // Thông tin đơn hàng
+    // Order information (nested DTO)
     private OrderBasicDTO order;
 }
 

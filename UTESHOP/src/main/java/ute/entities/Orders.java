@@ -73,8 +73,8 @@ public class Orders {
     private List<OrderDetail> orderDetails;
 
     @ManyToOne
-    @JoinColumn(name = "userCouponID")
-    private UserCoupon userCoupon;
+    @JoinColumn(name = "voucherID")
+    private Voucher voucher;
 
     @PrePersist
     protected void onPersist() {
