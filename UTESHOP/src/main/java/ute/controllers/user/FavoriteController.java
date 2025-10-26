@@ -50,8 +50,6 @@ public class FavoriteController extends HttpServlet {
                 System.out.println("First Item: " + favoriteItems.get(0).getProductName());
             } else {
                 System.out.println("Không có sản phẩm nào cả ");
-                req.getRequestDispatcher("/WEB-INF/views/web/home.jsp").forward(req, resp);
-                return;
             }
             System.out.println("=====================");
 
