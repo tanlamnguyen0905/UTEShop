@@ -36,7 +36,7 @@ public class TokenAuthFilter implements Filter {
             "/auth/", "/public/", "/assets/", "/uploads/",
             "/css/", "/js/", "/images/", "/user/", "/home",
             "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
-            "/api/cart/", "/api/address/" // Session-based APIs (không cần JWT)
+            "/api/cart/", "/api/favorite/", "/api/address/" // Session-based APIs (không cần JWT)
     );
 
     @Override
@@ -58,22 +58,22 @@ public class TokenAuthFilter implements Filter {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-        
-        //  Bỏ qua các đường dẫn public và static resources
+
+        // Bỏ qua các đường dẫn public và static resources
         if (isExcludedPath(path)) {
             chain.doFilter(request, response);
             return;
         }
-        
+
         // Chỉ kiểm tra token cho /api/*
         if (!path.startsWith(req.getContextPath() + "/api/")) {
             chain.doFilter(request, response);
             return;
         }
-        
-        //  Lấy token từ nhiều nguồn (ưu tiên: Cookie > Header > Session)
+
+        // Lấy token từ nhiều nguồn (ưu tiên: Cookie > Header > Session)
         String token = null;
-        
+
         // Kiểm tra cookie trước (tự động gửi với mọi request)
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
@@ -85,7 +85,7 @@ public class TokenAuthFilter implements Filter {
                 }
             }
         }
-        
+
         // Nếu không có cookie, kiểm tra Authorization header
         if (token == null) {
             String authHeader = req.getHeader("Authorization");
@@ -94,19 +94,19 @@ public class TokenAuthFilter implements Filter {
                 System.out.println("[AUTH] Token from Header");
             }
         }
-        
+
         // Nếu không có token, báo lỗi
         if (token == null) {
             sendError(req, res, 401, "Missing authentication token");
             return;
         }
-        
-        //  Validate token
+
+        // Validate token
         if (!JwtUtil.validateToken(token)) {
             sendError(req, res, 401, "Invalid or expired token");
             return;
         }
-        
+
         // Extract user info from token
         String username = JwtUtil.extractUsername(token);
         String role = JwtUtil.extractRole(token);
@@ -114,19 +114,19 @@ public class TokenAuthFilter implements Filter {
 
         // Log for debugging
         System.out.println(" JWT Valid | user=" + username + " | role=" + role + " | id=" + userId + " | path=" + path);
-        
-        //  Role-based access control
+
+        // Role-based access control
         if (!hasAccess(path, role)) {
             sendError(req, res, 403, "Access denied. You do not have permission to access this resource.");
             return;
         }
-        
-        //  Set user attributes for controller
+
+        // Set user attributes for controller
         req.setAttribute("tokenUsername", username);
         req.setAttribute("tokenRole", role);
         req.setAttribute("tokenUserId", userId);
-        
-        //  Proceed to controller
+
+        // Proceed to controller
         chain.doFilter(request, response);
     }
 
@@ -158,17 +158,17 @@ public class TokenAuthFilter implements Filter {
             case "ADMIN":
                 // Admin has full access to everything
                 return true;
-                
+
             case "MANAGER":
                 // Manager has access to: manager APIs + user APIs
-                return pathLower.contains("/api/manager") || 
-                       pathLower.contains("/api/user");
-                
+                return pathLower.contains("/api/manager") ||
+                        pathLower.contains("/api/user");
+
             case "SHIPPER":
                 // Shipper has access to: shipper APIs + user APIs
-                return pathLower.contains("/api/shipper") || 
-                       pathLower.contains("/api/user");
-                
+                return pathLower.contains("/api/shipper") ||
+                        pathLower.contains("/api/user");
+
             case "USER":
                 // User can only access user APIs
                 return pathLower.contains("/api/user");
@@ -183,30 +183,31 @@ public class TokenAuthFilter implements Filter {
      */
     private void sendError(HttpServletResponse res, int status, String message) throws IOException {
         res.setStatus(status);
-        
+
         // Nếu không có ServletRequest, trả JSON mặc định
         res.setContentType("application/json;charset=UTF-8");
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
         error.put("error", message);
-        
+
         PrintWriter out = res.getWriter();
         out.print(gson.toJson(error));
     }
-    
+
     /**
      * Send error response with request context (can forward to error pages)
      */
-    private void sendError(HttpServletRequest req, HttpServletResponse res, int status, String message) throws IOException, ServletException {
+    private void sendError(HttpServletRequest req, HttpServletResponse res, int status, String message)
+            throws IOException, ServletException {
         // Kiểm tra xem request có từ browser không (Accept header chứa text/html)
         String acceptHeader = req.getHeader("Accept");
         boolean isBrowserRequest = acceptHeader != null && acceptHeader.contains("text/html");
-        
+
         if (isBrowserRequest) {
             // Forward đến error page đẹp cho browser
             res.setStatus(status);
             req.setAttribute("errorMessage", message);
-            
+
             String errorPage = "/WEB-INF/views/error/" + status + ".jsp";
             try {
                 req.getRequestDispatcher(errorPage).forward(req, res);

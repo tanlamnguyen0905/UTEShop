@@ -89,10 +89,10 @@
                 <div class="list-group-item fav-item py-3">
                   <div class="d-flex align-items-center gap-3">
                     <!-- Image -->
-                    <a class="flex-shrink-0" href="${pageContext.request.contextPath}/product/${item.productID}">
+                    <a class="flex-shrink-0" href="${pageContext.request.contextPath}/detailProduct?productID=${item.productID}">
                       <c:choose>
                         <c:when test="${not empty item.images && item.images.size() > 0}">
-                          <img class="fav-image" src="${pageContext.request.contextPath}/image?fname=${item.images[0].dirImage}" alt="${item.productName}" />
+                          <img class="fav-image" src="${pageContext.request.contextPath}/image?fname=${item.images[0]}" alt="${item.productName}" />
                         </c:when>
                         <c:otherwise>
                           <img class="fav-image" src="${pageContext.request.contextPath}/assets/images/logo.png" alt="No image" />
@@ -102,11 +102,11 @@
 
                     <!-- Info -->
                     <div class="flex-grow-1">
-                      <a class="product-title d-block mb-1" href="${pageContext.request.contextPath}/product/${item.productID}">
+                      <a class="product-title d-block mb-1" href="${pageContext.request.contextPath}/detailProduct?productID=${item.productID}">
                         ${item.productName}
                       </a>
                       <div class="text-muted brand mb-1">
-                        <c:if test="${not empty item.brandName}"><i class="fa-solid fa-tag me-1"></i>${item.brandName}</c:if>
+                        <c:if test="${not empty item.brand}"><i class="fa-solid fa-tag me-1"></i>${item.brand}</c:if>
                       </div>
                       <div class="text-muted stock"><i class="fa-solid fa-box me-1"></i>Còn ${item.stockQuantity} sản phẩm</div>
                     </div>
@@ -118,7 +118,7 @@
                         <button class="btn btn-sm btn-outline-primary" type="button" data-pid="${item.productID}" onclick="moveToCart(${item.productID})">
                           <i class="fa-solid fa-cart-plus me-1"></i> Thêm vào giỏ
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" type="button" aria-label="Xóa" onclick="removeFavorite(${item.favoriteDetailID})">
+                        <button class="btn btn-sm btn-outline-danger" type="button" aria-label="Xóa" onclick="removeFavorite(${item.productID})">
                           <i class="fa-solid fa-trash"></i>
                         </button>
                       </div>
@@ -182,27 +182,25 @@
   const API_CLEAR  = '${pageContext.request.contextPath}/api/favorite/clear';
 
   // ===== Actions =====
-  async function removeFavorite(favoriteDetailId) {
+  async function removeFavorite(productID) {
     try {
       const res = await fetch(API_REMOVE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ favoriteDetailId: favoriteDetailId })
+        body: JSON.stringify({ productID: productID})
       });
       const data = await res.json();
       if (data.success) {
-        if (typeof window.updatefavoriteCount === 'function') {
-          window.updatefavoriteCount(data.itemCount);
-        }
         showToast('Đã xóa', 'Đã gỡ khỏi yêu thích', 'success');
         // Xóa phần tử khỏi DOM để mượt mà hơn thay vì reload toàn trang
-        const card = document.querySelector(`[onclick="removeFavorite(${favoriteDetailId})"]`)?.closest('.list-group-item');
-        if (card) card.remove();
-        // Nếu hết item, có thể reload để hiện empty-state
-        if (document.querySelectorAll('.list-group-item').length === 0) {
-          location.reload();
-        }
+        // const favorite = document.querySelector(`[onclick="removeFavorite(${productID})"]`)?.closest('.list-group-item');
+        // if (favorite) favorite.remove();
+        // // Nếu hết item, có thể reload để hiện empty-state
+        // if (document.querySelectorAll('.list-group-item').length === 0) {
+        //   location.reload();
+        // }
+        setTimeout(() => location.reload(), 600);
       } else {
         showToast('Lỗi', data.error || 'Không thể xóa sản phẩm', 'danger');
       }
@@ -221,10 +219,7 @@
       });
       const data = await res.json();
       if (data.success) {
-        if (typeof window.updatefavoriteCount === 'function') {
-          window.updatefavoriteCount(0);
-        }
-        showToast('Đã xóa', 'Đã xóa toàn bộ danh sách yêu thích', 'success');
+        showToast('Đã xóa', 'Đã xóa khỏi danh sách yêu thích', 'success');
         setTimeout(() => location.reload(), 600);
       } else {
         showToast('Lỗi', data.error || 'Không thể xóa danh sách', 'danger');
