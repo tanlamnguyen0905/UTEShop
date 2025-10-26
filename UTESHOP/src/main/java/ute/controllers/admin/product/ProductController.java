@@ -31,7 +31,7 @@ import ute.service.admin.inter.BrandService;
         maxFileSize = 10485760,       // 10MB
         maxRequestSize = 20971520     // 20MB
 )
-@MultipartConfig
+
 @WebServlet(urlPatterns = { "/api/admin/products/searchpaginated", "/api/admin/products/saveOrUpdate",
         "/api/admin/products/delete", "/api/admin/products/view", "/api/admin/products/export" })
 public class ProductController extends HttpServlet {

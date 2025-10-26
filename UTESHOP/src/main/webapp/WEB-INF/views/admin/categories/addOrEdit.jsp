@@ -22,7 +22,7 @@
             ${empty category.categoryID ? 'Thêm danh mục' : 'Sửa danh mục'}
         </div>
         <div class="card-body">
-            <form method="POST" action="${pageContext.request.contextPath}/admin/categories/saveOrUpdate" enctype="multipart/form-data">
+            <form method="POST" action="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate" enctype="multipart/form-data">
                 <c:if test="${not empty category.categoryID}">
                     <input type="hidden" name="id" value="${category.categoryID}">
                 </c:if>
@@ -54,7 +54,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Lưu</button>
-                <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated" class="btn btn-secondary">Hủy</a>
+                <a href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated" class="btn btn-secondary">Hủy</a>
             </form>
         </div>
     </div>

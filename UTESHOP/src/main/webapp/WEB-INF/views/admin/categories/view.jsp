@@ -43,13 +43,13 @@
     </div>
 
     <div class="mb-3">
-        <a href="${pageContext.request.contextPath}/admin/categories/searchpaginated"
+        <a href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated"
            class="btn btn-primary">Quay lại danh sách</a>
 
-        <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate?id=${category.categoryID}"
+        <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate?id=${category.categoryID}"
            class="btn btn-warning">Sửa</a>
 
-        <a href="${pageContext.request.contextPath}/admin/categories/delete?id=${category.categoryID}"
+        <a href="${pageContext.request.contextPath}/api/admin/categories/delete?id=${category.categoryID}"
            class="btn btn-danger"
            onclick="return confirm('Xóa danh mục này?')">Xóa</a>
     </div>

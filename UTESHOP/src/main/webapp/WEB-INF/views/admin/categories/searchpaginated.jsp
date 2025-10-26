@@ -26,7 +26,7 @@
     </c:if>
 
     <!-- Form tìm kiếm -->
-    <form method="GET" action="${pageContext.request.contextPath}/admin/categories/searchpaginated" class="mb-4">
+    <form method="GET" action="${pageContext.request.contextPath}/api/admin/categories/searchpaginated" class="mb-4">
         <div class="row">
             <div class="col-md-4">
                 <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm theo tên danh mục" value="${searchKeyword}">
@@ -35,7 +35,7 @@
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
             <div class="col-md-6 text-end">
-                <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate" class="btn btn-success">Thêm mới</a>
+                <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate" class="btn btn-success">Thêm mới</a>
             </div>
         </div>
     </form>
@@ -44,7 +44,7 @@
     <c:choose>
         <c:when test="${empty categoryList or categoryList.size() == 0}">
             <div class="alert alert-info">
-                Không có dữ liệu danh mục. <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate">Thêm danh mục mới</a>.
+                Không có dữ liệu danh mục. <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate">Thêm danh mục mới</a>.
             </div>
         </c:when>
         <c:otherwise>
@@ -86,9 +86,9 @@
                                 </td>
                                 <td>${category.products != null ? category.products.size() : 0}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/admin/categories/view?id=${category.categoryID}" class="btn btn-info btn-sm">Xem</a>
-                                    <a href="${pageContext.request.contextPath}/admin/categories/saveOrUpdate?id=${category.categoryID}" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="${pageContext.request.contextPath}/admin/categories/delete?id=${category.categoryID}" class="btn btn-danger btn-sm" onclick="return confirm('Xóa danh mục này?')">Xóa</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/categories/view?id=${category.categoryID}" class="btn btn-info btn-sm">Xem</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate?id=${category.categoryID}" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a href="${pageContext.request.contextPath}/api/admin/categories/delete?id=${category.categoryID}" class="btn btn-danger btn-sm" onclick="return confirm('Xóa danh mục này?')">Xóa</a>
                                 </td>
                             </tr>
                         </c:forEach>

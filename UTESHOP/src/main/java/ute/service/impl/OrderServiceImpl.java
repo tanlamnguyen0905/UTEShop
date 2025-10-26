@@ -17,7 +17,7 @@ import ute.entities.OrderDetail;
 import ute.entities.Orders;
 import ute.entities.PaymentMethod;
 import ute.entities.Product;
-import ute.entities.UserCoupon;
+import ute.entities.Voucher;
 import ute.entities.Users;
 import ute.service.inter.OrderService;
 
@@ -65,9 +65,9 @@ public class OrderServiceImpl implements OrderService {
             
             // 4. Xử lý coupon (nếu có)
             double totalDiscount = 0.0;
-            UserCoupon userCoupon = null;
+            Voucher userCoupon = null;
             if (userCouponId != null) {
-                userCoupon = em.find(UserCoupon.class, userCouponId);
+                userCoupon = em.find(Voucher.class, userCouponId);
                 if (userCoupon != null && isValidCoupon(userCoupon)) {
                     double discountAmount = totalAmount * (userCoupon.getDiscountPercent() / 100);
                     if (userCoupon.getMaxDiscountAmount() != null && 
@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
                     .phoneNumber(address.getPhone())
                     .recipientName(address.getName())
                     .notes(notes)
-                    .userCoupon(userCoupon)
+                    .voucher(userCoupon)
                     .build();
             
             // 6. Tạo order details từ cart items
@@ -144,12 +144,12 @@ public class OrderServiceImpl implements OrderService {
         }
     }
     
-    private boolean isValidCoupon(UserCoupon coupon) {
+    private boolean isValidCoupon(Voucher coupon) {
         LocalDateTime now = LocalDateTime.now();
-        return coupon.getUserCouponStart() != null && 
-               coupon.getUserCouponEnd() != null &&
-               now.isAfter(coupon.getUserCouponStart()) && 
-               now.isBefore(coupon.getUserCouponEnd());
+        return coupon.getStartDate() != null &&
+               coupon.getEndDate() != null &&
+               now.isAfter(coupon.getStartDate()) &&
+               now.isBefore(coupon.getEndDate());
     }
 
     @Override

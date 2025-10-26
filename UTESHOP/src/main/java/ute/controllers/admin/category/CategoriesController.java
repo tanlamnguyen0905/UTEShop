@@ -17,12 +17,7 @@ import ute.service.impl.CategoriesServiceImpl;
 
 @WebServlet(urlPatterns = { "/api/admin/categories/searchpaginated", "/api/admin/categories/saveOrUpdate",
         "/api/admin/categories/delete", "/api/admin/categories/view" })
-@MultipartConfig(
-        fileSizeThreshold = 10240,    // 10KB
-        maxFileSize = 10485760,       // 10MB
-        maxRequestSize = 20971520     // 20MB
-)
-@MultipartConfig
+
 public class CategoriesController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -127,88 +122,28 @@ public class CategoriesController extends HttpServlet {
             // Handle file upload
             Part filePart = req.getPart("image"); // Get the file part
             String image = null;
-            boolean fileUploadSuccess = false;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = filePart.getSubmittedFileName();
-                if (fileName != null && !fileName.trim().isEmpty()) {
-                    // Validate file type (basic check for images)
-                    String contentType = filePart.getContentType();
-                    if (contentType != null && contentType.startsWith("image/")) {
-                        // Get webapp root path for reliable file storage
-                        String webAppRoot = getServletContext().getRealPath("/");
-                        if (webAppRoot == null) {
-                            // Fallback for environments where getRealPath returns null (e.g., some cloud setups)
-                            webAppRoot = System.getProperty("java.io.tmpdir");
-                            req.setAttribute("error", "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
-                            req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                            return;
-                        }
 
-                        // Ensure uploads directory exists
-                        String uploadPath = webAppRoot + File.separator + "assets" + File.separator + "images" + File.separator + "categories";
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            if (!uploadDir.mkdirs()) {
-                                req.setAttribute("error", "Không thể tạo thư mục lưu trữ. Kiểm tra quyền truy cập.");
-                                req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                                return;
-                            }
-                        }
-
-                        // Generate unique filename to avoid conflicts
-                        String fileExtension = "";
-                        int lastDotIndex = fileName.lastIndexOf(".");
-                        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
-                            fileExtension = fileName.substring(lastDotIndex);
-                        }
-                        String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.-]", "_"); // Sanitize filename
-                        String filePath = uploadPath + File.separator + uniqueFileName;
-
-                        // Save the file
-                        try {
-                            filePart.write(filePath);
-                            // Verify file was written successfully
-                            File savedFile = new File(filePath);
-                            if (savedFile.exists() && savedFile.length() > 0) {
-                                fileUploadSuccess = true;
-                                image = "images/categories/" + uniqueFileName; // Store relative path in the database
-                            } else {
-                                // Clean up empty file
-                                if (savedFile.exists()) {
-                                    savedFile.delete();
-                                }
-                                req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
-                                req.setAttribute("category", category);
-                                req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                                return;
-                            }
-                        } catch (IOException e) {
-                            // Clean up on error
-                            File errorFile = new File(filePath);
-                            if (errorFile.exists()) {
-                                errorFile.delete();
-                            }
-                            req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
-                            req.setAttribute("category", category);
-                            req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                            return;
-                        }
-                    } else {
-                        req.setAttribute("error", "Chỉ chấp nhận file ảnh (image/*)!");
-                        req.setAttribute("category", category);
-                        req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                        return;
-                    }
-                } else {
-                    req.setAttribute("error", "Tên file không hợp lệ!");
-                    req.setAttribute("category", category);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/categories/addOrEdit.jsp").forward(req, resp);
-                    return;
+                // Ensure uploads directory exists
+                String uploadPath = ute.utils.Constant.Dir + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
                 }
-            }
-            if (!fileUploadSuccess && id != null) {
+
+                // Generate unique filename to avoid conflicts
+                String fileExtension = "";
+                if (fileName.lastIndexOf(".") > 0) {
+                    fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                }
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                String filePath = uploadPath + File.separator + uniqueFileName;
+
+                // Save the file
+                filePart.write(filePath);
+                image = "uploads/" + uniqueFileName; // Store relative path in the database
+            } else if (id != null) {
                 // If no new image is uploaded, keep the existing image
                 image = category.getImage();
             }
