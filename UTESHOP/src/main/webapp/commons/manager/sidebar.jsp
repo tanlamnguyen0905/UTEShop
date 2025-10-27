@@ -53,7 +53,11 @@
                         </a>
                     </nav>
                 </div>
-
+                
+               <!-- Về Trang Chủ -->
+               <a class="nav-link" href="${pageContext.request.contextPath}/home">
+                    <i class="fas fa-home me-1"></i> Về trang chủ
+                </a>
             </div>
         </div>
 
