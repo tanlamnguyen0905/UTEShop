@@ -1,8 +1,6 @@
 package ute.controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDateTime;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +8,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import ute.entities.Product;
 import ute.entities.Review;
 import ute.entities.Users;
@@ -19,62 +16,94 @@ import ute.service.impl.ReviewServiceImpl;
 import ute.service.inter.ProductService;
 import ute.service.inter.ReviewService;
 
-@WebServlet(urlPatterns = { "/review/add" })
+@WebServlet(urlPatterns = {"/review/submit"})
 public class ReviewController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private ReviewService reviewService;
-    private ProductService productService;
+    private ReviewService reviewService = new ReviewServiceImpl();
+    private ProductService productService = new ProductServiceImpl();
 
     @Override
-    public void init() throws ServletException {
-        this.reviewService = new ReviewServiceImpl();
-        this.productService = new ProductServiceImpl();
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = resp.getWriter();
-
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
+        HttpSession session = request.getSession(false);
+        
+        // Kiểm tra đăng nhập
+        if (session == null || session.getAttribute("currentUser") == null) {
+            response.sendRedirect(request.getContextPath() + "/auth/login");
+            return;
+        }
+        
+        Users currentUser = (Users) session.getAttribute("currentUser");
+        
         try {
-            HttpSession session = req.getSession();
-            Users user = (Users) session.getAttribute("user");
-            if (user == null) {
-                out.print("{\"success\":false, \"message\":\"Not authenticated\"}");
+            // Lấy thông tin từ form
+            String productIdStr = request.getParameter("productId");
+            String ratingStr = request.getParameter("rating");
+            String content = request.getParameter("content");
+            
+            if (productIdStr == null || productIdStr.isEmpty()) {
+                session.setAttribute("error", "Thiếu thông tin sản phẩm!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
                 return;
             }
-
-            String productIdStr = req.getParameter("productId");
-            String ratingStr = req.getParameter("rating");
-            String comment = req.getParameter("comment");
-
-            if (productIdStr == null || ratingStr == null || comment == null) {
-                out.print("{\"success\":false, \"message\":\"Missing parameters\"}");
+            
+            if (ratingStr == null || ratingStr.isEmpty()) {
+                session.setAttribute("error", "Vui lòng chọn số sao đánh giá!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
                 return;
             }
-
+            
             Long productId = Long.parseLong(productIdStr);
-            double rating = Double.parseDouble(ratingStr);
-
+            Double rating = Double.parseDouble(ratingStr);
+            
+            // Validate rating
+            if (rating < 1 || rating > 5) {
+                session.setAttribute("error", "Đánh giá phải từ 1 đến 5 sao!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                return;
+            }
+            
+            // Lấy product
             Product product = productService.findById(productId);
             if (product == null) {
-                out.print("{\"success\":false, \"message\":\"Product not found\"}");
+                session.setAttribute("error", "Không tìm thấy sản phẩm!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
                 return;
             }
-
+            
+            // Kiểm tra đã đánh giá chưa
+            Review existingReview = reviewService.getUserProductReview(currentUser.getUserID(), productId);
+            if (existingReview != null) {
+                session.setAttribute("error", "Bạn đã đánh giá sản phẩm này rồi!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                return;
+            }
+            
+            // Tạo review mới
             Review review = Review.builder()
-                    .content(comment)
-                    .rating(rating)
-                    .user(user)
+                    .user(currentUser)
                     .product(product)
+                    .rating(rating)
+                    .content(content != null && !content.trim().isEmpty() ? content.trim() : null)
+                    .image(null) // Không xử lý upload ảnh để đơn giản
                     .build();
-
+            
             reviewService.addReview(review);
-
-            out.print("{\"success\":true, \"message\":\"Review submitted\"}");
+            
+            session.setAttribute("success", "Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.");
+            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "Dữ liệu không hợp lệ!");
+            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
         } catch (Exception e) {
             e.printStackTrace();
-            out.print("{\"success\":false, \"message\":\"Server error\"}");
+            session.setAttribute("error", "Lỗi: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
         }
     }
 }

@@ -15,6 +15,13 @@ public class JPAConfig {
     private static EntityManagerFactory emf;
 
     public static EntityManager getEntityManager() {
+    	if (emf == null || !emf.isOpen()) 
+    		createEntityManagerFactory();
+        // Tạo và return EM
+        return emf.createEntityManager();
+    }
+    
+    private static void createEntityManagerFactory() {
         try {
             Properties props = new Properties();
             try (InputStream is = Thread.currentThread().getContextClassLoader()
@@ -46,14 +53,6 @@ public class JPAConfig {
                 emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, overrides);
                 System.out.println("EntityManagerFactory đã được tạo thành công!");
             }
-
-            // Tạo và return EM
-            EntityManager em = emf.createEntityManager();
-            if (em == null) {
-                throw new RuntimeException("Không thể tạo EntityManager từ EntityManagerFactory");
-            }
-            return em;
-
         } catch (Exception e) {
             System.err.println("========================================");
             System.err.println("LỖI KHI TẠO ENTITYMANAGER");

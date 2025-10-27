@@ -158,7 +158,7 @@ public class ProductController extends HttpServlet {
             Product product = productService.findById(Long.parseLong(idStr));
             req.setAttribute("product", product);
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
-        } else if (uri.contains("/api/admin/products/delete")) {
+        } else if (uri.contains("/admin/products/delete")) {
             String idStr = req.getParameter("id");
             productService.delete(Long.parseLong(idStr));
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");

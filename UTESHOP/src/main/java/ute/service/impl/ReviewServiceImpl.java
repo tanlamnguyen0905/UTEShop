@@ -1,14 +1,19 @@
 package ute.service.impl;
 
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import ute.dao.impl.ReviewDaoImpl;
 import ute.dao.inter.ReviewDao;
 import ute.entities.Review;
 import ute.service.inter.ReviewService;
 
 public class ReviewServiceImpl implements ReviewService {
-    private ReviewDao reviewDao;
-
+    
+    private final ReviewDao reviewDao;
+    
     public ReviewServiceImpl() {
         this.reviewDao = new ReviewDaoImpl();
     }
@@ -42,5 +47,32 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Long getProductReviewCount(Long productId) {
         return reviewDao.getReviewCountByProductId(productId);
+    }
+
+    @Override
+    public Review getUserProductReview(Long userId, Long productId) {
+        return reviewDao.findByUserIdAndProductId(userId, productId);
+    }
+
+    @Override
+    public boolean hasUserPurchasedProduct(Long userId, Long productId) {
+        return reviewDao.hasUserPurchasedProduct(userId, productId);
+    }
+
+    @Override
+    public Long getTotalReviewCount() {
+        return reviewDao.getTotalReviewCount();
+    }
+
+    @Override
+    public Double getAverageRating() {
+        return reviewDao.getAverageRating();
+    }
+
+    @Override
+    public Double getAverageRatingByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        return reviewDao.getAverageRatingByDateRange(startDateTime, endDateTime);
     }
 }

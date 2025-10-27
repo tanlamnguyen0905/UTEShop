@@ -36,7 +36,8 @@ public class TokenAuthFilter implements Filter {
             "/auth/", "/public/", "/assets/", "/uploads/",
             "/css/", "/js/", "/images/", "/user/", "/home",
             "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
-            "/api/cart/", "/api/favorite/", "/api/address/" // Session-based APIs (không cần JWT)
+            "/api/cart/", "/api/favorite/", "/api/address/", // Session-based APIs (không cần JWT)
+            "/api/vouchers/", "/api/voucher/" // Public voucher APIs cho checkout
     );
 
     @Override
@@ -160,8 +161,9 @@ public class TokenAuthFilter implements Filter {
                 return true;
 
             case "MANAGER":
-                // Manager has access to: manager APIs + user APIs
+                // Manager has access to: manager APIs + admin chat + user APIs
                 return pathLower.contains("/api/manager") ||
+                        pathLower.contains("/api/admin/chat") ||
                         pathLower.contains("/api/user");
 
             case "SHIPPER":

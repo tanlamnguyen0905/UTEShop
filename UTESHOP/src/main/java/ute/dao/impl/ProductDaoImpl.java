@@ -163,14 +163,31 @@ public class ProductDaoImpl implements ProductDao {
 	}
 
 	@Override
+	public List<Product> findLatest(int limit) {
+		EntityManager em = JPAConfig.getEntityManager();
+		TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.productID DESC", Product.class);
+		query.setMaxResults(limit);
+		try {
+			return query.getResultList();			
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
 	public List<Product> findBestSeller(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM OrderDetail od right JOIN od.product p GROUP BY p ORDER BY SUM(od.quantity) DESC",
-					Product.class);
-			query.setMaxResults(limit);
-			List<Product> bestSellers = query.getResultList();
+		TypedQuery<Product> query = em.createQuery(
+				"SELECT p FROM OrderDetail od " +
+				"JOIN od.product p " +
+				"GROUP BY p " +
+				"ORDER BY SUM(od.quantity) DESC",
+				Product.class
+			);
+		query.setMaxResults(limit);
+		List<Product> bestSellers;
+		try { 
+			bestSellers = query.getResultList();
 			// Initialize collections
 			for (Product p : bestSellers) {
 				if (p.getImages() != null)
@@ -248,8 +265,10 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findTopReview(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.reviewCount DESC",
-					Product.class);
+			// ORDER BY số lượng reviews thực tế
+			TypedQuery<Product> query = em.createQuery(
+				"SELECT p FROM Product p LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC",
+				Product.class);
 			query.setMaxResults(limit);
 			List<Product> products = query.getResultList();
 			// Initialize collections
@@ -258,6 +277,8 @@ public class ProductDaoImpl implements ProductDao {
 					p.getImages().size();
 				if (p.getFavorites() != null)
 					p.getFavorites().size();
+				if (p.getReviews() != null)
+					p.getReviews().size();
 			}
 			return products;
 		} finally {
@@ -422,7 +443,7 @@ public class ProductDaoImpl implements ProductDao {
 				jpql.append(" ORDER BY p.productID DESC");
 				break;
 			case "2": // Nhiều đánh giá
-				jpql.append(" ORDER BY p.reviewCount DESC");
+				jpql.append(" LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC");
 				break;
 			case "3": // Yêu thích
 				jpql.append(" GROUP BY p ORDER BY favCount DESC");
@@ -519,6 +540,20 @@ public class ProductDaoImpl implements ProductDao {
 			query.setFirstResult((page - 1) * pageSize);
 			query.setMaxResults(pageSize);
 			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public Long getActiveProductCount() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Long> query = em.createQuery(
+				"SELECT COUNT(p) FROM Product p WHERE p.stockQuantity > 0",
+				Long.class
+			);
+			return query.getSingleResult();
 		} finally {
 			em.close();
 		}

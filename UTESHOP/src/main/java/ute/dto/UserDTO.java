@@ -8,9 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ute.entities.Users;
 
-/**
- * DTO cho User - không expose password và các thông tin nhạy cảm
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,11 +23,6 @@ public class UserDTO {
     private String status;
     private LocalDateTime createAt;
     
-    // Không có password field - bảo mật!
-    
-    /**
-     * Convert từ Entity sang DTO (không có password - bảo mật!)
-     */
     public static UserDTO fromEntity(Users entity) {
         if (entity == null) {
             return null;
