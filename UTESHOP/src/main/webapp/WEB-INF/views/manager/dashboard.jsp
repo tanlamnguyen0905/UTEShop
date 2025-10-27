@@ -325,23 +325,13 @@
             <h5 class="section-title">Hành động nhanh</h5>
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <a href="${pageContext.request.contextPath}/api/manager/products" class="btn quick-action-btn btn-primary w-100">
+                    <a href="${pageContext.request.contextPath}/api/manager/products/searchpaginated" class="btn quick-action-btn btn-primary w-100">
                         <i class="fas fa-box me-2"></i>Xem sản phẩm
                     </a>
                 </div>
                 <div class="col-md-3 mb-3">
                     <a href="${pageContext.request.contextPath}/api/manager/orders" class="btn quick-action-btn btn-success w-100">
                         <i class="fas fa-shopping-cart me-2"></i>Xem đơn hàng
-                    </a>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="${pageContext.request.contextPath}/api/manager/review/searchpaginated" class="btn quick-action-btn btn-info w-100">
-                        <i class="fas fa-star me-2"></i>Quản lý đánh giá
-                    </a>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="${pageContext.request.contextPath}/api/manager/voucher/saveOrUpdate" class="btn quick-action-btn btn-warning w-100">
-                        <i class="fas fa-gift me-2"></i>Tạo voucher
                     </a>
                 </div>
             </div>
