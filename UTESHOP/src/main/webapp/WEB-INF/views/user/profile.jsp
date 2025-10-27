@@ -361,7 +361,7 @@
             <div class="tab-pane fade" id="orders">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold text-gradient"><i class="fas fa-box me-2"></i>Đơn hàng</h5>
-                    <button class="btn btn-warning shadow-sm text-white" onclick="window.location.href='${pageContext.request.contextPath}/cart'">
+                    <button class="btn btn-warning shadow-sm text-white" onclick="window.location.href=contextPath + '/cart'">
                         <i class="fas fa-shopping-cart me-1"></i> Xem giỏ hàng
                     </button>
                 </div>
@@ -453,7 +453,7 @@
                                     <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">Chưa có đơn hàng nào</h5>
                                     <p class="text-muted">Hãy mua sắm để tạo đơn hàng đầu tiên của bạn!</p>
-                                    <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/home'">
+                                    <button class="btn btn-primary" onclick="window.location.href=contextPath + '/home'">
                                         <i class="fas fa-shopping-bag me-1"></i> Mua sắm ngay
                                     </button>
                                 </div>
@@ -527,16 +527,6 @@
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
-                                            
-                                            <!-- Nút đánh giá cho đơn hàng đã hoàn thành -->
-                                            <c:if test="${order.orderStatus eq 'Đã giao hàng' || order.orderStatus eq 'Đã giao'}">
-                                                <button class="btn btn-sm btn-outline-warning shadow-sm" 
-                                                        onclick="openReviewModal(${order.orderID})"
-                                                        title="Đánh giá sản phẩm"
-                                                        style="font-weight: 500;">
-                                                    <i class="fas fa-star me-1"></i>Đánh giá
-                                                </button>
-                                            </c:if>
                                         </div>
                                     </div>
                                     
@@ -571,6 +561,72 @@
                                                                 <div class="text-primary fw-bold mt-1">
                                                                     <fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" maxFractionDigits="0" />₫
                                                                 </div>
+                                                                
+                                                                <!-- Nút đánh giá (chỉ hiện khi đơn hàng hoàn tất) -->
+                                                                <c:if test="${order.orderStatus eq 'Hoàn thành' or order.orderStatus eq 'Hoàn tất' or order.orderStatus eq 'Đã giao' or order.orderStatus eq 'Đã giao hàng'}">
+                                                                    <c:set var="reviewed" value="false" />
+                                                                    <c:forEach var="rev" items="${detail.product.reviews}">
+                                                                        <c:if test="${rev.user.userID eq sessionScope.currentUser.userID}">
+                                                                            <c:set var="reviewed" value="true" />
+                                                                        </c:if>
+                                                                    </c:forEach>
+                                                                    
+                                                                    <c:choose>
+                                                                        <c:when test="${reviewed}">
+                                                                            <small class="text-success mt-2 d-block">
+                                                                                <i class="fas fa-check-circle"></i> Đã đánh giá
+                                                                            </small>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <button 
+                                                                                class="btn btn-sm btn-outline-warning mt-2"
+                                                                                type="button"
+                                                                                data-bs-toggle="collapse" 
+                                                                                data-bs-target="#reviewForm_${detail.product.productID}_${order.orderID}"
+                                                                                aria-expanded="false">
+                                                                                <i class="fas fa-star me-1"></i> Đánh giá
+                                                                            </button>
+                                                                            
+                                                                            <!-- Form đánh giá collapse -->
+                                                                            <div class="collapse mt-2" id="reviewForm_${detail.product.productID}_${order.orderID}">
+                                                                                <div class="card card-body p-3">
+                                                                                    <form action="${pageContext.request.contextPath}/review/submit" method="post">
+                                                                                        <input type="hidden" name="productId" value="${detail.product.productID}">
+                                                                                        
+                                                                                        <div class="mb-2">
+                                                                                            <label class="form-label fw-bold small">Đánh giá của bạn</label>
+                                                                                            <div class="rating-stars">
+                                                                                                <input type="radio" name="rating" value="5" id="star5_${detail.product.productID}_${order.orderID}" required>
+                                                                                                <label for="star5_${detail.product.productID}_${order.orderID}">★</label>
+                                                                                                <input type="radio" name="rating" value="4" id="star4_${detail.product.productID}_${order.orderID}">
+                                                                                                <label for="star4_${detail.product.productID}_${order.orderID}">★</label>
+                                                                                                <input type="radio" name="rating" value="3" id="star3_${detail.product.productID}_${order.orderID}">
+                                                                                                <label for="star3_${detail.product.productID}_${order.orderID}">★</label>
+                                                                                                <input type="radio" name="rating" value="2" id="star2_${detail.product.productID}_${order.orderID}">
+                                                                                                <label for="star2_${detail.product.productID}_${order.orderID}">★</label>
+                                                                                                <input type="radio" name="rating" value="1" id="star1_${detail.product.productID}_${order.orderID}">
+                                                                                                <label for="star1_${detail.product.productID}_${order.orderID}">★</label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        
+                                                                                        <div class="mb-2">
+                                                                                            <label class="form-label small">Nhận xét (không bắt buộc)</label>
+                                                                                            <textarea 
+                                                                                                name="content" 
+                                                                                                class="form-control form-control-sm" 
+                                                                                                rows="2" 
+                                                                                                placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                                                                                        </div>
+                                                                                        
+                                                                                        <button type="submit" class="btn btn-warning btn-sm">
+                                                                                            <i class="fas fa-paper-plane me-1"></i> Gửi đánh giá
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </div>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:if>
                                                             </div>
                                                         </div>
                                                     </c:forEach>
@@ -662,7 +718,7 @@
                             <div class="card-body">
                                 <h6 class="fw-bold"><i class="fas fa-lock me-2"></i>Bảo mật</h6>
                                 <p class="text-muted mb-3">Quản lý mật khẩu và bảo mật tài khoản</p>
-                                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='${pageContext.request.contextPath}/user/change-password'">
+                                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href=contextPath + '/user/change-password'">
                                     <i class="fas fa-key me-1"></i> Đổi mật khẩu
                                 </button>
                             </div>
@@ -693,39 +749,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Review Modal -->
-<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h5 class="modal-title" id="reviewModalLabel">
-                    <i class="fas fa-star me-2"></i>Đánh giá sản phẩm
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="reviewProductsList">
-                    <!-- Danh sách sản phẩm sẽ được load ở đây -->
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 text-muted">Đang tải sản phẩm...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>Đóng
-                </button>
-                <button type="button" class="btn btn-primary" onclick="submitReviews()">
-                    <i class="fas fa-paper-plane me-1"></i>Gửi đánh giá
-                </button>
             </div>
         </div>
     </div>
@@ -886,10 +909,49 @@
         resize: vertical;
         min-height: 80px;
     }
+    
+    /* Rating Stars */
+    .rating-stars {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        font-size: 2rem;
+        justify-content: flex-end;
+    }
+    
+    .rating-stars input[type="radio"] {
+        display: none;
+    }
+    
+    .rating-stars label {
+        color: #ddd;
+        cursor: pointer;
+        padding: 0 5px;
+        transition: all 0.2s;
+    }
+    
+    .rating-stars input[type="radio"]:checked ~ label {
+        color: #ffc107;
+    }
+    
+    .rating-stars:not(:checked) > label:hover,
+    .rating-stars:not(:checked) > label:hover ~ label {
+        color: #ffc107;
+    }
+    
+    .rating-stars input[type="radio"]:checked + label:hover,
+    .rating-stars input[type="radio"]:checked + label:hover ~ label,
+    .rating-stars input[type="radio"]:checked ~ label:hover,
+    .rating-stars input[type="radio"]:checked ~ label:hover ~ label,
+    .rating-stars label:hover ~ input[type="radio"]:checked ~ label {
+        color: #ffc107;
+    }
 </style>
 
 <!-- JavaScript -->
 <script>
+// Context path for API calls
+const contextPath = '${pageContext.request.contextPath}';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Avatar Upload
     const avatarUploadBtn = document.getElementById('avatarUploadBtn');
@@ -956,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 emailValidationMessage.style.display = 'block';
 
                 try {
-                    const response = await fetch('${pageContext.request.contextPath}/auth/check-exist?email=' + encodeURIComponent(newEmail));
+                    const response = await fetch(contextPath + '/auth/check-exist?email=' + encodeURIComponent(newEmail));
                     const data = await response.json();
 
                     if (data.success) {
@@ -1005,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('${pageContext.request.contextPath}/api/user/addresses', {
+            const response = await fetch(contextPath + '/api/user/addresses', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + token
@@ -1144,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // ✅ Get token from localStorage
             const token = localStorage.getItem('authToken');
             
-            const response = await fetch('${pageContext.request.contextPath}/api/user/addresses/' + addressId, {
+            const response = await fetch(contextPath + '/api/user/addresses/' + addressId, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': 'Bearer ' + token // ✅ Send token
@@ -1178,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // ✅ Get token from localStorage
             const token = localStorage.getItem('authToken');
             
-            const response = await fetch('${pageContext.request.contextPath}/api/user/addresses/' + addressId, {
+            const response = await fetch(contextPath + '/api/user/addresses/' + addressId, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': 'Bearer ' + token // ✅ Send token
@@ -1189,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (result.success) {
                 // Success - reload page
-                window.location.href = '${pageContext.request.contextPath}/user/profile?success=' + 
+                window.location.href = contextPath + '/user/profile?success=' + 
                     encodeURIComponent(result.message) + '#address';
             } else {
                 alert('Lỗi: ' + result.error);
@@ -1246,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function() {
              console.log('=========================');
             
             try {
-                let url = '${pageContext.request.contextPath}/api/user/addresses';
+                let url = contextPath + '/api/user/addresses';
                 let method = 'POST';
                 
                 if (isEdit) {
@@ -1410,209 +1472,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== REVIEW FUNCTIONALITY ====================
     
-    window.currentOrderId = null;
-    window.reviewData = [];
-    
-    // Mở modal đánh giá
-    window.openReviewModal = async function(orderId) {
-        console.log('Opening review modal for order:', orderId);
-        window.currentOrderId = orderId;
-        
-        // Reset review data
-        window.reviewData = [];
-        
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
-        modal.show();
-        
-        // Load products from order
-        await loadOrderProducts(orderId);
-    };
-    
-    // Load danh sách sản phẩm từ đơn hàng
-    async function loadOrderProducts(orderId) {
-        const container = document.getElementById('reviewProductsList');
-        
-        try {
-            // Tìm đơn hàng trong danh sách orders hiện tại
-            const orders = ${not empty orders ? '[' : '[]'}
-            <c:forEach var="order" items="${orders}" varStatus="status">
-                {
-                    orderID: ${order.orderID},
-                    orderDetails: [
-                        <c:forEach var="detail" items="${order.orderDetails}" varStatus="detailStatus">
-                        {
-                            productId: ${detail.product.productID},
-                            productName: '${detail.product.productName}'.replace(/'/g, "\\'"),
-                            productImage: '${not empty detail.product.images and not empty detail.product.images[0] ? detail.product.images[0].dirImage : ""}',
-                            quantity: ${detail.quantity}
-                        }${!detailStatus.last ? ',' : ''}
-                        </c:forEach>
-                    ]
-                }${!status.last ? ',' : ''}
-            </c:forEach>
-            ${not empty orders ? ']' : ''};
-            
-            const order = orders.find(o => o.orderID == orderId);
-            
-            if (!order || !order.orderDetails) {
-                container.innerHTML = '<div class="alert alert-warning">Không tìm thấy sản phẩm trong đơn hàng này.</div>';
-                return;
-            }
-            
-            // Render products
-            let html = '';
-            order.orderDetails.forEach((product, index) => {
-                html += `
-                    <div class="review-product-item" data-product-id="${product.productId}">
-                        <div class="d-flex align-items-start">
-                            <img src="${product.productImage ? '${pageContext.request.contextPath}/image?fname=' + product.productImage : '${pageContext.request.contextPath}/assets/images/logo.png'}"
-                                 alt="${product.productName}"
-                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
-                                 class="me-3">
-                            <div class="flex-grow-1">
-                                <h6 class="mb-2">${product.productName}</h6>
-                                
-                                <div class="mb-2">
-                                    <label class="form-label fw-semibold small mb-1">Đánh giá của bạn:</label>
-                                    <div class="star-rating" data-product-id="${product.productId}">
-                                        <i class="fas fa-star" data-rating="1"></i>
-                                        <i class="fas fa-star" data-rating="2"></i>
-                                        <i class="fas fa-star" data-rating="3"></i>
-                                        <i class="fas fa-star" data-rating="4"></i>
-                                        <i class="fas fa-star" data-rating="5"></i>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="form-label fw-semibold small mb-1">Nhận xét:</label>
-                                    <textarea class="form-control review-textarea" 
-                                              data-product-id="${product.productId}"
-                                              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Attach star rating event listeners
-            document.querySelectorAll('.star-rating').forEach(ratingDiv => {
-                const stars = ratingDiv.querySelectorAll('i');
-                stars.forEach(star => {
-                    star.addEventListener('click', function() {
-                        const rating = parseInt(this.dataset.rating);
-                        const productId = ratingDiv.dataset.productId;
-                        
-                        // Update visual
-                        stars.forEach((s, idx) => {
-                            if (idx < rating) {
-                                s.classList.add('active');
-                            } else {
-                                s.classList.remove('active');
-                            }
-                        });
-                        
-                        // Store rating
-                        const existingReview = window.reviewData.find(r => r.productId == productId);
-                        if (existingReview) {
-                            existingReview.rating = rating;
-                        } else {
-                            window.reviewData.push({
-                                productId: productId,
-                                rating: rating,
-                                comment: ''
-                            });
-                        }
-                    });
-                    
-                    // Hover effect
-                    star.addEventListener('mouseenter', function() {
-                        const rating = parseInt(this.dataset.rating);
-                        stars.forEach((s, idx) => {
-                            if (idx < rating) {
-                                s.style.color = '#ffc107';
-                            }
-                        });
-                    });
-                    
-                    star.addEventListener('mouseleave', function() {
-                        stars.forEach(s => {
-                            if (!s.classList.contains('active')) {
-                                s.style.color = '#ddd';
-                            }
-                        });
-                    });
-                });
-            });
-            
-        } catch (error) {
-            console.error('Error loading order products:', error);
-            container.innerHTML = '<div class="alert alert-danger">Có lỗi xảy ra khi tải sản phẩm.</div>';
-        }
-    }
-    
-    // Gửi đánh giá
-    window.submitReviews = async function() {
-        if (!window.currentOrderId) {
-            alert('Không tìm thấy thông tin đơn hàng!');
-            return;
-        }
-        
-        // Collect all reviews
-        const reviews = [];
-        document.querySelectorAll('.review-product-item').forEach(item => {
-            const productId = item.dataset.productId;
-            const ratingDiv = item.querySelector('.star-rating');
-            const activeStars = ratingDiv.querySelectorAll('i.active').length;
-            const textarea = item.querySelector('textarea');
-            const comment = textarea.value.trim();
-            
-            if (activeStars > 0) {
-                reviews.push({
-                    productId: parseInt(productId),
-                    orderId: window.currentOrderId,
-                    rating: activeStars,
-                    comment: comment
-                });
-            }
-        });
-        
-        if (reviews.length === 0) {
-            alert('Vui lòng đánh giá ít nhất một sản phẩm!');
-            return;
-        }
-        
-        try {
-            // Send reviews to server
-            const response = await fetch('${pageContext.request.contextPath}/review/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(reviews)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                showToast('Cảm ơn bạn đã đánh giá!', 'success');
-                // Close modal
-                bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
-                // Reset data
-                window.currentOrderId = null;
-                window.reviewData = [];
-            } else {
-                alert('Lỗi: ' + (result.error || 'Không thể gửi đánh giá'));
-            }
-        } catch (error) {
-            console.error('Error submitting reviews:', error);
-            alert('Có lỗi xảy ra khi gửi đánh giá!');
-        }
-    };
-
     // Delete Account Confirmation - Đơn giản hóa
     const confirmDeleteInput = document.getElementById('confirmDelete');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
@@ -1639,7 +1498,7 @@ function uploadAvatar(file) {
     const formData = new FormData();
     formData.append('avatar', file);
     
-    fetch('${pageContext.request.contextPath}/user/update-profile', {
+    fetch(contextPath + '/user/update-profile', {
         method: 'POST',
         body: formData
     })
@@ -1660,15 +1519,28 @@ function uploadAvatar(file) {
 function showToast(message, type) {
     const toast = document.createElement('div');
     const bgClass = type === 'success' ? 'success' : 'danger';
-    toast.className = `toast align-items-center text-bg-${bgClass} border-0 position-fixed bottom-0 end-0 m-3`;
+    toast.className = 'toast align-items-center text-bg-' + bgClass + ' border-0 position-fixed bottom-0 end-0 m-3';
     toast.role = 'alert';
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
+    toast.innerHTML = 
+        '<div class="d-flex">' +
+            '<div class="toast-body">' + message + '</div>' +
+            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+        '</div>';
     document.body.appendChild(toast);
     new bootstrap.Toast(toast).show();
 }
+
+// Show success/error messages from server
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    
+    if (success) {
+        showToast(success, 'success');
+    }
+    if (error) {
+        showToast(error, 'error');
+    }
+});
 </script>
