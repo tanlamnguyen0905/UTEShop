@@ -1,0 +1,338 @@
+/* ===================================
+   SIDEBAR LAYOUT STYLES
+   =================================== */
+
+/* Body layout với sidebar fixed */
+.sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1038;
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+}
+
+.sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+    padding-left: 250px;
+    transition: padding-left 0.3s ease-in-out;
+}
+
+/* Khi sidebar bị toggle (ẩn) */
+.sb-nav-fixed.sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
+    transform: translateX(-250px);
+}
+
+.sb-nav-fixed.sb-sidenav-toggled #layoutSidenav #layoutSidenav_content {
+    padding-left: 0;
+}
+
+/* Top navbar */
+.sb-topnav {
+    height: 56px;
+    z-index: 1039;
+    padding-left: 0;
+}
+
+.sb-nav-fixed .sb-topnav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+/* Main content padding for fixed topnav */
+.sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+    padding-top: 56px;
+}
+
+/* ===================================
+   SIDEBAR NAVIGATION STYLES
+   =================================== */
+
+.sb-sidenav {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-wrap: nowrap;
+}
+
+.sb-sidenav .sb-sidenav-menu {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav {
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .nav-link .sb-nav-link-icon {
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    min-width: 1.5rem;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .nav-link .sb-sidenav-collapse-arrow {
+    display: inline-block;
+    margin-left: auto;
+    transition: transform 0.15s ease;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .nav-link.collapsed .sb-sidenav-collapse-arrow {
+    transform: rotate(-90deg);
+}
+
+/* Menu headings */
+.sb-sidenav .sb-sidenav-menu .sb-sidenav-menu-heading {
+    padding: 1.75rem 1rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Nested navigation */
+.sb-sidenav .sb-sidenav-menu .nav .sb-sidenav-menu-nested {
+    margin-left: 0;
+    flex-direction: column;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .sb-sidenav-menu-nested .nav-link {
+    padding-left: 3rem;
+    font-size: 0.9rem;
+}
+
+/* Footer */
+.sb-sidenav .sb-sidenav-footer {
+    padding: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* ===================================
+   SIDEBAR COLOR THEMES
+   =================================== */
+
+/* Primary theme (blue) for Manager */
+.sb-sidenav-primary {
+    background-color: #0d6efd;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.sb-sidenav-primary .sb-sidenav-menu .sb-sidenav-menu-heading {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.sb-sidenav-primary .sb-sidenav-menu .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    border-left: 3px solid transparent;
+}
+
+.sb-sidenav-primary .sb-sidenav-menu .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #fff;
+}
+
+.sb-sidenav-primary .sb-sidenav-menu .nav-link.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left-color: #fff;
+    font-weight: 600;
+}
+
+.sb-sidenav-primary .sb-sidenav-footer {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dark theme - Enhanced Gray */
+.sb-sidenav-dark {
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    color: rgba(255, 255, 255, 0.7);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .sb-sidenav-menu-heading {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #3498db;
+    padding-left: 1.2rem;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link.active {
+    color: #fff;
+    background-color: rgba(52, 152, 219, 0.2);
+    border-left-color: #3498db;
+    font-weight: 600;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link.active .sb-nav-link-icon {
+    color: #3498db;
+}
+
+.sb-sidenav-dark .sb-sidenav-footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===================================
+   RESPONSIVE STYLES
+   =================================== */
+
+/* Mobile - Sidebar ẩn mặc định */
+@media (max-width: 991.98px) {
+    .sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
+        transform: translateX(-250px);
+    }
+
+    .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+        padding-left: 0;
+    }
+
+    /* Khi sidebar được toggle (hiện) trên mobile */
+    .sb-nav-fixed.sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
+        transform: translateX(0);
+    }
+
+    /* Overlay khi sidebar mở trên mobile */
+    .sb-nav-fixed.sb-sidenav-toggled::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1037;
+    }
+}
+
+/* ===================================
+   SCROLLBAR STYLES
+   =================================== */
+
+.sb-sidenav-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sb-sidenav-menu::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.sb-sidenav-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.sb-sidenav-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+
+/* Layout container */
+#layoutSidenav {
+    display: flex;
+}
+
+#layoutSidenav #layoutSidenav_nav {
+    flex-basis: 250px;
+    flex-shrink: 0;
+}
+
+#layoutSidenav #layoutSidenav_content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+    flex-grow: 1;
+    min-height: 100vh;
+}
+
+/* Main content */
+main {
+    flex-grow: 1;
+}
+
+/* Footer */
+footer {
+    flex-shrink: 0;
+}
+
+/* ===================================
+   ANIMATION & TRANSITIONS
+   =================================== */
+
+.collapse {
+    transition: height 0.35s ease;
+}
+
+.collapsing {
+    transition: height 0.35s ease;
+}
+
+/* Smooth transitions */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================================
+   CUSTOM ENHANCEMENTS
+   =================================== */
+
+/* Hover effect cho nav items */
+.sb-sidenav .nav-link:hover i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Badge cho notifications trong menu */
+.nav-link .badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+}
+
+/* Divider trong menu */
+.sb-sidenav-menu hr {
+    margin: 0.5rem 1rem;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Active indicator animation */
+.sb-sidenav .nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 70%;
+    background-color: #fff;
+    border-radius: 0 3px 3px 0;
+}

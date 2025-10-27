@@ -1,5 +1,6 @@
 package ute.dao.inter;
 
+import java.time.LocalDate;
 import java.util.List;
 import ute.entities.Orders;
 
@@ -69,5 +70,23 @@ public interface OrderDao {
      * Đếm số đơn hàng đã xác nhận
      */
     long countConfirmedOrders();
+
+    // ======== Thống kê doanh thu ========
+    /**
+     * Doanh thu daily theo khoảng thời gian
+     */
+    List<Object[]> getDailyRevenueRaw(LocalDate fromDate, LocalDate toDate);
+
+    /**
+     * Tổng doanh thu, số đơn, trung bình theo khoảng thời gian
+     */
+    Object[] getTotalRevenueStatsRaw(LocalDate fromDate, LocalDate toDate);
+
+    List<Orders> findByStatusPaginated(String orderStatus, String paymentStatus, int offset, int limit);
+
+    /**
+     * Đếm đơn hàng theo status
+     */
+    long countByStatus(String orderStatus, String paymentStatus);
 }
 
