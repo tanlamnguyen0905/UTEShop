@@ -448,31 +448,32 @@ public class OrderDaoImpl implements OrderDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> getOrderStatusDistribution() {
-		// Since Orders entity doesn't have orderStatus,
-		// we'll return a simple count grouped by payment method or another field
-		// For now, returning basic statistics
+	public Map<String, Long> countOrdersByStatus() {
 		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			TypedQuery<Object[]> query = em.createQuery(
-				"SELECT pm.name, COUNT(o) FROM Orders o " +
-				"JOIN o.paymentMethod pm " +
-				"GROUP BY pm.id, pm.name",
-				Object[].class
-			);
-			List<Object[]> results = query.getResultList();
-			
-			List<Map<String, Object>> distribution = new ArrayList<>();
-			for (Object[] row : results) {
-				Map<String, Object> map = new HashMap<>();
-				map.put("status", row[0]);
-				map.put("count", row[1]);
-				distribution.add(map);
-			}
-			return distribution;
-		} finally {
-			em.close();
-		}
+        Map<String, Long> result = new HashMap<>();
+
+        try {
+            // Query: count orders grouped by orderStatus
+            Query query = em.createQuery(
+                "SELECT o.orderStatus, COUNT(o) FROM Orders o GROUP BY o.orderStatus"
+            );
+
+            @SuppressWarnings("unchecked")
+            List<Object[]> list = query.getResultList();
+
+            for (Object[] row : list) {
+                String status = (String) row[0];
+                Long count = (Long) row[1];
+                result.put(status, count);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+
+        return result;
 	}
 
 	@Override

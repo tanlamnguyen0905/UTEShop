@@ -69,8 +69,7 @@ public interface OrderDao {
 	Long getOrderCountByStatus(String status);
 	
 	// Get order status distribution (status name + count)
-	// Returns List of Maps with keys: "status" (String), "count" (Long)
-	List<Map<String, Object>> getOrderStatusDistribution();
+	Map<String, Long> countOrdersByStatus();
 	
 	// Get daily revenue for date range
 	// Returns List of Maps with keys: "date" (String in yyyy-MM-dd), "total" (Double)

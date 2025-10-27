@@ -334,8 +334,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Map<String, Object>> getOrderStatusDistribution() {
-        return orderDao.getOrderStatusDistribution();
+    public Map<String, Long> countOrdersByStatus() {
+        return orderDao.countOrdersByStatus();
     }
 
     @Override
