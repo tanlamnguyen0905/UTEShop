@@ -75,15 +75,18 @@
                                         <label for="role" class="form-label">
                                             Vai trò <span class="required">*</span>
                                         </label>
-                                        <select class="form-select" id="role" name="role" required>
-                                            <option value="USER" ${user.role == 'USER' ? 'selected' : ''}>
-                                                Khách hàng (User)
+                                        <select class="form-select" id="role" name="role" required>                                            
+                                            <option value="ADMIN" ${user.role == 'ADMIN' ? 'selected' : ''}>
+                                                Quản trị viên (Admin)
+                                            </option>
+                                            <option value="MANAGER" ${user.role == 'MANAGER' ? 'selected' : ''}>
+                                                Quản lý cửa hàng (Manager)
                                             </option>
                                             <option value="SHIPPER" ${user.role == 'SHIPPER' ? 'selected' : ''}>
                                                 Shipper
                                             </option>
-                                            <option value="ADMIN" ${user.role == 'ADMIN' ? 'selected' : ''}>
-                                                Quản trị viên (Admin)
+                                            <option value="USER" ${user.role == 'USER' ? 'selected' : ''}>
+                                                Khách hàng (User)
                                             </option>
                                         </select>
                                     </div>

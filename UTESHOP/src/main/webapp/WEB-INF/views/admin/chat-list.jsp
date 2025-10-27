@@ -186,11 +186,17 @@
                                        class="chat-room-item">
                                         <div class="room-avatar">
                                             <c:choose>
-                                                <c:when test="${room.lastSenderRole eq 'USER'}">
-                                                    <i class="fas fa-user"></i>
+                                                <c:when test="${room.lastSenderRole eq 'ADMIN'}">
+                                                    <i class="fas fa-user-shield"></i>
+                                                </c:when>
+                                                <c:when test="${room.lastSenderRole eq 'MANAGER'}">
+                                                    <i class="fas fa-user-tie"></i>
                                                 </c:when>
                                                 <c:when test="${room.lastSenderRole eq 'SHIPPER'}">
                                                     <i class="fas fa-shipping-fast"></i>
+                                                </c:when>
+                                                <c:when test="${room.lastSenderRole eq 'USER'}">
+                                                    <i class="fas fa-user"></i>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <i class="fas fa-comments"></i>
