@@ -130,25 +130,6 @@
                 </a>
 
 
-                <!-- Reports with submenu -->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseReports">
-                    <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
-                    Báo cáo
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseReports">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-dollar-sign me-1"></i> Báo cáo doanh thu
-                        </a>
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-box me-1"></i> Báo cáo sản phẩm
-                        </a>
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-user-friends me-1"></i> Báo cáo khách hàng
-                        </a>
-                    </nav>
-                </div>
 
                 <!-- CÀI ĐẶT -->
                 <div class="sb-sidenav-menu-heading">Hệ thống</div>

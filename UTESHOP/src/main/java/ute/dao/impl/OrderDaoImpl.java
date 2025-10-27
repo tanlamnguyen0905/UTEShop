@@ -3,11 +3,13 @@ package ute.dao.impl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.OrderDao;
@@ -264,6 +266,119 @@ public class OrderDaoImpl implements OrderDao {
                 Long.class
             );
             query.setParameter("status", "Đã xác nhận");
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Object[]> getDailyRevenueRaw(LocalDate fromDate, LocalDate toDate) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            // Fix: Sử dụng native SQL query với CAST AS DATE cho SQL Server
+            String sql = """
+                SELECT CAST(o.orderDate AS DATE) as order_date, 
+                       SUM(o.amount - ISNULL(o.totalDiscount, 0) + ISNULL(o.shippingFee, 0)) as revenue 
+                FROM Orders o 
+                WHERE o.orderStatus IN ('Đã giao', 'Hoàn thành') 
+                AND o.paymentStatus = 'Đã thanh toán' 
+                AND CAST(o.orderDate AS DATE) BETWEEN ? AND ? 
+                GROUP BY CAST(o.orderDate AS DATE) 
+                ORDER BY order_date ASC
+                """;
+            Query query = em.createNativeQuery(sql);
+            query.setParameter(1, fromDate);
+            query.setParameter(2, toDate);
+            List<Object[]> results = query.getResultList();
+
+            // Convert Object[] về đúng type (order_date là java.sql.Date, convert sang LocalDate)
+            return results.stream().map(row -> {
+                java.sql.Date sqlDate = (java.sql.Date) row[0];
+                LocalDate localDate = sqlDate.toLocalDate();
+                Double revenue = ((Number) row[1]).doubleValue();
+                return new Object[] { localDate, revenue };
+            }).toList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Object[] getTotalRevenueStatsRaw(LocalDate fromDate, LocalDate toDate) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            // Fix: Native SQL với CAST AS DATE
+            String sql = """
+                SELECT SUM(o.amount - ISNULL(o.totalDiscount, 0) + ISNULL(o.shippingFee, 0)) as totalRevenue, 
+                       COUNT(o.orderID) as orderCount, 
+                       AVG(o.amount - ISNULL(o.totalDiscount, 0) + ISNULL(o.shippingFee, 0)) as avgRevenue 
+                FROM Orders o 
+                WHERE o.orderStatus IN ('Đã giao', 'Hoàn thành') 
+                AND o.paymentStatus = 'Đã thanh toán' 
+                AND CAST(o.orderDate AS DATE) BETWEEN ? AND ?
+                """;
+            Query query = em.createNativeQuery(sql);
+            query.setParameter(1, fromDate);
+            query.setParameter(2, toDate);
+            Object[] result = (Object[]) query.getSingleResult();
+
+            // Convert về đúng type
+            Double totalRevenue = result[0] != null ? ((Number) result[0]).doubleValue() : 0.0;
+            Long orderCount = result[1] != null ? ((Number) result[1]).longValue() : 0L;
+            Double avgRevenue = result[2] != null ? ((Number) result[2]).doubleValue() : 0.0;
+            return new Object[] { totalRevenue, orderCount, avgRevenue };
+        } finally {
+            em.close();
+        }
+    }
+    @Override
+    public List<Orders> findByStatusPaginated(String orderStatus, String paymentStatus, int offset, int limit) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT o FROM Orders o LEFT JOIN FETCH o.user LEFT JOIN FETCH o.address LEFT JOIN FETCH o.paymentMethod LEFT JOIN FETCH o.orderDetails od LEFT JOIN FETCH od.product WHERE 1=1";
+            if (orderStatus != null && !orderStatus.isEmpty()) {
+                jpql += " AND o.orderStatus = :orderStatus";
+            }
+            if (paymentStatus != null && !paymentStatus.isEmpty()) {
+                jpql += " AND o.paymentStatus = :paymentStatus";
+            }
+            jpql += " ORDER BY o.orderDate DESC";
+
+            TypedQuery<Orders> query = em.createQuery(jpql, Orders.class);
+            if (orderStatus != null && !orderStatus.isEmpty()) {
+                query.setParameter("orderStatus", orderStatus);
+            }
+            if (paymentStatus != null && !paymentStatus.isEmpty()) {
+                query.setParameter("paymentStatus", paymentStatus);
+            }
+            query.setFirstResult(offset);
+            query.setMaxResults(limit);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countByStatus(String orderStatus, String paymentStatus) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(o) FROM Orders o WHERE 1=1";
+            if (orderStatus != null && !orderStatus.isEmpty()) {
+                jpql += " AND o.orderStatus = :orderStatus";
+            }
+            if (paymentStatus != null && !paymentStatus.isEmpty()) {
+                jpql += " AND o.paymentStatus = :paymentStatus";
+            }
+
+            TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+            if (orderStatus != null && !orderStatus.isEmpty()) {
+                query.setParameter("orderStatus", orderStatus);
+            }
+            if (paymentStatus != null && !paymentStatus.isEmpty()) {
+                query.setParameter("paymentStatus", paymentStatus);
+            }
             return query.getSingleResult();
         } finally {
             em.close();

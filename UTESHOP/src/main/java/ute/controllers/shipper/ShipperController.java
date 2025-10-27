@@ -35,7 +35,7 @@ public class ShipperController extends HttpServlet {
         
         // Kiểm tra session
         if (session == null) {
-            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
         
@@ -44,7 +44,7 @@ public class ShipperController extends HttpServlet {
         // Kiểm tra đăng nhập
         if (currentUser == null) {
             session.setAttribute("error", "Vui lòng đăng nhập!");
-            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
         

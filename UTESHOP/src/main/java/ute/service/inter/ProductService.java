@@ -3,6 +3,7 @@ package ute.service.inter;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletResponse;
 import ute.dto.ProductDTO;
 import ute.entities.Product;
 import ute.utils.ProductFilter;
@@ -60,7 +61,11 @@ public interface ProductService {
     ProductPage getProductsPageByFilter(ProductFilter filter);
 
     List<ProductDTO> MapToProductDTO(List<Product> products);
-
+    // Thêm cho manager
+    void importStock(Long productId, int quantity);
+    void exportStock(Long productId, int quantity);
+    List<Product> getInventoryStats(ProductFilter filter, int page, int pageSize);
+    void exportInventoryReport(HttpServletResponse response, ProductFilter filter);
     // Product counts
     Long getTotalProductCount();
     Long getActiveProductCount();

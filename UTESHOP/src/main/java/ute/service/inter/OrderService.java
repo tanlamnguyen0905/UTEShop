@@ -1,10 +1,11 @@
 package ute.service.inter;
 
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import ute.entities.Orders;
+import ute.utils.RevenueStats;
 
 public interface OrderService {
 
@@ -62,6 +63,26 @@ public interface OrderService {
      * Tính tổng tiền đơn hàng
      */
     Double calculateOrderTotal(Orders order);
+    // ======== Thống kê doanh thu ========
+    /**
+     * Thống kê doanh thu theo khoảng thời gian (daily)
+     * @param fromDate Ngày bắt đầu
+     * @param toDate Ngày kết thúc
+     * @return List<RevenueStats> với {date, revenue}
+     */
+    List<RevenueStats> getDailyRevenue(LocalDate fromDate, LocalDate toDate);
+
+    /**
+     * Thống kê tổng hợp: Tổng doanh thu, số đơn, trung bình
+     */
+    RevenueStats getTotalRevenueStats(LocalDate fromDate, LocalDate toDate);
+
+    List<Orders> findByStatusPaginated(String orderStatus, String paymentStatus, int page, int pageSize);
+
+    /**
+     * Đếm số đơn hàng theo status
+     */
+    long countByStatus(String orderStatus, String paymentStatus);
 
     // Total revenue calculation
     Double getTotalRevenue();
@@ -73,7 +94,4 @@ public interface OrderService {
     
     // Order status distribution
     List<Map<String, Object>> getOrderStatusDistribution();
-    
-    // Daily revenue breakdown
-    List<Map<String, Object>> getDailyRevenue(LocalDate startDate, LocalDate endDate);
 }

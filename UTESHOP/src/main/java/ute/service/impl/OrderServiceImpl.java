@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 
 import jakarta.persistence.EntityManager;
@@ -22,6 +23,7 @@ import ute.entities.Product;
 import ute.entities.Voucher;
 import ute.entities.Users;
 import ute.service.inter.OrderService;
+import ute.utils.RevenueStats;
 
 public class OrderServiceImpl implements OrderService {
     
@@ -276,6 +278,40 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<RevenueStats> getDailyRevenue(LocalDate fromDate, LocalDate toDate) {
+        List<Object[]> rawData = orderDao.getDailyRevenueRaw(fromDate, toDate);
+        return rawData.stream()
+                .map(row -> new RevenueStats(
+                        (LocalDate) row[0],  // date
+                        ((Number) row[1]).doubleValue()  // revenue
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RevenueStats getTotalRevenueStats(LocalDate fromDate, LocalDate toDate) {
+        Object[] raw = orderDao.getTotalRevenueStatsRaw(fromDate, toDate);
+        if (raw == null || raw.length == 0) {
+            return new RevenueStats(0.0, 0L, 0.0);
+        }
+        return new RevenueStats(
+                ((Number) raw[0]).doubleValue(),  // totalRevenue
+                ((Number) raw[1]).longValue(),    // orderCount
+                ((Number) raw[2]).doubleValue()   // avgRevenue
+        );
+    }
+    @Override
+    public List<Orders> findByStatusPaginated(String orderStatus, String paymentStatus, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return orderDao.findByStatusPaginated(orderStatus, paymentStatus, offset, pageSize);
+    }
+
+    @Override
+    public long countByStatus(String orderStatus, String paymentStatus) {
+        return orderDao.countByStatus(orderStatus, paymentStatus);
+    }
+
+    @Override
     public Double getTotalRevenue() {
         return orderDao.getTotalRevenue();
     }
@@ -303,7 +339,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Map<String, Object>> getDailyRevenue(LocalDate startDate, LocalDate endDate) {
+    public List<Map<String, Object>> getDailyRevenue_2(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         return orderDao.getDailyRevenue(startDateTime, endDateTime);
