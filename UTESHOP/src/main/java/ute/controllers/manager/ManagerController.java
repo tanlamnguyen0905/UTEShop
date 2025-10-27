@@ -29,14 +29,14 @@ public class ManagerController extends HttpServlet {
             LocalDate monthStart = now.withDayOfMonth(1);
             LocalDate monthEnd = now;
 
-            // Tổng đơn hàng (sử dụng findAll().size() vì chưa có count() tổng)
+            // Tổng đơn hàng
             List<Orders> allOrders = orderService.findAll();
             long totalOrders = allOrders.size();
 
             // Doanh thu tháng hiện tại
             RevenueStats monthlyRevenue = orderService.getTotalRevenueStats(monthStart, monthEnd);
 
-            // Đơn hàng đang chờ (sử dụng findByStatus)
+            // Đơn hàng đang chờ (sử dụng orderStatus thay vì status)
             List<Orders> pendingOrdersList = orderService.findByStatus("Đang chờ");
             long pendingOrders = pendingOrdersList.size();
 
@@ -48,7 +48,7 @@ public class ManagerController extends HttpServlet {
                     ? ((monthlyRevenue.getRevenue() - prevMonthRevenue.getRevenue()) / prevMonthRevenue.getRevenue() * 100)
                     : 0.0;
 
-            // Đơn hàng gần đây (5 đơn mới nhất, sử dụng findAll sorted nếu chưa có paginated)
+            // Đơn hàng gần đây (5 đơn mới nhất)
             List<Orders> recentOrders = allOrders.stream()
                     .sorted((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()))
                     .limit(5)
@@ -57,7 +57,7 @@ public class ManagerController extends HttpServlet {
             // Doanh thu theo tháng (cho chart, 12 tháng gần nhất)
             List<RevenueStats> monthlyRevenues = getMonthlyRevenues(now);
 
-            // Set attributes động
+            // Set attributes
             req.setAttribute("totalOrders", totalOrders);
             req.setAttribute("totalRevenue", monthlyRevenue.getRevenue());
             req.setAttribute("pendingOrders", pendingOrders);
@@ -77,11 +77,10 @@ public class ManagerController extends HttpServlet {
     // Helper method: Lấy doanh thu 12 tháng gần nhất
     private List<RevenueStats> getMonthlyRevenues(LocalDate now) {
         List<RevenueStats> revenues = new ArrayList<>();
-        for (int i = 11; i >= 0; i--) {  // 12 tháng
+        for (int i = 11; i >= 0; i--) {
             LocalDate monthStart = now.minusMonths(i).withDayOfMonth(1);
             LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
             RevenueStats stats = orderService.getTotalRevenueStats(monthStart, monthEnd);
-            // Fix constructor: Sử dụng constructor đầy đủ (revenue, 0L, 0.0)
             revenues.add(new RevenueStats(stats.getRevenue(), 0L, 0.0));
         }
         return revenues;

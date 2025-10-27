@@ -246,27 +246,57 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach var="order" items="${recentOrders}">
+                                    <c:forEach var="order" items="${recentOrders}" varStatus="status">
                                         <tr>
-                                            <td>#${order.orderId}</td>
-                                            <td>${order.user.fullname != null ? order.user.fullname : 'N/A'}</td>
-                                            <td><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+                                            <td>#${order.orderID}</td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${order.status == 'Đang chờ'}">
-                                                        <span class="badge badge-pending badge-status">${order.status}</span>
+                                                    <c:when test="${not empty order.user and not empty order.user.fullname}">
+                                                        ${order.user.fullname}
                                                     </c:when>
-                                                    <c:when test="${order.status == 'Hoàn thành'}">
-                                                        <span class="badge badge-completed badge-status">${order.status}</span>
+                                                    <c:when test="${not empty order.recipientName}">
+                                                        ${order.recipientName}
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge badge-cancelled badge-status">${order.status}</span>
+                                                        Khách hàng
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td>₫<fmt:formatNumber value="${order.totalPrice}" type="number" maxFractionDigits="0" /></td>
                                             <td>
-                                                <a href="${pageContext.request.contextPath}/api/manager/orders/detail?id=${order.orderId}"
+                                                <c:choose>
+                                                    <c:when test="${not empty order.orderDate}">
+                                                        ${order.orderDate.dayOfMonth}/${order.orderDate.monthValue}/${order.orderDate.year}
+                                                        ${order.orderDate.hour}:${order.orderDate.minute < 10 ? '0' : ''}${order.orderDate.minute}
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${order.orderStatus eq 'Đang chờ'}">
+                                                        <span class="badge badge-pending badge-status">${order.orderStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${order.orderStatus eq 'Hoàn thành'}">
+                                                        <span class="badge badge-completed badge-status">${order.orderStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${order.orderStatus eq 'Đã hủy'}">
+                                                        <span class="badge badge-cancelled badge-status">${order.orderStatus}</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-info badge-status">${order.orderStatus}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty order.amount}">
+                                                        ₫<fmt:formatNumber value="${order.amount}" type="number" maxFractionDigits="0" />
+                                                    </c:when>
+                                                    <c:otherwise>₫0</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <a href="${pageContext.request.contextPath}/api/manager/orders/detail?id=${order.orderID}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-eye me-1"></i>Chi tiết
                                                 </a>
@@ -295,13 +325,23 @@
             <h5 class="section-title">Hành động nhanh</h5>
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <a href="${pageContext.request.contextPath}/api/manager/products/searchpaginated" class="btn quick-action-btn btn-primary w-100">
+                    <a href="${pageContext.request.contextPath}/api/manager/products" class="btn quick-action-btn btn-primary w-100">
                         <i class="fas fa-box me-2"></i>Xem sản phẩm
                     </a>
                 </div>
                 <div class="col-md-3 mb-3">
                     <a href="${pageContext.request.contextPath}/api/manager/orders" class="btn quick-action-btn btn-success w-100">
                         <i class="fas fa-shopping-cart me-2"></i>Xem đơn hàng
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="${pageContext.request.contextPath}/api/manager/review/searchpaginated" class="btn quick-action-btn btn-info w-100">
+                        <i class="fas fa-star me-2"></i>Quản lý đánh giá
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="${pageContext.request.contextPath}/api/manager/voucher/saveOrUpdate" class="btn quick-action-btn btn-warning w-100">
+                        <i class="fas fa-gift me-2"></i>Tạo voucher
                     </a>
                 </div>
             </div>
