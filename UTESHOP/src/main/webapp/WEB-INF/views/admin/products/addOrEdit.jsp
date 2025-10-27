@@ -74,9 +74,7 @@
         </div>
         <div class="card-body">
             <form method="POST" action="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate" enctype="multipart/form-data">
-                <c:if test="${not empty product.productID}">
-                    <input type="hidden" name="id" value="${product.productID}">
-                </c:if>
+                <input type="hidden" name="id" value="${product.productID}">
 
                 <div class="row g-3">
                     <!-- Tên sản phẩm -->
@@ -126,20 +124,35 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Hình ảnh:</label>
-                    <input type="file" name="image" class="form-control" accept="image/*">
-                    <small class="text-muted">Chọn hình ảnh mới (nếu muốn thêm). Hình ảnh hiện tại sẽ được giữ nếu không chọn. Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 10MB.</small>
-                    <c:if test="${not empty product.images}">
-                        <div class="mt-2 d-flex flex-wrap">
-                            <c:forEach var="image" items="${product.images}">
-                                <div class="me-2 mb-2">
-                                    <img src="${pageContext.request.contextPath}/image?fname=${image.dirImage}"
-                                         alt="${product.productName}"
-                                         width="50" height="50" class="img-thumbnail"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                    <span style="display:none; color: #6c757d;">Không tải được ảnh hiện tại</span>
-                                    <small class="d-block">Hình ảnh hiện tại</small>
+                <!-- PHẦN ẢNH: Hiển thị ảnh cũ (nếu edit) với checkbox xóa -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <label class="form-label">Ảnh hiện có (chọn để xóa):</label>
+                        <c:choose>
+                            <c:when test="${not empty product && not empty product.images}">
+                                <div class="row">
+                                    <c:forEach var="img" items="${product.images}" varStatus="status">
+                                        <div class="col-md-3 mb-3">
+                                            <div class="position-relative">
+                                                <img src="${pageContext.request.contextPath}/assets/${img.dirImage}"
+                                                     alt="Ảnh ${status.index + 1}"
+                                                     class="img-thumbnail w-100"
+                                                     style="height: 150px;"
+                                                     onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">
+                                                <div class="position-absolute top-0 end-0 p-2">
+                                                    <input type="checkbox"
+                                                           name="deletedImageIds"
+                                                           value="${img.imageID}"
+                                                           class="form-check-input"
+                                                           id="deleteImg${img.imageID}"
+                                                           data-bs-toggle="tooltip" title="Chọn để xóa ảnh này">
+                                                    <label for="deleteImg${img.imageID}" class="badge bg-danger cursor-pointer">
+                                                        <i class="fas fa-trash"></i> Xóa
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
                                 </div>
                             </c:when>
                             <c:otherwise>
@@ -158,13 +171,16 @@
                     </div>
                 </div>
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>${empty product.productID ? 'Thêm' : 'Cập nhật'}
-                    </button>
-                    <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-secondary">
-                        <i class="fas fa-times me-2"></i>Hủy
-                    </a>
+                <!-- Buttons -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-save me-2"></i>Lưu sản phẩm
+                        </button>
+                        <a href="${pageContext.request.contextPath}/api/admin/products/searchpaginated" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Hủy và quay lại
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>

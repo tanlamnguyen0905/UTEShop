@@ -26,7 +26,8 @@
     <!-- Begin footer -->
 <%@ include file="/commons/web/footer.jsp" %>
     <!-- End footer -->
-
+    <!-- Floating Chat Button -->
+<%@ include file="/commons/web/floating-chat.jsp" %>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

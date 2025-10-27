@@ -53,4 +53,32 @@ public class JwtUtil {
 			return false; // token sai hoặc hết hạn
 		}
 	}
+
+	// ===================== PHƯƠNG THỨC HỖ TRỢ WEBSOCKET =====================
+	public static Jws<Claims> parse(String token) {
+		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+	}
+
+	public static Long getUserId(Claims claims) {
+		Object id = claims.get("userId");
+		if (id == null)
+			return null;
+		if (id instanceof Number) {
+			return ((Number) id).longValue();
+		}
+		try {
+			return Long.parseLong(id.toString());
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	public static String getUsername(Claims claims) {
+		return claims.getSubject();
+	}
+
+	public static String getRole(Claims claims) {
+		Object role = claims.get("role");
+		return role != null ? role.toString() : null;
+	}
 }
