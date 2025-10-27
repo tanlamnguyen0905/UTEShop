@@ -6,7 +6,8 @@
     
     <!-- Decorator cho shipper -->
     <mapping path="/api/shipper*" decorator="/shipper.jsp" />
-
+    <!-- Decorator cho manager -->
+    <mapping path="/api/manager/*" decorator="/manager.jsp" />
     <!-- Decorator cho user -->
     <mapping path="/home/user*" decorator="/user.jsp" />
 
