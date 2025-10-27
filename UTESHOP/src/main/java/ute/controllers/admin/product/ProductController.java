@@ -25,7 +25,9 @@ import ute.service.impl.CategoriesServiceImpl;
 import ute.service.inter.CategoriesService;
 import ute.utils.Constant;
 import ute.service.admin.Impl.BrandServiceImpl;
+import ute.service.admin.Impl.ImageServiceImpl;
 import ute.service.admin.inter.BrandService;
+import ute.service.admin.inter.ImageService;
 
 @MultipartConfig(fileSizeThreshold = 10240, // 10KB
         maxFileSize = 10485760, // 10MB
@@ -166,10 +168,13 @@ public class ProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         String uri = req.getRequestURI();
 
         if (uri.contains("/api/admin/products/saveOrUpdate")) {
+
             Product product = new Product();
+            Product tempProduct = new Product();
             String idStr = req.getParameter("id");
             String productName = req.getParameter("productName");
             String describe = req.getParameter("describe");
@@ -179,7 +184,6 @@ public class ProductController extends HttpServlet {
             String brandIdStr = req.getParameter("brandId");
 
             Long id = null;
-            Product tempProduct = new Product();
             if (idStr != null && !idStr.isEmpty()) {
                 id = Long.parseLong(idStr);
                 product = productService.findById(id);
@@ -192,6 +196,7 @@ public class ProductController extends HttpServlet {
                 tempProduct = product;
             }
 
+            // ========== VALIDATION ==========
             if (productName == null || productName.trim().isEmpty()) {
                 req.setAttribute("error", "Tên sản phẩm không được để trống!");
                 loadDropdowns(req);
@@ -200,45 +205,33 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
-            Double unitPrice;
+            double unitPrice;
             try {
                 unitPrice = Double.parseDouble(unitPriceStr);
+                if (unitPrice <= 0)
+                    throw new NumberFormatException();
             } catch (NumberFormatException e) {
-                req.setAttribute("error", "Giá sản phẩm không hợp lệ!");
+                req.setAttribute("error", "Giá sản phẩm phải là số dương!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
                 req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
-            Integer stockQuantity;
+            int stockQuantity;
             try {
                 stockQuantity = Integer.parseInt(stockQuantityStr);
+                if (stockQuantity < 0)
+                    throw new NumberFormatException();
             } catch (NumberFormatException e) {
-                req.setAttribute("error", "Số lượng tồn kho không hợp lệ!");
+                req.setAttribute("error", "Số lượng tồn kho phải là số không âm!");
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
                 req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                 return;
             }
 
-            if (unitPrice <= 0) {
-                req.setAttribute("error", "Giá sản phẩm phải lớn hơn 0!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            if (stockQuantity < 0) {
-                req.setAttribute("error", "Số lượng tồn kho không được âm!");
-                loadDropdowns(req);
-                req.setAttribute("product", tempProduct);
-                req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
-
-            Long categoryId = Long.parseLong(categoryIdStr.trim());
+            Long categoryId = Long.parseLong(categoryIdStr);
             Categories category = categoriesService.findById(categoryId);
             if (category == null) {
                 req.setAttribute("error", "Danh mục không tồn tại!");
@@ -248,7 +241,7 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
-            Long brandId = Long.parseLong(brandIdStr.trim());
+            Long brandId = Long.parseLong(brandIdStr);
             Brand brand = brandService.findById(brandId);
             if (brand == null) {
                 req.setAttribute("error", "Thương hiệu không tồn tại!");
@@ -258,6 +251,7 @@ public class ProductController extends HttpServlet {
                 return;
             }
 
+            // ========== GÁN GIÁ TRỊ ==========
             product.setProductName(productName.trim());
             product.setDescribe(describe != null ? describe.trim() : null);
             product.setUnitPrice(unitPrice);
@@ -265,73 +259,53 @@ public class ProductController extends HttpServlet {
             product.setCategory(category);
             product.setBrand(brand);
 
-            // Handle file upload
-            // 🖼️ Xử lý upload ảnh sản phẩm (theo kiểu Constant.Dir)
+            // ========== UPLOAD ẢNH ==========
+            // 🖼️ Xử lý upload ảnh sản phẩm
+            // ========== UPLOAD ẢNH ==========
             Part filePart = req.getPart("image");
-            boolean fileUploadSuccess = false;
-
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    // Sử dụng thư mục gốc cố định
-                    String uploadDir = Constant.Dir + File.separator + "products";
-                    File dir = new File(uploadDir);
-                    if (!dir.exists())
-                        dir.mkdirs();
 
-                    // Kiểm tra loại file
-                    String contentType = filePart.getContentType();
-                    if (contentType == null || !contentType.startsWith("image/")) {
-                        req.setAttribute("error", "Chỉ chấp nhận file ảnh (image/*)!");
+                    // ✅ Đường dẫn vật lý thật
+                    String uploadDir = Constant.Dir;
+                    File dir = new File(uploadDir);
+                    if (!dir.exists() && !dir.mkdirs()) {
+                        req.setAttribute("error", "Không thể tạo thư mục lưu ảnh!");
                         loadDropdowns(req);
                         req.setAttribute("product", tempProduct);
                         req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                         return;
                     }
 
-                    // Tạo tên file an toàn
-                    String rawFileName = filePart.getSubmittedFileName();
-                    String safeFileName = System.currentTimeMillis() + "_"
-                            + rawFileName.replaceAll("[^a-zA-Z0-9.]", "_");
-                    String filePath = uploadDir + File.separator + safeFileName;
+                    // ✅ Tên file an toàn
+                    String originalFileName = filePart.getSubmittedFileName();
+                    String safeFileName = System.currentTimeMillis() + "_" +
+                            originalFileName.replaceAll("[^a-zA-Z0-9.]", "_");
 
-                    // Lưu file vào ổ đĩa
+                    String filePath = uploadDir + File.separator + safeFileName;
                     filePart.write(filePath);
 
-                    // Kiểm tra file sau khi ghi
                     File savedFile = new File(filePath);
-                    if (savedFile.exists() && savedFile.length() > 0) {
-                        fileUploadSuccess = true;
-
-                        // Tạo đối tượng ảnh để lưu DB
-                        Image image = new Image();
-                        image.setDirImage(safeFileName);
-                        image.setProduct(product);
-
-                        if (product.getImages() == null) {
-                            product.setImages(new ArrayList<>());
-                        }
-                        product.getImages().add(image);
-
-                        System.out.println("✅ Ảnh sản phẩm đã upload: " + safeFileName);
-                    } else {
-                        // Xóa file rỗng nếu có
-                        if (savedFile.exists())
-                            savedFile.delete();
-
-                        req.setAttribute("error", "Lỗi khi lưu file ảnh. Vui lòng thử lại.");
+                    if (!savedFile.exists() || savedFile.length() == 0) {
+                        req.setAttribute("error", "Lỗi khi lưu file ảnh!");
                         loadDropdowns(req);
                         req.setAttribute("product", tempProduct);
                         req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                         return;
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
-                    loadDropdowns(req);
-                    req.setAttribute("product", tempProduct);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                    return;
+                    // ✅ Thêm vào danh sách ảnh của sản phẩm
+                    Image image = new Image();
+                    image.setDirImage(safeFileName);
+                    image.setProduct(product);
+
+                    if (product.getImages() == null) {
+                        product.setImages(new ArrayList<>());
+                    }
+                    product.getImages().add(image);
+
+                    System.out.println("✅ Ảnh đã được thêm vào product: " + image.getDirImage());
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
@@ -340,38 +314,41 @@ public class ProductController extends HttpServlet {
                     req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                     return;
                 }
+
             }
 
-            // Check for duplicate product name (exact match)
+            // ========== KIỂM TRA TRÙNG TÊN ==========
             List<Product> existingProducts = productService.findByName(productName.trim());
-            boolean isDuplicate = false;
             for (Product existing : existingProducts) {
-                if (existing.getProductName().equals(productName.trim())
-                        && !Objects.equals(existing.getProductID(), id)) {
-                    isDuplicate = true;
-                    break;
+                if (!Objects.equals(existing.getProductID(), id)
+                        && existing.getProductName().equalsIgnoreCase(productName.trim())) {
+                    req.setAttribute("error", "Tên sản phẩm đã tồn tại!");
+                    loadDropdowns(req);
+                    req.setAttribute("product", tempProduct);
+                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
+                    return;
                 }
             }
-            if (isDuplicate) {
-                req.setAttribute("error", "Tên sản phẩm đã tồn tại! Vui lòng nhập tên khác!");
+
+            // ========== LƯU VÀ PHẢN HỒI ==========
+            try {
+                if (id != null) {
+                    productService.update(product);
+                    req.getSession().setAttribute("message", "Cập nhật sản phẩm thành công!");
+                } else {
+                    productService.insert(product);
+                    req.getSession().setAttribute("message", "Thêm sản phẩm mới thành công!");
+                }
+                resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Lỗi khi lưu sản phẩm: " + e.getMessage());
                 loadDropdowns(req);
                 req.setAttribute("product", tempProduct);
                 req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                return;
             }
-
-            String message;
-            if (id != null) {
-                productService.update(product);
-                message = "Product is Edited!";
-            } else {
-                productService.insert(product);
-                message = "Product is Saved!";
-            }
-
-            req.getSession().setAttribute("message", message);
-            resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
+
     }
 
     private void loadDropdowns(HttpServletRequest req) {

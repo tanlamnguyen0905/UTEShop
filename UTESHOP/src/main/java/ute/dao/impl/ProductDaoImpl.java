@@ -8,6 +8,7 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.ProductDao;
+import ute.entities.Image;
 import ute.entities.Product;
 import ute.utils.ProductFilter;
 
@@ -19,11 +20,20 @@ public class ProductDaoImpl implements ProductDao {
 		EntityTransaction trans = em.getTransaction();
 		try {
 			trans.begin();
+
+			// Giải quyết lỗi cascade: ensure product <-> images đồng bộ trong cùng context
+			if (product.getImages() != null) {
+				for (Image img : product.getImages()) {
+					img.setProduct(product);
+				}
+			}
+
 			em.persist(product);
 			trans.commit();
 		} catch (Exception e) {
 			if (trans.isActive())
 				trans.rollback();
+			e.printStackTrace();
 			throw e;
 		} finally {
 			em.close();
@@ -36,11 +46,19 @@ public class ProductDaoImpl implements ProductDao {
 		EntityTransaction trans = em.getTransaction();
 		try {
 			trans.begin();
+
+			if (product.getImages() != null) {
+				for (Image img : product.getImages()) {
+					img.setProduct(product);
+				}
+			}
+
 			em.merge(product);
 			trans.commit();
 		} catch (Exception e) {
 			if (trans.isActive())
 				trans.rollback();
+			e.printStackTrace();
 			throw e;
 		} finally {
 			em.close();
