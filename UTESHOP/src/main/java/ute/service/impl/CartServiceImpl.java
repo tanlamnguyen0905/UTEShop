@@ -150,11 +150,41 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void clearCart(Long userId) {
-        Cart cart = cartDao.findCartByUserId(userId);
-        if (cart != null) {
-            cartDao.clearCart(cart.getCartID());
-            cart.setTotalPrice(0.0);
-            cartDao.updateCart(cart);
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        try {
+            trans.begin();
+            
+            // Tìm cart trong cùng một EntityManager
+            Cart cart = em.createQuery(
+                "SELECT c FROM Cart c WHERE c.user.userID = :userId", Cart.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+            
+            if (cart != null) {
+                // Xóa tất cả CartDetails trong cùng transaction
+                em.createQuery("DELETE FROM CartDetail cd WHERE cd.cart.cartID = :cartId")
+                    .setParameter("cartId", cart.getCartID())
+                    .executeUpdate();
+                
+                // Cập nhật total price trong cùng transaction
+                cart.setTotalPrice(0.0);
+                // Không cần merge vì cart đã được quản lý bởi EntityManager hiện tại
+            }
+            
+            trans.commit();
+        } catch (jakarta.persistence.NoResultException e) {
+            // Cart không tồn tại, rollback và bỏ qua
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw new RuntimeException("Lỗi khi xóa giỏ hàng: " + e.getMessage(), e);
+        } finally {
+            em.close();
         }
     }
 
