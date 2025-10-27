@@ -247,8 +247,10 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findTopReview(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.reviewCount DESC",
-					Product.class);
+			// ORDER BY số lượng reviews thực tế
+			TypedQuery<Product> query = em.createQuery(
+				"SELECT p FROM Product p LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC",
+				Product.class);
 			query.setMaxResults(limit);
 			List<Product> products = query.getResultList();
 			// Initialize collections
@@ -257,6 +259,8 @@ public class ProductDaoImpl implements ProductDao {
 					p.getImages().size();
 				if (p.getFavorites() != null)
 					p.getFavorites().size();
+				if (p.getReviews() != null)
+					p.getReviews().size();
 			}
 			return products;
 		} finally {
@@ -421,7 +425,7 @@ public class ProductDaoImpl implements ProductDao {
 				jpql.append(" ORDER BY p.productID DESC");
 				break;
 			case "2": // Nhiều đánh giá
-				jpql.append(" ORDER BY p.reviewCount DESC");
+				jpql.append(" LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC");
 				break;
 			case "3": // Yêu thích
 				jpql.append(" GROUP BY p ORDER BY favCount DESC");
