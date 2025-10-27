@@ -314,7 +314,6 @@ public class ProductController extends HttpServlet {
                     req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                     return;
                 }
-
             }
 
             // ========== KIỂM TRA TRÙNG TÊN ==========
