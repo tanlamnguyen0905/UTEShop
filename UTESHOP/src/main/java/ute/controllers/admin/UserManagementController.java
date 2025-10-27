@@ -86,12 +86,14 @@ public class UserManagementController extends HttpServlet {
         // Thống kê
         long totalUsers = userService.countAllUsers();
         long adminCount = userService.countUsersByRole("ADMIN");
+        long managerCount = userService.countUsersByRole("MANAGER");
         long shipperCount = userService.countUsersByRole("SHIPPER");
         long userCount = userService.countUsersByRole("USER");
         
         req.setAttribute("users", users);
         req.setAttribute("totalUsers", totalUsers);
         req.setAttribute("adminCount", adminCount);
+        req.setAttribute("managerCount", managerCount);
         req.setAttribute("shipperCount", shipperCount);
         req.setAttribute("userCount", userCount);
         

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +15,7 @@
         }
         .stats-card.total { border-left-color: #007bff; }
         .stats-card.admin { border-left-color: #dc3545; }
+        .stats-card.manager { border-left-color: #6f42c1; }
         .stats-card.shipper { border-left-color: #28a745; }
         .stats-card.user { border-left-color: #ffc107; }
     </style>
@@ -50,7 +52,7 @@
 
         <!-- Statistics -->
         <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                 <div class="card stats-card total">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -65,7 +67,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                 <div class="card stats-card admin">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -80,7 +82,22 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card stats-card manager">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Manager</h6>
+                                <h3 class="mb-0">${managerCount}</h3>
+                            </div>
+                            <div style="color: #6f42c1;">
+                                <i class="fas fa-user-tie fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                 <div class="card stats-card shipper">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -95,7 +112,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
                 <div class="card stats-card user">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -157,6 +174,11 @@
                                                         <i class="fas fa-user-shield me-1"></i>Admin
                                                     </span>
                                                 </c:when>
+                                                <c:when test="${user.role == 'MANAGER'}">
+                                                    <span class="badge" style="background-color: #6f42c1;">
+                                                        <i class="fas fa-user-tie me-1"></i>Manager
+                                                    </span>
+                                                </c:when>
                                                 <c:when test="${user.role == 'SHIPPER'}">
                                                     <span class="badge bg-success">
                                                         <i class="fas fa-shipping-fast me-1"></i>Shipper
@@ -195,8 +217,9 @@
                                                class="btn btn-sm btn-warning" title="Chỉnh sửa">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="confirmDelete(${user.userID}, '${user.username}')"
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete" 
+                                                    data-user-id="${user.userID}"
+                                                    data-username="${user.username}"
                                                     title="Xóa">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -238,12 +261,21 @@
     </div>
 
     <script>
-        function confirmDelete(userId, username) {
-            document.getElementById('deleteUsername').textContent = username;
-            document.getElementById('deleteForm').action = '${pageContext.request.contextPath}/api/admin/user/delete?id=' + userId;
-            var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            modal.show();
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle delete button clicks
+            document.querySelectorAll('.btn-delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const username = this.getAttribute('data-username');
+                    
+                    document.getElementById('deleteUsername').textContent = username;
+                    document.getElementById('deleteForm').action = '${pageContext.request.contextPath}/api/admin/user/delete?id=' + userId;
+                    
+                    var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                    modal.show();
+                });
+            });
+        });
     </script>
 </body>
 </html>

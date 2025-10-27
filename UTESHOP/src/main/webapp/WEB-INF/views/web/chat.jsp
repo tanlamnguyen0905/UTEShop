@@ -186,6 +186,11 @@
             color: #92400e;
         }
         
+        .role-badge.manager {
+            background: #fce7f3;
+            color: #831843;
+        }
+        
         .role-badge.shipper {
             background: #dbeafe;
             color: #1e40af;

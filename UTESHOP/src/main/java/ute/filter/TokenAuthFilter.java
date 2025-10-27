@@ -161,8 +161,9 @@ public class TokenAuthFilter implements Filter {
                 return true;
 
             case "MANAGER":
-                // Manager has access to: manager APIs + user APIs
+                // Manager has access to: manager APIs + admin chat + user APIs
                 return pathLower.contains("/api/manager") ||
+                        pathLower.contains("/api/admin/chat") ||
                         pathLower.contains("/api/user");
 
             case "SHIPPER":

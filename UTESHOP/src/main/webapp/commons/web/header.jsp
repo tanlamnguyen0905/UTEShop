@@ -7,9 +7,8 @@
 <jsp:include page="/WEB-INF/views/auth/reset-password.jsp" />
 
 	<!-- ====== HEADER ====== -->
-	<header class="border-bottom bg-white py-3 shadow-sm"
-		style="position: sticky; top: 0; z-index: 1030; transition: backdrop-filter 0.3s ease; backdrop-filter: blur(5px);">
-		<div class="container">
+	<header class="header-wrapper">
+		<div class="header-container">
 			<div class="row align-items-center">
 				<!-- Logo -->
 				<div class="col-auto">
@@ -323,3 +322,228 @@
 			}
 		}
 	</script>
+
+	<!-- Header Styles -->
+	<style>
+		/* Header Wrapper - Sticky (follows on scroll) */
+		.header-wrapper {
+			position: sticky;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 1050;
+			padding: 10px 20px 0 20px;
+			margin-bottom: 20px;
+		}
+		
+		/* Header Container - Not full width, rounded */
+		.header-container {
+			max-width: 1400px;
+			margin: 0 auto;
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 20px 30px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.18);
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+		
+		.header-container:hover {
+			box-shadow: 0 12px 40px rgba(102, 126, 234, 0.12);
+		}
+		
+		/* Logo */
+		.header-container .col-auto a img {
+			height: 50px;
+			transition: transform 0.3s;
+		}
+		
+		.header-container .col-auto a:hover img {
+			transform: scale(1.05);
+		}
+		
+		/* Main Nav */
+		.main-nav {
+			gap: 10px;
+		}
+		
+		.main-nav .nav-link {
+			padding: 8px 16px;
+			border-radius: 12px;
+			transition: all 0.3s;
+			font-size: 15px;
+			position: relative;
+		}
+		
+		.main-nav .nav-link::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 0;
+			height: 2px;
+			background: linear-gradient(90deg, #667eea, #764ba2);
+			transition: width 0.3s;
+		}
+		
+		.main-nav .nav-link:hover {
+			background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+			color: #667eea !important;
+		}
+		
+		.main-nav .nav-link:hover::after {
+			width: 80%;
+		}
+		
+		/* Search Form */
+		.header-container form {
+			background: #f8f9fa !important;
+			border: 2px solid transparent;
+			transition: all 0.3s;
+		}
+		
+		.header-container form:focus-within {
+			background: white !important;
+			border-color: #667eea;
+			box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+		}
+		
+		.header-container form input {
+			font-size: 14px;
+		}
+		
+		.header-container form button {
+			transition: transform 0.3s;
+		}
+		
+		.header-container form button:hover {
+			transform: scale(1.1);
+		}
+		
+		/* User Dropdown */
+		.header-container .btn-light {
+			width: 45px;
+			height: 45px;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.3s;
+			border: 2px solid #f8f9fa;
+		}
+		
+		.header-container .btn-light:hover {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-color: #667eea;
+			transform: scale(1.05);
+		}
+		
+		.header-container .btn-light:hover i {
+			color: white !important;
+		}
+		
+		/* Cart & Favorite Buttons */
+		.header-container .position-relative {
+			transition: transform 0.3s;
+		}
+		
+		.header-container .position-relative:hover {
+			transform: translateY(-2px);
+		}
+		
+		.header-container .badge {
+			font-size: 10px;
+			padding: 3px 6px;
+			font-weight: 600;
+		}
+		
+		/* Dropdown Menu */
+		.header-container .dropdown-menu {
+			border: none;
+			border-radius: 12px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+			margin-top: 10px;
+			animation: slideDown 0.3s ease;
+		}
+		
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.header-container .dropdown-item {
+			padding: 10px 20px;
+			transition: all 0.2s;
+			border-radius: 8px;
+			margin: 2px 8px;
+		}
+		
+		.header-container .dropdown-item:hover {
+			background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+			color: #667eea;
+			padding-left: 25px;
+		}
+		
+		/* Responsive */
+		@media (max-width: 1200px) {
+			.header-container {
+				max-width: 100%;
+				border-radius: 15px;
+			}
+			
+			.header-wrapper {
+				padding: 8px 15px 0 15px;
+			}
+		}
+		
+		@media (max-width: 991px) {
+			.header-wrapper {
+				top: 0;
+				padding: 8px 10px 0 10px;
+			}
+			
+			.header-container {
+				padding: 15px 20px;
+				border-radius: 12px;
+			}
+			
+			.main-nav {
+				flex-direction: column;
+				gap: 5px;
+			}
+			
+			.main-nav .nav-link {
+				padding: 6px 12px;
+				font-size: 14px;
+			}
+		}
+		
+		@media (max-width: 576px) {
+			.header-wrapper {
+				top: 0;
+				padding: 5px 5px 0 5px;
+			}
+			
+			.header-container {
+				padding: 12px 15px;
+				border-radius: 10px;
+			}
+			
+			.header-container .col-auto a img {
+				height: 40px;
+			}
+			
+			.header-container form {
+				max-width: 180px !important;
+			}
+		}
+	</style>
