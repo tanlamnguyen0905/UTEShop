@@ -166,7 +166,7 @@ public class CategoriesController extends HttpServlet {
             Part filePart = req.getPart("image");
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    String uploadDir = Constant.Dir + File.separator + "categories";
+                    String uploadDir = Constant.Dir;
                     File dir = new File(uploadDir);
                     if (!dir.exists())
                         dir.mkdirs();

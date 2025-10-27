@@ -283,10 +283,12 @@ public class ProductController extends HttpServlet {
                             originalFileName.replaceAll("[^a-zA-Z0-9.]", "_");
 
                     String filePath = uploadDir + File.separator + safeFileName;
+                    System.out.println("file lưu ở     " + filePath);
                     filePart.write(filePath);
 
                     File savedFile = new File(filePath);
                     if (!savedFile.exists() || savedFile.length() == 0) {
+                        System.out.println("file lưu kihoong thnafh công     ");
                         req.setAttribute("error", "Lỗi khi lưu file ảnh!");
                         loadDropdowns(req);
                         req.setAttribute("product", tempProduct);
