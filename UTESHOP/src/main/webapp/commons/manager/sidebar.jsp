@@ -27,9 +27,6 @@
                         <a class="nav-link" href="${pageContext.request.contextPath}/api/manager/products/searchpaginated">
                             <i class="fas fa-list me-1"></i> Danh sách sản phẩm
                         </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/api/manager/products/saveOrUpdate">
-                            <i class="fas fa-plus me-1"></i> Thêm sản phẩm
-                        </a>
                         <a class="nav-link" href="${pageContext.request.contextPath}/api/manager/products/export">
                             <i class="fas fa-file-excel me-1"></i> Xuất Excel
                         </a>

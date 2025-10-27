@@ -2,7 +2,6 @@ package ute.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ute.entities.Image;
@@ -42,7 +41,7 @@ public class ProductDTO {
         dto.setBrand(p.getBrand().getBrandName());
         dto.setRating(p.getRating());
         dto.setSoldCount(p.getSoldCount() != null ? p.getSoldCount() : 0L);
-        dto.setReviewCount(p.getReviewCount() != null ? p.getReviewCount() : 0L);
+        dto.setReviewCount(p.getReviewCount());
         // discount price: không còn discount => mặc định bằng unitPrice
 
         // Convert all product images to URLs

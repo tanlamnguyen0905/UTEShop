@@ -44,8 +44,6 @@ public class Product {
     private Integer stockQuantity;
     @Builder.Default
     private Long soldCount = 0L;
-    @Builder.Default
-    private Long reviewCount = 0L;
     private LocalDateTime importDate;
 
     @PrePersist
@@ -92,6 +90,15 @@ public class Product {
                 .mapToDouble(Review::getRating)
                 .average()
                 .orElse(0.0);
+    }
+
+    @Transient
+    public Long reviewCount;
+    
+    public Long getReviewCount() {
+        if (reviews == null)
+            return 0L;
+        return (long) reviews.size();
     }
 
     @Transient
