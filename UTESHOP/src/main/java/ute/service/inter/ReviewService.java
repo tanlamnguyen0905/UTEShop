@@ -15,4 +15,8 @@ public interface ReviewService {
     double getProductAverageRating(Long productId);
 
     Long getProductReviewCount(Long productId);
+    
+    Review getUserProductReview(Long userId, Long productId);
+    
+    boolean hasUserPurchasedProduct(Long userId, Long productId);
 }

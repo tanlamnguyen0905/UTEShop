@@ -19,4 +19,10 @@ public interface ReviewDao {
     Long getReviewCountByProductId(Long productId);
 
     List<Review> findByUserId(Long userId);
+    
+    // Kiểm tra user đã review sản phẩm chưa
+    Review findByUserIdAndProductId(Long userId, Long productId);
+    
+    // Kiểm tra user có mua sản phẩm chưa (từ order đã hoàn tất)
+    boolean hasUserPurchasedProduct(Long userId, Long productId);
 }
