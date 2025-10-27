@@ -149,7 +149,7 @@ public class ReviewDaoImpl implements ReviewDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Review> query = em.createQuery(
-				"SELECT r FROM Review r WHERE r.user.userID = :userId ORDER BY r.createAt DESC",
+				"SELECT r FROM Review r WHERE r.user.userID = :userId ORDER BY r.createdAt DESC",
 				Review.class
 			);
 			query.setParameter("userId", userId);
@@ -181,6 +181,44 @@ public class ReviewDaoImpl implements ReviewDao {
 			TypedQuery<Long> query = em.createQuery(jpql, Long.class);
 			query.setParameter("productId", productId);
 			return query.getSingleResult();	
+		} finally {
+			em.close();
+		}
+    }
+
+    @Override
+    public Review findByUserIdAndProductId(Long userId, Long productId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			String jpql = "SELECT r FROM Review r WHERE r.user.userID = :userId AND r.product.productID = :productId";
+			TypedQuery<Review> query = em.createQuery(jpql, Review.class);
+			query.setParameter("userId", userId);
+			query.setParameter("productId", productId);
+			List<Review> results = query.getResultList();
+			return results.isEmpty() ? null : results.get(0);
+		} finally {
+			em.close();
+		}
+    }
+
+    @Override
+    public boolean hasUserPurchasedProduct(Long userId, Long productId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			String jpql = "SELECT COUNT(od) FROM OrderDetail od " +
+						"WHERE od.order.user.userID = :userId " +
+						"AND od.product.productID = :productId " +
+						"AND (od.order.orderStatus = :status1 OR od.order.orderStatus = :status2 " +
+						"OR od.order.orderStatus = :status3 OR od.order.orderStatus = :status4)";
+			TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+			query.setParameter("userId", userId);
+			query.setParameter("productId", productId);
+			query.setParameter("status1", "Hoàn thành");
+			query.setParameter("status2", "Hoàn tất");
+			query.setParameter("status3", "Đã giao");
+			query.setParameter("status4", "Đã giao hàng");
+			Long count = query.getSingleResult();
+			return count != null && count > 0;
 		} finally {
 			em.close();
 		}

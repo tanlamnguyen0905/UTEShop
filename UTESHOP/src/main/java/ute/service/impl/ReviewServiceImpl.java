@@ -50,6 +50,16 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public Review getUserProductReview(Long userId, Long productId) {
+        return reviewDao.findByUserIdAndProductId(userId, productId);
+    }
+
+    @Override
+    public boolean hasUserPurchasedProduct(Long userId, Long productId) {
+        return reviewDao.hasUserPurchasedProduct(userId, productId);
+    }
+
+    @Override
     public Long getTotalReviewCount() {
         return reviewDao.getTotalReviewCount();
     }

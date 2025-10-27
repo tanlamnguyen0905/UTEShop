@@ -36,7 +36,8 @@ public class TokenAuthFilter implements Filter {
             "/auth/", "/public/", "/assets/", "/uploads/",
             "/css/", "/js/", "/images/", "/user/", "/home",
             "/WEB-INF/", ".jsp", ".css", ".js", ".png", ".jpg", ".ico",
-            "/api/cart/", "/api/favorite/", "/api/address/" // Session-based APIs (không cần JWT)
+            "/api/cart/", "/api/favorite/", "/api/address/", // Session-based APIs (không cần JWT)
+            "/api/vouchers/", "/api/voucher/" // Public voucher APIs cho checkout
     );
 
     @Override

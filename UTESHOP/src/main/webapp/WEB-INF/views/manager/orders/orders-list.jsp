@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <html>
 <head>
     <title>Danh Sách Đơn Hàng - Manager</title>
@@ -50,6 +51,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <label>Số lượng:</label>
                     <select name="size" class="form-select">
                         <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
                         <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 items</option>
@@ -91,13 +93,58 @@
                     <c:forEach var="order" items="${orders}">
                         <tr>
                             <td>${order.orderID}</td>
-                            <td>${order.user.username} (${order.recipientName})</td>
-                            <td><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm" /></td>
-                            <td><span class="badge bg-${order.orderStatus == 'Hoàn thành' ? 'success' : order.orderStatus == 'Đã giao' ? 'info' : order.orderStatus == 'Đã hủy' ? 'danger' : 'warning'} status-badge">${order.orderStatus}</span></td>
-                            <td><span class="badge bg-${order.paymentStatus == 'Đã thanh toán' ? 'success' : 'warning'} status-badge">${order.paymentStatus}</span></td>
-                            <td><fmt:formatNumber value="${order.amount + order.shippingFee - order.totalDiscount}" type="number" maxFractionDigits="0" /></td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/api/manager/orders/${order.orderID}" class="btn btn-info btn-sm">
+                                <c:choose>
+                                    <c:when test="${not empty order.user and not empty order.user.username}">
+                                        ${order.user.username}
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${order.recipientName}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty order.orderDate}">
+                                        ${order.orderDate.dayOfMonth}/${order.orderDate.monthValue}/${order.orderDate.year}
+                                        ${order.orderDate.hour}:${order.orderDate.minute < 10 ? '0' : ''}${order.orderDate.minute}
+                                    </c:when>
+                                    <c:otherwise>N/A</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${order.orderStatus eq 'Hoàn thành'}">
+                                        <span class="badge bg-success status-badge">${order.orderStatus}</span>
+                                    </c:when>
+                                    <c:when test="${order.orderStatus eq 'Đã giao'}">
+                                        <span class="badge bg-info status-badge">${order.orderStatus}</span>
+                                    </c:when>
+                                    <c:when test="${order.orderStatus eq 'Đã hủy'}">
+                                        <span class="badge bg-danger status-badge">${order.orderStatus}</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-warning status-badge">${order.orderStatus}</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${order.paymentStatus eq 'Đã thanh toán'}">
+                                        <span class="badge bg-success status-badge">${order.paymentStatus}</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-warning status-badge">${order.paymentStatus}</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <fmt:formatNumber value="${order.amount + order.shippingFee - order.totalDiscount}"
+                                                  type="number" maxFractionDigits="0" />
+                            </td>
+                            <td>
+                                <a href="${pageContext.request.contextPath}/api/manager/orders/${order.orderID}"
+                                   class="btn btn-info btn-sm">
                                     <i class="fas fa-eye"></i> Chi tiết
                                 </a>
                             </td>
@@ -114,11 +161,27 @@
             <c:if test="${totalPages > 1}">
                 <nav aria-label="Pagination">
                     <ul class="pagination justify-content-center">
+                        <c:if test="${currentPage > 1}">
+                            <li class="page-item">
+                                <a class="page-link" href="?page=${currentPage - 1}&size=${pageSize}&orderStatus=${orderStatus}&paymentStatus=${paymentStatus}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        </c:if>
+
                         <c:forEach var="i" begin="1" end="${totalPages}">
                             <li class="page-item ${i == currentPage ? 'active' : ''}">
                                 <a class="page-link" href="?page=${i}&size=${pageSize}&orderStatus=${orderStatus}&paymentStatus=${paymentStatus}">${i}</a>
                             </li>
                         </c:forEach>
+
+                        <c:if test="${currentPage < totalPages}">
+                            <li class="page-item">
+                                <a class="page-link" href="?page=${currentPage + 1}&size=${pageSize}&orderStatus=${orderStatus}&paymentStatus=${paymentStatus}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </c:if>
                     </ul>
                 </nav>
             </c:if>

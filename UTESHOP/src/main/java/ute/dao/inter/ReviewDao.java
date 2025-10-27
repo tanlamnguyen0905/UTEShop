@@ -26,4 +26,10 @@ public interface ReviewDao {
     Double getAverageRatingByProductId(Long productId);
 
     Long getReviewCountByProductId(Long productId);
+    
+    // Kiểm tra user đã review sản phẩm chưa
+    Review findByUserIdAndProductId(Long userId, Long productId);
+    
+    // Kiểm tra user có mua sản phẩm chưa (từ order đã hoàn tất)
+    boolean hasUserPurchasedProduct(Long userId, Long productId);
 }
