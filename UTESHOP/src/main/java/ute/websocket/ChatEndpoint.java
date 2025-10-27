@@ -9,6 +9,7 @@ import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
+import ute.configs.GsonConfig;
 import ute.dao.impl.MessageDaoImpl;
 import ute.dao.inter.MessageDao;
 import ute.entities.Message;
@@ -25,14 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatEndpoint {
 	private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
 	private static final Map<Session, UserCtx> CONTEXT = new ConcurrentHashMap<>();
-	private static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(OffsetDateTime.class, 
-				(JsonSerializer<OffsetDateTime>) (src, _, context) -> 
-					context.serialize(src.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
-			.registerTypeAdapter(OffsetDateTime.class,
-				(JsonDeserializer<OffsetDateTime>) (json, _, __) ->
-					OffsetDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-			.create();
+	private static final Gson GSON = GsonConfig.getGson();
 	private static final MessageDao messageDao = new MessageDaoImpl();
 
 	public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
