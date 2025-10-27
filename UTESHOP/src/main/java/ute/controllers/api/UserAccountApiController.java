@@ -28,7 +28,7 @@ public class UserAccountApiController extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		userService = new UserServiceImpl(new UserDaoImpl());
+		userService = new UserServiceImpl();
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class UserAccountApiController extends HttpServlet {
 		String status = req.getParameter("status");
 
 		List<Users> users = userService.search(search, role, status);
-		List<UserDTO> userDTOs = users.stream().map(UserDTO::new).collect(Collectors.toList());
+		List<UserDTO> userDTOs = users.stream().map(UserDTO::fromEntity).collect(Collectors.toList());
 		resp.getWriter().write(gson.toJson(userDTOs));
 	}
 

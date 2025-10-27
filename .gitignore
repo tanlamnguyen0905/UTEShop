@@ -50,4 +50,6 @@ src/main/resources/static/upload/
 
 # ---- Env / Config (tùy dự án) ----
 *.env
+.github/
+.vscode/
 application-*.properties

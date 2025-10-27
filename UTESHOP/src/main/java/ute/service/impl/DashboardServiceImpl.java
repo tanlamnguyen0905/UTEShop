@@ -40,7 +40,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<Map<String, Object>> getRevenueDailyByDateRange(LocalDate startDate, LocalDate endDate) {
-        return orderService.getDailyRevenue(startDate, endDate);
+        return orderService.getDailyRevenue_2(startDate, endDate);
     }
 
     @Override

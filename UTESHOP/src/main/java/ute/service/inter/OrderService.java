@@ -93,5 +93,7 @@ public interface OrderService {
     Long getOrderCountByStatus(String status);
     
     // Order status distribution
+    public List<Map<String, Object>> getDailyRevenue_2(LocalDate startDate, LocalDate endDate);
     List<Map<String, Object>> getOrderStatusDistribution();
+    
 }
