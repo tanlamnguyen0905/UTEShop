@@ -23,24 +23,24 @@
 </head>
 
 <body class="sb-nav-fixed">
-    <!-- Header -->
-    <jsp:include page="/commons/admin/header.jsp" />
-    
-    <div id="layoutSidenav">
-        <!-- Sidebar -->
-        <jsp:include page="/commons/admin/sidebar.jsp" />
-        
-        <!-- Main content -->
-        <div id="layoutSidenav_content">
-            <main class="p-4">
-                <!-- Nội dung trang con sẽ được SiteMesh 3 inject vào đây -->
-                <sitemesh:write property="body" />
-            </main>
-            
-            <!-- Footer -->
-            <jsp:include page="/commons/admin/footer.jsp" />
-        </div>
+<!-- Header -->
+<jsp:include page="/commons/admin/header.jsp" />
+
+<div id="layoutSidenav">
+    <!-- Sidebar -->
+    <jsp:include page="/commons/admin/sidebar.jsp" />
+
+    <!-- Main content -->
+    <div id="layoutSidenav_content">
+        <main class="p-4">
+            <!-- Nội dung trang con sẽ được SiteMesh 3 inject vào đây -->
+            <sitemesh:write property="body" />
+        </main>
+
+        <!-- Footer -->
+        <jsp:include page="/commons/admin/footer.jsp" />
     </div>
+</div>
 <!-- Core JS -->
 <script src="${pageContext.request.contextPath}/templates/admin/assets/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/templates/admin/js/scripts.js"></script>
@@ -49,21 +49,21 @@
 
 <!-- Script từ trang con -->
 <c:out value="${script}" escapeXml="false" />
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Sidebar Toggle Script -->
-    <script>
-        window.addEventListener('DOMContentLoaded', event => {
-            const sidebarToggle = document.body.querySelector('#sidebarToggle');
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', event => {
-                    event.preventDefault();
-                    document.body.classList.toggle('sb-sidenav-toggled');
-                });
-            }
-        });
-    </script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Sidebar Toggle Script -->
+<script>
+    window.addEventListener('DOMContentLoaded', event => {
+        const sidebarToggle = document.body.querySelector('#sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', event => {
+                event.preventDefault();
+                document.body.classList.toggle('sb-sidenav-toggled');
+            });
+        }
+    });
+</script>
 </div>
 
 <!-- Core JS - Load từ CDN vì local không có file -->
