@@ -10,7 +10,7 @@
 
                 <!-- DASHBOARD -->
                 <div class="sb-sidenav-menu-heading">Tổng quan</div>
-                <a class="nav-link ${currentPath.contains('/dashboard') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/dashboard') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/api/admin/dashboard">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Dashboard
@@ -20,19 +20,19 @@
                 <div class="sb-sidenav-menu-heading">Quản lý sản phẩm</div>
 
                 <!-- Products with submenu -->
-                <a class="nav-link collapsed ${currentPath.contains('/products') ? 'active' : ''}" 
-                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts">
+                <a class="nav-link ${currentPath.contains('/products') ? 'active' : 'collapsed'}"
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" data-bs-parent="#sidenavAccordion">
                     <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                     Sản phẩm
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse ${currentPath.contains('/products') ? 'show' : ''}" id="collapseProducts">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link ${currentPath.contains('/products/searchpaginated') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/products/searchpaginated') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/products/searchpaginated">
                             <i class="fas fa-list me-2"></i>Danh sách sản phẩm
                         </a>
-                        <a class="nav-link ${currentPath.contains('/products/saveOrUpdate') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/products/saveOrUpdate') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate">
                             <i class="fas fa-plus me-2"></i>Thêm sản phẩm
                         </a>
@@ -43,19 +43,19 @@
                 </div>
 
                 <!-- Categories with submenu -->
-                <a class="nav-link collapsed ${currentPath.contains('/categories') ? 'active' : ''}" 
-                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseCategories">
+                <a class="nav-link ${currentPath.contains('/categories') ? 'active' : 'collapsed'}"
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseCategories" data-bs-parent="#sidenavAccordion">
                     <div class="sb-nav-link-icon"><i class="fas fa-th-large"></i></div>
                     Danh mục
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse ${currentPath.contains('/categories') ? 'show' : ''}" id="collapseCategories">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link ${currentPath.contains('/categories/searchpaginated') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/categories/searchpaginated') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/categories/searchpaginated">
                             <i class="fas fa-list me-2"></i>Danh sách danh mục
                         </a>
-                        <a class="nav-link ${currentPath.contains('/categories/saveOrUpdate') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/categories/saveOrUpdate') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/categories/saveOrUpdate">
                             <i class="fas fa-plus me-2"></i>Thêm danh mục
                         </a>
@@ -63,19 +63,19 @@
                 </div>
 
                 <!-- Brands with submenu -->
-                <a class="nav-link collapsed ${currentPath.contains('/brands') ? 'active' : ''}" 
-                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseBrands">
+                <a class="nav-link ${currentPath.contains('/brands') ? 'active' : 'collapsed'}"
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseBrands" data-bs-parent="#sidenavAccordion">
                     <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
                     Thương hiệu
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse ${currentPath.contains('/brands') ? 'show' : ''}" id="collapseBrands">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link ${currentPath.contains('/brands/searchpaginated') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/brands/searchpaginated') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/brands/searchpaginated">
                             <i class="fas fa-list me-2"></i>Danh sách thương hiệu
                         </a>
-                        <a class="nav-link ${currentPath.contains('/brands/saveOrUpdate') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/brands/saveOrUpdate') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/brands/saveOrUpdate">
                             <i class="fas fa-plus me-2"></i>Thêm thương hiệu
                         </a>
@@ -86,26 +86,26 @@
                 <div class="sb-sidenav-menu-heading">Quản lý bán hàng</div>
 
                 <!-- Orders -->
-                <a class="nav-link ${currentPath.contains('/orders') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/orders') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/api/admin/orders">
                     <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                     Đơn hàng
                 </a>
 
                 <!-- Voucher -->
-                <a class="nav-link collapsed ${currentPath.contains('/voucher') ? 'active' : ''}" 
-                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseVoucher">
+                <a class="nav-link ${currentPath.contains('/voucher') ? 'active' : 'collapsed'}"
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseVoucher" data-bs-parent="#sidenavAccordion">
                     <div class="sb-nav-link-icon"><i class="fas fa-ticket-alt"></i></div>
                     Mã giảm giá
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse ${currentPath.contains('/voucher') ? 'show' : ''}" id="collapseVoucher">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link ${currentPath.contains('/voucher/searchpaginated') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/voucher/searchpaginated') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/voucher/searchpaginated">
                             <i class="fas fa-list me-2"></i>Danh sách voucher
                         </a>
-                        <a class="nav-link ${currentPath.contains('/voucher/saveOrUpdate') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/voucher/saveOrUpdate') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/voucher/saveOrUpdate">
                             <i class="fas fa-plus me-2"></i>Thêm voucher
                         </a>
@@ -113,15 +113,15 @@
                 </div>
 
                 <!-- Review -->
-                <a class="nav-link collapsed ${currentPath.contains('/review') ? 'active' : ''}" 
-                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseReview">
+                <a class="nav-link ${currentPath.contains('/review') ? 'active' : 'collapsed'}"
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseReview" data-bs-parent="#sidenavAccordion">
                     <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
                     Đánh giá
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse ${currentPath.contains('/review') ? 'show' : ''}" id="collapseReview">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link ${currentPath.contains('/review/searchpaginated') ? 'active' : ''}" 
+                        <a class="nav-link ${currentPath.contains('/review/searchpaginated') ? 'active' : ''}"
                            href="${pageContext.request.contextPath}/api/admin/review/searchpaginated">
                             <i class="fas fa-list me-2"></i>Danh sách đánh giá
                         </a>
@@ -135,14 +135,14 @@
                 <div class="sb-sidenav-menu-heading">Quản lý hệ thống</div>
 
                 <!-- Users -->
-                <a class="nav-link ${currentPath.contains('/users') || currentPath.contains('/user/') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/users') || currentPath.contains('/user/') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/api/admin/users">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     Người dùng
                 </a>
 
                 <!-- Chat -->
-                <a class="nav-link ${currentPath.contains('/chat') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/chat') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/api/admin/chat">
                     <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                     Chat hỗ trợ
@@ -152,17 +152,16 @@
                 </a>
 
                 <!-- Banners -->
-                <a class="nav-link ${currentPath.contains('/banner') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/banner') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/api/admin/banner">
                     <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
                     Banner quảng cáo
                 </a>
 
                 <!-- Settings -->
-                <a class="nav-link ${currentPath.contains('/settings') ? 'active' : ''}" 
+                <a class="nav-link ${currentPath.contains('/home') ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/home">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-house"></i>
-</i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-house"></i></div>
                     Trang chủ
                 </a>
 
@@ -178,48 +177,42 @@
         border-left: 3px solid #667eea;
         color: #667eea !important;
     }
-    
+
     .sb-sidenav .nav-link.active .sb-nav-link-icon {
         color: #667eea;
     }
-    
+
     /* Nested nav active state */
     .sb-sidenav-menu-nested .nav-link.active {
         background: rgba(102, 126, 234, 0.1);
         color: #667eea !important;
         font-weight: 600;
     }
-    
+
     /* Hover effect */
     .sb-sidenav .nav-link:hover {
         background: rgba(255, 255, 255, 0.05);
         padding-left: 1.25rem;
         transition: all 0.2s ease;
     }
-    
+
     .sb-sidenav-menu-nested .nav-link:hover {
         padding-left: 2.5rem;
     }
-    
+
     /* Icon styling */
     .sb-nav-link-icon {
         width: 1.5rem;
         text-align: center;
         margin-right: 0.5rem;
     }
-    
+
     /* Badge styling */
     .sb-sidenav .badge {
         font-size: 0.65rem;
         padding: 0.25rem 0.5rem;
     }
-    
-    /* Footer styling */
-    .sb-sidenav-footer {
-        background: rgba(0, 0, 0, 0.2);
-        padding: 1rem;
-    }
-    
+
     /* Menu heading */
     .sb-sidenav-menu-heading {
         padding: 1rem 1rem 0.5rem;
@@ -229,13 +222,16 @@
         letter-spacing: 0.05em;
         color: rgba(255, 255, 255, 0.4);
     }
-    
-    /* Collapse arrow animation */
+
+    /* Collapse arrow animation - cải thiện sync với active/collapsed */
     .sb-sidenav-collapse-arrow {
         transition: transform 0.2s ease;
+        float: right;
+        margin-top: 0.1rem;
     }
-    
-    .nav-link:not(.collapsed) .sb-sidenav-collapse-arrow {
+
+    .nav-link:not(.collapsed) .sb-sidenav-collapse-arrow i,
+    .nav-link.active .sb-sidenav-collapse-arrow i {
         transform: rotate(180deg);
     }
 </style>

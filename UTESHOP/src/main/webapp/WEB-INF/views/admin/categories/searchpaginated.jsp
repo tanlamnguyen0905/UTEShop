@@ -73,16 +73,19 @@
                                 <td>${category.categoryName}</td>
                                 <td>${category.description}</td>
                                 <td>
-                                    <c:if test="${not empty category.image}">
-                                        <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
-                                             alt="${category.categoryName}"
-                                             width="50" height="50" class="img-thumbnail"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                        <span style="display:none; color: #6c757d; font-size: 0.875em;">Không tải được ảnh</span>
-                                    </c:if>
-                                    <c:if test="${empty category.image}">
-                                        <span class="text-muted">Không có ảnh</span>
-                                    </c:if>
+                                    <c:choose>
+                                        <c:when test="${not empty category.image}">
+                                            <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
+                                                 alt="${category.categoryName}"
+                                                 width="50" height="50" class="img-thumbnail"
+                                                 onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${pageContext.request.contextPath}/assets/images/logo.png"
+                                                 alt="No image"
+                                                 width="50" height="50" class="img-thumbnail">
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                                 <td>${category.products != null ? category.products.size() : 0}</td>
                                 <td>

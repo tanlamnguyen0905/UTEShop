@@ -154,7 +154,7 @@ public class CategoriesController extends HttpServlet {
             Part filePart = req.getPart("image");
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    String uploadDir = Constant.Dir + File.separator + "images/categories";
+                    String uploadDir = Constant.Dir + File.separator + "images" + File.separator + "categories";
                     File dir = new File(uploadDir);
                     if (!dir.exists())
                         dir.mkdirs();
@@ -164,7 +164,8 @@ public class CategoriesController extends HttpServlet {
 
                     filePart.write(uploadDir + File.separator + fileName);
 
-                    category.setImage(fileName);
+                    // FIX: Lưu full path vào DB để nhất quán với load ảnh
+                    category.setImage("images/categories/" + fileName);
 
                     System.out.println("✅ Ảnh danh mục đã upload: " + fileName);
 
@@ -176,11 +177,11 @@ public class CategoriesController extends HttpServlet {
                     return;
                 }
             } else if (id != null && category.getImage() != null) {
-                // Giữ ảnh cũ khi không upload mới
+                // Giữ ảnh cũ khi không upload mới (full path đã lưu)
                 category.setImage(category.getImage());
             } else {
-                // Ảnh mặc định khi thêm mới
-                category.setImage("logo.png");
+                // Ảnh mặc định khi thêm mới (full path nếu logo ở root, hoặc điều chỉnh nếu logo ở assets)
+                category.setImage("logo.png");  // Giả sử logo.png ở root; nếu không, dùng "assets/images/logo.png"
             }
 
             // 💾 Lưu hoặc cập nhật
