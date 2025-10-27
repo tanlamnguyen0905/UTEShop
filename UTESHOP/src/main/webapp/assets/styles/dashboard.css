@@ -1,0 +1,27 @@
+/* dashboard.css - KPI card styling */
+.kpi-card {
+  color: #fff;
+  padding: 1rem;
+  border-radius: .5rem;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.kpi-label { font-size: .9rem; opacity: .95; }
+.kpi-value { font-size: 1.25rem; font-weight: 700; margin-top: .25rem; }
+.kpi-sub { font-size: .85rem; opacity: .9; margin-top:.25rem; }
+
+.gradient-green { background: linear-gradient(135deg,#198754,#36b37e); }
+.gradient-blue { background: linear-gradient(135deg,#0d6efd,#5aa9ff); }
+.gradient-orange { background: linear-gradient(135deg,#fd7e14,#ffb86b); }
+.gradient-purple { background: linear-gradient(135deg,#6f42c1,#9b7cff); }
+.gradient-teal { background: linear-gradient(135deg,#20c997,#63e6be); color:#042; }
+.gradient-gray { background: linear-gradient(135deg,#6c757d,#adb5bd); }
+
+/* Small table tweaks */
+.table-sm td, .table-sm th { padding: .45rem .6rem; }
+.card-header.fw-semibold { font-weight:600; }
+@media (max-width: 576px) {
+  .kpi-value { font-size: 1rem; }
+}

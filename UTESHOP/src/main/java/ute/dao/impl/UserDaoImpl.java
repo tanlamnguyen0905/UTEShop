@@ -1,15 +1,18 @@
 package ute.dao.impl;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
-import ute.entities.Users;
 import ute.configs.JPAConfig;
 import ute.dao.inter.UserDao;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import ute.entities.Users;
 
 public class UserDaoImpl implements UserDao {
 
@@ -221,6 +224,96 @@ public class UserDaoImpl implements UserDao {
 			if (tx.isActive()) tx.rollback();
 			e.printStackTrace();
 			return false;
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public Long getTotalCustomerCount() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Long> query = em.createQuery(
+				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER'",
+				Long.class
+			);
+			return query.getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public Long getActiveCustomerCount() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Long> query = em.createQuery(
+				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER' AND u.status = 'ACTIVE'",
+				Long.class
+			);
+			return query.getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getTopCustomersByOrderCount(int limit) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Object[]> query = em.createQuery(
+				"SELECT u.fullname, COUNT(o), COALESCE(SUM(o.amount), 0.0) " +
+				"FROM Users u " +
+				"JOIN u.orders o " +
+				"WHERE u.role = 'USER' " +
+				"GROUP BY u.userID, u.fullname " +
+				"ORDER BY COUNT(o) DESC",
+				Object[].class
+			);
+			query.setMaxResults(limit);
+			
+			List<Object[]> results = query.getResultList();
+			List<Map<String, Object>> topCustomers = new ArrayList<>();
+			
+			for (Object[] row : results) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("name", row[0]);
+				map.put("orders", row[1]);
+				map.put("spend", row[2]);
+				topCustomers.add(map);
+			}
+			return topCustomers;
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getTopCustomersBySpending(int limit) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Object[]> query = em.createQuery(
+				"SELECT u.fullname, COUNT(o), COALESCE(SUM(o.amount), 0.0) " +
+				"FROM Users u " +
+				"JOIN u.orders o " +
+				"WHERE u.role = 'USER' " +
+				"GROUP BY u.userID, u.fullname " +
+				"ORDER BY SUM(o.amount) DESC",
+				Object[].class
+			);
+			query.setMaxResults(limit);
+			
+			List<Object[]> results = query.getResultList();
+			List<Map<String, Object>> topCustomers = new ArrayList<>();
+			
+			for (Object[] row : results) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("name", row[0]);
+				map.put("orders", row[1]);
+				map.put("spend", row[2]);
+				topCustomers.add(map);
+			}
+			return topCustomers;
 		} finally {
 			em.close();
 		}

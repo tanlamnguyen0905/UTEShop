@@ -70,58 +70,58 @@
 	</div>
 
 	<!-- Info Modal -->
-	<div class="modal fade" id="userModal" tabindex="-1"
-		aria-labelledby="userModalLabel" aria-hidden="true">
+	<div class="modal fade" id="acc_mdl_userModal" tabindex="-1"
+		aria-labelledby="acc_mdl_userModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
-			<form id="userForm" class="modal-content">
+			<form id="acc_mdl_userForm" class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="userModalLabel">Chỉnh sửa tài
+					<h5 class="modal-title" id="acc_mdl_userModalLabel">Chỉnh sửa tài
 						khoản</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Đóng"></button>
 				</div>
 				<div class="modal-body row g-3">
-					<input type="hidden" id="userId">
+					<input type="hidden" id="acc_mdl_userId">
 					<div class="col-md-4 text-center">
-						<img id="avatarPreview" src="" alt="Avatar"
+						<img id="acc_mdl_avatarPreview" src="" alt="Avatar"
 							class="img-thumbnail mb-2" style="max-width: 150px;"> <input
 							type="file" id="avatarInput" class="form-control"
 							accept="image/*">
 					</div>
 					<div class="col-md-8">
 						<div class="mb-2">
-							<label>Tên đăng nhập</label> <input type="text" id="username"
+							<label>Tên đăng nhập</label> <input type="text" id="acc_mdl_username"
 								class="form-control" required>
 						</div>
 						<div class="mb-2">
-							<label>Họ tên</label> <input type="text" id="fullname"
+							<label>Họ tên</label> <input type="text" id="acc_mdl_fullname"
 								class="form-control">
 						</div>
 						<div class="mb-2">
-							<label>Email</label> <input type="email" id="email"
+							<label>Email</label> <input type="email" id="acc_mdl_email"
 								class="form-control">
 						</div>
 						<div class="mb-2">
-							<label>SĐT</label> <input type="text" id="phone"
+							<label>SĐT</label> <input type="text" id="acc_mdl_phone"
 								class="form-control">
 						</div>
 						<div class="mb-2">
-							<label>Mật khẩu</label> <input type="password" id="password"
+							<label>Mật khẩu</label> <input type="password" id="acc_mdl_password"
 								class="form-control" placeholder="(không đổi)">
 						</div>
 						<div class="mb-2">
 							<label>Nhập lại mật khẩu</label> <input type="password"
-								id="password2" class="form-control" placeholder="(nhập lại)">
+								id="acc_mdl_password2" class="form-control" placeholder="(nhập lại)">
 						</div>
 						<div class="mb-2">
-							<label>Vai trò</label> <select id="role" class="form-select">
+							<label>Vai trò</label> <select id="acc_mdl_role" class="form-select">
 								<c:forEach var="role" items="${requestScope.roles}">
 									<option value="${role}">${role}</option>
 								</c:forEach>
 							</select>
 						</div>
 						<div class="mb-2">
-							<label>Trạng thái</label> <select id="status" class="form-select">
+							<label>Trạng thái</label> <select id="acc_mdl_status" class="form-select">
 								<c:forEach var="status" items="${requestScope.statuses}">
 									<option value="${status}">${status}</option>
 								</c:forEach>
@@ -139,7 +139,7 @@
 	</div>
 
 	<!-- Confirm Modal -->
-	<div class="modal fade" id="deleteModal" tabindex="-1"
+	<div class="modal fade" id="acc_mdl_deleteModal" tabindex="-1"
 		aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
