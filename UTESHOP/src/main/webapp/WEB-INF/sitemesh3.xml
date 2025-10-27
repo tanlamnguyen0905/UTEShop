@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
 
-	<!-- Decorator mặc định cho toàn site -->
-	<mapping path="/*" name="web" decorator="web.jsp" />
+    <!-- Decorator cho admin -->
+    <mapping path="/api/admin/*" decorator="/admin.jsp" />
+    
+    <!-- Decorator cho shipper -->
+    <mapping path="/api/shipper*" decorator="/shipper.jsp" />
 
-	<!-- Loại trừ các trang không cần layout (auth + API) -->
-	<mapping path="/auth/*" exclude="true" />
-	<mapping path="/api/*" exclude="true" />
-	<mapping path="/assets/*" exclude="true" />
-	
+    <!-- Decorator cho user -->
+    <mapping path="/home/user*" decorator="/user.jsp" />
+
+    <!-- Decorator mặc định cho web -->
+    <mapping path="/*" decorator="/web.jsp" />
+
+	    <!-- Exclude các đường dẫn không cần decorate -->
+    <mapping path="/api*" exclude="true" />
+    <mapping path="/auth/logout" exclude="true" />
+
+    <!-- Exclude static files để tránh decorate -->
+    <mapping path="/*.css" exclude="true" />
+    <mapping path="/*.js" exclude="true" />
+    <mapping path="/*.png" exclude="true" />
+    <mapping path="/*.jpg" exclude="true" />
+    <mapping path="/*.gif" exclude="true" />
+    <mapping path="/images/*" exclude="true" />
+    <mapping path="/image" exclude="true" />
+    <mapping path="/templates/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+
 </sitemesh>

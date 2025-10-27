@@ -25,7 +25,6 @@ public class DownloadFileController extends HttpServlet {
 	 */
 	public DownloadFileController() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -34,7 +33,6 @@ public class DownloadFileController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String fileName = request.getParameter("fname");
 		File file = new File(Constant.Dir + "/" + fileName);
 		response.setContentType("image/jpeg");
@@ -49,7 +47,6 @@ public class DownloadFileController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

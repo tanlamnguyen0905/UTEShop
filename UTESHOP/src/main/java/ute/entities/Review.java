@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,15 +29,18 @@ public class Review {
     private String content;
     private String image;
     private Double rating;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
-    private int status;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "userID")
     private Users user;
 
-    @OneToOne
-    @JoinColumn(name = "orderDetailID")
-    private OrderDetail orderDetail;
+    @ManyToOne
+    @JoinColumn(name = "productID")
+    private Product product;
 }

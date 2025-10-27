@@ -5,14 +5,14 @@ import java.util.List;
 import ute.entities.Review;
 
 public interface ReviewDao {
-	// Basic CRUD
+
 	void insert(Review review);
 	void update(Review review);
 	void delete(Long id);
 	Review findById(Long id);
+	List<Review> findByProductId(Long productId);
+	List<Review> findByUserId(Long userId);
 	List<Review> findAll();
-	
-	// Dashboard-specific queries
 	
 	// Get total review count
 	Long getTotalReviewCount();
@@ -22,10 +22,8 @@ public interface ReviewDao {
 	
 	// Get average rating within date range
 	Double getAverageRatingByDateRange(LocalDateTime startDate, LocalDateTime endDate);
-	
-	// Get reviews by product
-	List<Review> findByProductId(Long productId);
-	
-	// Get reviews by user
-	List<Review> findByUserId(Long userId);
+
+    Double getAverageRatingByProductId(Long productId);
+
+    Long getReviewCountByProductId(Long productId);
 }

@@ -17,26 +17,6 @@ import ute.entities.Users;
 public class UserDaoImpl implements UserDao {
 
 	@Override
-	public List<Users> findAll() {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			return em.createQuery("SELECT u FROM Users u", Users.class).getResultList();
-		} finally {
-			em.close();
-		}
-	}
-
-	@Override
-	public Users findById(Long id) {
-		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			return em.find(Users.class, id);
-		} finally {
-			em.close();
-		}
-	}
-
-	@Override
 	public List<Users> search(String keyword, String role, String status) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
@@ -71,11 +51,11 @@ public class UserDaoImpl implements UserDao {
 	public Users findByUsername(String username) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Users> query = em.createQuery(
-					"SELECT u FROM Users u WHERE u.username = :username", Users.class);
-			query.setParameter("username", username);
-			List<Users> result = query.getResultList();
-			return result.isEmpty() ? null : result.get(0);
+            TypedQuery<Users> query = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.username = :username", Users.class);
+            query.setParameter("username", username);
+            List<Users> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
 		} finally {
 			em.close();
 		}
@@ -84,15 +64,15 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public boolean existsByUsername(String username) {
 		EntityManager em = JPAConfig.getEntityManager();
-		try {
-			Long count = em.createQuery(
-				"SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
-				.setParameter("username", username)
-				.getSingleResult();
-			return count > 0;
-		} finally {
-			em.close();
-		}
+        try {
+            Long count = em.createQuery(
+                "SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+            return count > 0;
+        } finally {
+            em.close();
+        }
 	}
 
 	@Override
@@ -141,24 +121,32 @@ public class UserDaoImpl implements UserDao {
 			if (existingUser == null)
 				throw new IllegalArgumentException("Không tìm thấy người dùng với ID: " + user.getUserID());
 
-			// Cập nhật các thông tin cho phép thay đổi
-			// (giữ nguyên các quan hệ và dữ liệu hệ thống như createAt, role, status nếu
-			// bạn muốn)
+            // Cập nhật các thông tin cho phép thay đổi
+            // (giữ nguyên các quan hệ và dữ liệu hệ thống như createAt, role, status nếu
+            // bạn muốn)
 
-			if (user.getFullname() != null) existingUser.setFullname(user.getFullname());
-			if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
-			if (user.getPhone() != null) existingUser.setPhone(user.getPhone());
-			if (user.getAvatar() != null) existingUser.setAvatar(user.getAvatar());
+            if (user.getFullname() != null)
+                existingUser.setFullname(user.getFullname());
+            if (user.getEmail() != null)
+                existingUser.setEmail(user.getEmail());
+            if (user.getPhone() != null)
+                existingUser.setPhone(user.getPhone());
+            if (user.getAvatar() != null)
+                existingUser.setAvatar(user.getAvatar());
 
-			// Nếu có cập nhật mật khẩu (đã mã hóa sẵn trước khi truyền vào)
-			if (user.getPassword() != null && !user.getPassword().isEmpty()) existingUser.setPassword(user.getPassword());
+            // Nếu có cập nhật mật khẩu (đã mã hóa sẵn trước khi truyền vào)
+            if (user.getPassword() != null && !user.getPassword().isEmpty())
+                existingUser.setPassword(user.getPassword());
 
-			// Nếu có cập nhật trạng thái hoặc quyền
-			if (user.getStatus() != null) existingUser.setStatus(user.getStatus());
-			if (user.getRole() != null) existingUser.setRole(user.getRole());
+            // Nếu có cập nhật trạng thái hoặc quyền
+            if (user.getStatus() != null)
+                existingUser.setStatus(user.getStatus());
+            if (user.getRole() != null)
+                existingUser.setRole(user.getRole());
 
-			// Cập nhật thời gian đăng nhập gần nhất (nếu có)
-			if (user.getLastLoginAt() != null) existingUser.setLastLoginAt(user.getLastLoginAt());
+            // Cập nhật thời gian đăng nhập gần nhất (nếu có)
+            if (user.getLastLoginAt() != null)
+                existingUser.setLastLoginAt(user.getLastLoginAt());
 
 			em.merge(existingUser);
 			tx.commit();
@@ -189,25 +177,26 @@ public class UserDaoImpl implements UserDao {
 		} catch (Exception e) {
 			if (tx.isActive()) tx.rollback();
 			e.printStackTrace();
+			throw new RuntimeException("Lỗi khi xóa tài khoản: " + e.getMessage(), e);
 		} finally {
 			em.close();
 		}
 		return result;
 	}
 
-	@Override
-	public boolean activateUserByEmail(String email) {
-		EntityManager em = JPAConfig.getEntityManager();
-		EntityTransaction tx = em.getTransaction();
+    @Override
+    public boolean activateUserByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
 
-		try {
-			tx.begin();
-			
-			// Tìm user theo email
-			Users user = em.createQuery(
-				"SELECT u FROM Users u WHERE u.email = :email", Users.class)
-				.setParameter("email", email)
-				.getSingleResult();
+        try {
+            tx.begin();
+
+            // Tìm user theo email
+            Users user = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
 
 			if (user != null) {
 				user.setStatus("ACTIVE");
@@ -215,15 +204,92 @@ public class UserDaoImpl implements UserDao {
 				em.merge(user);
 			}
 
-			tx.commit();
-			return true;
-		} catch (NoResultException e) {
-			if (tx.isActive()) tx.rollback();
-			return false;
-		} catch (Exception e) {
-			if (tx.isActive()) tx.rollback();
-			e.printStackTrace();
-			return false;
+            tx.commit();
+            return true;
+        } catch (NoResultException e) {
+            if (tx.isActive())
+                tx.rollback();
+            return false;
+        } catch (Exception e) {
+            if (tx.isActive())
+                tx.rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Users findByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<Users> query = em.createQuery(
+                    "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+            query.setParameter("email", email);
+            List<Users> result = query.getResultList();
+            return result.isEmpty() ? null : result.get(0);
+        } finally {
+            em.close();
+        }
+    }
+
+	@Override
+	public Users findById(Long userId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.find(Users.class, userId);
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public List<Users> findByRole(String role) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery(
+				"SELECT u FROM Users u WHERE u.role = :role AND u.status = 'active' ORDER BY u.fullname", 
+				Users.class);
+			query.setParameter("role", role);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public List<Users> findAll() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			TypedQuery<Users> query = em.createQuery(
+				"SELECT u FROM Users u ORDER BY u.createAt DESC", 
+				Users.class);
+			return query.getResultList();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public long countAll() {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.createQuery("SELECT COUNT(u) FROM Users u", Long.class)
+				.getSingleResult();
+		} finally {
+			em.close();
+		}
+	}
+
+	@Override
+	public long countByRole(String role) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			return em.createQuery(
+				"SELECT COUNT(u) FROM Users u WHERE u.role = :role", Long.class)
+				.setParameter("role", role)
+				.getSingleResult();
 		} finally {
 			em.close();
 		}

@@ -25,7 +25,11 @@
 			<artifactId>jakarta.transaction-api</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
 		<!-- Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -101,6 +105,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Gson for JSON serialization -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -111,7 +116,7 @@
 		<dependency>
 			<groupId>org.sitemesh</groupId>
 			<artifactId>sitemesh</artifactId>
-			<version>3.2.2</version>
+			<version>3.2.1</version>
 		</dependency>
 
 		<!--
@@ -144,7 +149,7 @@
 			<version>2.0.2</version>
 		</dependency>
 
-	</dependencies>
+</dependencies>
 
 	<build>
 		<plugins>
@@ -155,6 +160,13 @@
 				<configuration>
 					<source>22</source>
 					<target>22</target>
+				<annotationProcessorPaths>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>1.18.40</version>
+                    </path>
+                </annotationProcessorPaths>
 					<!-- put your configurations here -->
 				</configuration>
 			</plugin>

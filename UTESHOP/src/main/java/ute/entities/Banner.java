@@ -6,12 +6,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "products")
 @Builder
 public class Banner {
 
@@ -19,12 +21,14 @@ public class Banner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bannerID;
 
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String bannerName;
 
     private String bannerImage;
 
-    // ✅ Bên Banner là bên BỊ ÁNH XẠ — không tạo @JoinTable ở đây
+    private String description;
+
     @ManyToMany(mappedBy = "banners")
+    @Builder.Default
     private Set<Product> products = new HashSet<>();
 }

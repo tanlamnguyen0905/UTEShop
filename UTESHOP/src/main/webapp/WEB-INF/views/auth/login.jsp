@@ -95,8 +95,10 @@ h3 {
 						</button>
 
 						<div class="text-center mt-3">
-							<a href="#" class="text-muted">Quên mật khẩu?</a><br> Chưa
-							có tài khoản? <a href="#" data-bs-toggle="modal"
+							<a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">
+    Quên mật khẩu?
+</a><br> Chưa
+							có tài khoản? <a href="#forgot-password" data-bs-toggle="modal"
 								data-bs-target="#registerModal" data-bs-dismiss="modal">
 								Đăng ký </a>
 						</div>
@@ -140,6 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             if (data.success) {
+                // ✅ Lưu JWT token vào localStorage
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    console.log('🔐 Token saved to localStorage');
+                }
+                
                 // Đăng nhập thành công
                 const loginModal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
                 loginModal.hide();
@@ -149,14 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 toast.className = "toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3";
                 toast.role = "alert";
                 toast.innerHTML = `<div class="d-flex">
-                    <div class="toast-body"> Đăng nhập thành công! Xin chào ${data.username}.</div>
+                    <div class="toast-body">🔐 Đăng nhập thành công! Xin chào ${data.username}.</div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>`;
                 document.body.appendChild(toast);
                 new bootstrap.Toast(toast).show();
 
-                // Reload lại trang sau 1.5s
-                setTimeout(() => location.reload(), 1500);
+                // Check for redirect URL
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 1500);
+                } else {
+                    setTimeout(() => location.reload(), 1500);
+                }
             } else {
                 // ❌ Sai tài khoản / mật khẩu
                 errorBox.textContent = data.error || "Sai tên đăng nhập hoặc mật khẩu!";

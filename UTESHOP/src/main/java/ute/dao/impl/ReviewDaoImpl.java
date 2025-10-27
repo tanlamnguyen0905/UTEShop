@@ -134,7 +134,7 @@ public class ReviewDaoImpl implements ReviewDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Review> query = em.createQuery(
-				"SELECT r FROM Review r WHERE r.product.productID = :productId",
+				"SELECT r FROM Review r WHERE r.product.productID = :productId ORDER BY r.createdAt DESC",
 				Review.class
 			);
 			query.setParameter("productId", productId);
@@ -149,7 +149,7 @@ public class ReviewDaoImpl implements ReviewDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Review> query = em.createQuery(
-				"SELECT r FROM Review r WHERE r.user.userID = :userId",
+				"SELECT r FROM Review r WHERE r.user.userID = :userId ORDER BY r.createAt DESC",
 				Review.class
 			);
 			query.setParameter("userId", userId);
@@ -158,4 +158,31 @@ public class ReviewDaoImpl implements ReviewDao {
 			em.close();
 		}
 	}
+
+    @Override
+    public Double getAverageRatingByProductId(Long productId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			String jpql = "SELECT AVG(r.rating) FROM Review r WHERE r.product.productID = :productId";
+			TypedQuery<Double> query = em.createQuery(jpql, Double.class);
+			query.setParameter("productId", productId);
+			Double result = query.getSingleResult();
+			return result != null ? result : 0.0;
+		} finally {
+			em.close();
+		}
+    }
+
+    @Override
+    public Long getReviewCountByProductId(Long productId) {
+		EntityManager em = JPAConfig.getEntityManager();
+		try {
+			String jpql = "SELECT COUNT(r) FROM Review r WHERE r.product.productID = :productId";
+			TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+			query.setParameter("productId", productId);
+			return query.getSingleResult();	
+		} finally {
+			em.close();
+		}
+    }
 }

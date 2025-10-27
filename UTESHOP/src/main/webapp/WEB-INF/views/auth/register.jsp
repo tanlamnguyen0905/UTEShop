@@ -222,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 📨 Gửi mã OTP qua email
   sendOtpBtn.addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
+    const username = document.getElementById("username").value.trim();
 
     if (!email) {
       otpMsg.className = "alert alert-warning py-2";
@@ -230,31 +231,41 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (!username) {
+      otpMsg.className = "alert alert-warning py-2";
+      otpMsg.textContent = "⚠️ Vui lòng nhập tên đăng nhập trước khi nhận mã OTP!";
+      otpMsg.style.display = "block";
+      return;
+    }
+
     // Disable nút gửi trong vài giây để tránh spam
     sendOtpBtn.disabled = true;
     otpMsg.className = "alert alert-info py-2";
-    otpMsg.textContent = "⏳ Đang gửi mã OTP...";
+    otpMsg.textContent = "⏳ Đang kiểm tra thông tin...";
     otpMsg.style.display = "block";
 
     try {
       // Không dùng để tránh lỗi EL
-      const url = form.action + "?sendOtp=true&email=" + encodeURIComponent(email);
+      const url = form.action + "?sendOtp=true&email=" + encodeURIComponent(email) + "&username=" + encodeURIComponent(username);
       const res = await fetch(url);
+      const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         otpMsg.className = "alert alert-success py-2";
         otpMsg.textContent = "📩 Mã OTP đã được gửi đến email của bạn!";
+        // Kích hoạt lại nút sau 60 giây để cho phép gửi lại OTP
+        setTimeout(() => sendOtpBtn.disabled = false, 60000);
       } else {
         otpMsg.className = "alert alert-danger py-2";
-        otpMsg.textContent = "❌ Gửi OTP thất bại. Thử lại sau!";
+        otpMsg.textContent = data.error || "❌ Gửi OTP thất bại. Thử lại sau!";
+        sendOtpBtn.disabled = false; // Cho phép gửi lại ngay nếu lỗi
       }
     } catch (err) {
       otpMsg.className = "alert alert-danger py-2";
       otpMsg.textContent = "🚫 Không thể kết nối đến máy chủ!";
+      sendOtpBtn.disabled = false;
     } finally {
       otpMsg.style.display = "block";
-      // Kích hoạt lại nút sau 10 giây
-      setTimeout(() => sendOtpBtn.disabled = false, 10000);
     }
   });
 

@@ -11,8 +11,8 @@ public class MailServiceImpl implements MailService {
 	private static final String PASSWORD;
 
 	static {
-		USER = "uteshop86@gmail.com";
-		PASSWORD = "vkbe ucym xajn fqwv";
+		USER = "uteshop99@gmail.com";
+		PASSWORD = "wden dcxi dkjk udrg";
 	}
 
 	@Override

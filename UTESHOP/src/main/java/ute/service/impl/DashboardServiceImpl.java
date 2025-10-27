@@ -22,7 +22,7 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardServiceImpl() {
         this.orderService = new OrderServiceImpl();
         this.productService = new ProductServiceImpl();
-        this.userService = new UserServiceImpl(new UserDaoImpl());
+        this.userService = new UserServiceImpl();
         this.reviewService = new ReviewServiceImpl();
     }
 
