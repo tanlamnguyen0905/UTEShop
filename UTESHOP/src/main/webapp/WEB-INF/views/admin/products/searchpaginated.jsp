@@ -136,7 +136,7 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${not empty product.images && not empty product.images[0]}">
-                                        <img src="${pageContext.request.contextPath}/assets/${product.images[0].dirImage}"
+                                        <img src="${pageContext.request.contextPath}/image?fname=${product.images[0].dirImage}"
                                              alt="${product.productName}"
                                              width="50" height="50"
                                              class="img-thumbnail"

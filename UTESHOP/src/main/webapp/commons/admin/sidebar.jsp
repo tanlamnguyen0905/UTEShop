@@ -124,7 +124,7 @@
                 </a>
 
                 <!-- Banners -->
-                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/banners">
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/banner">
                     <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
                     Banner quảng cáo
                 </a>
