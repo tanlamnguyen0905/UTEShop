@@ -47,7 +47,7 @@ public class CheckoutController extends HttpServlet {
         // Kiểm tra đăng nhập
         Users currentUser = (Users) session.getAttribute("currentUser");
         if (currentUser == null) {
-            resp.sendRedirect(req.getContextPath() + "/auth/login");
+            resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
         
