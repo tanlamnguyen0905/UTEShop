@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
-	<!--<mapping path="/home/user*" name="user" decorator="user.jsp" />-->
-	
-	<mapping path="/*" name="admin" decorator="admin.jsp" /><!-- Exclude
-	path from decoration. -->
-	<!--mapping path="/*" name="web" decorator="web.jsp" />
-	<mapping path="/api*" exclude="true" />-->
+
+    <!-- Decorator cho admin -->
+    <mapping path="/api/admin/*" decorator="/admin.jsp" />
+    
+    <!-- Decorator cho shipper -->
+    <mapping path="/api/shipper*" decorator="/shipper.jsp" />
+    <!-- Decorator cho manager -->
+    <mapping path="/api/manager/*" decorator="/manager.jsp" />
+    <!-- Decorator cho user -->
+    <mapping path="/home/user*" decorator="/user.jsp" />
+
+    <!-- Decorator mặc định cho web -->
+    <mapping path="/*" decorator="/web.jsp" />
+
+	    <!-- Exclude các đường dẫn không cần decorate -->
+    <mapping path="/api*" exclude="true" />
+    <mapping path="/auth/logout" exclude="true" />
+
+    <!-- Exclude static files để tránh decorate -->
+    <mapping path="/*.css" exclude="true" />
+    <mapping path="/*.js" exclude="true" />
+    <mapping path="/*.png" exclude="true" />
+    <mapping path="/*.jpg" exclude="true" />
+    <mapping path="/*.gif" exclude="true" />
+    <mapping path="/images/*" exclude="true" />
+    <mapping path="/image" exclude="true" />
+    <mapping path="/templates/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+
 </sitemesh>

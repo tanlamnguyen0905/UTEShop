@@ -7,36 +7,33 @@
 
     <persistence-unit name="UTESHOP" transaction-type="RESOURCE_LOCAL">
 
-        <!-- Thêm tất cả các entity classes từ project structure của bạn -->
+        <!-- Các entities (auto-synced to current codebase) -->
         <class>ute.entities.Users</class>
         <class>ute.entities.Addresses</class>
+        <class>ute.entities.Banner</class>
         <class>ute.entities.Brand</class>
         <class>ute.entities.Cart</class>
-        <class>ute.entities.CartProduct</class>
+        <class>ute.entities.CartDetail</class>
         <class>ute.entities.Categories</class>
-        <class>ute.entities.Discounts</class>
-        <class>ute.entities.OrderDetails</class>
+        <class>ute.entities.Favorite</class>
+        <class>ute.entities.Image</class>
+        <class>ute.entities.OrderDetail</class>
         <class>ute.entities.Orders</class>
-        <class>ute.entities.PaymentMethods</class>
-        <class>ute.entities.ProductComments</class>
-        <class>ute.entities.ProductDiscounts</class>
-        <class>ute.entities.Products</class>
-        <class>ute.entities.Reviews</class>
-        <class>ute.entities.UserCoupon</class>
+        <class>ute.entities.PaymentMethod</class>
+        <class>ute.entities.Product</class>
+        <class>ute.entities.Review</class>
+        <class>ute.entities.Voucher</class>
 
         <properties>
             <!-- JDBC config cho SQL Server -->
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://localhost:1433;databaseName=UTESHOP_1;encrypt=false;trustServerCertificate=true"/>
+            <!-- Thông tin đăng nhập sẽ được lưu trong config.properties -->
 
             <!-- Hibernate config -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-
-            <!-- Tùy chọn: Tắt batch insert nếu gặp lỗi với SQL Server -->
-            <property name="hibernate.jdbc.batch_size" value="0"/>
         </properties>
     </persistence-unit>
 </persistence>

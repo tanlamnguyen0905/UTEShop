@@ -25,7 +25,11 @@
 			<artifactId>jakarta.transaction-api</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
 		<!-- Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -55,6 +59,12 @@
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>jakarta.servlet.jsp.jstl</artifactId>
 			<version>3.0.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mindrot</groupId>
+		    <artifactId>jbcrypt</artifactId>
+		    <version>0.4</version>
 		</dependency>
 
 		<!-- Connection pool -->
@@ -95,11 +105,18 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/opensymphony/sitemesh -->
+		<!-- Gson for JSON serialization -->
 		<dependency>
-			<groupId>opensymphony</groupId>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.sitemesh/sitemesh -->
+		<dependency>
+			<groupId>org.sitemesh</groupId>
 			<artifactId>sitemesh</artifactId>
-			<version>2.7.0-M1</version>
+			<version>3.2.1</version>
 		</dependency>
 
 		<!--
@@ -117,7 +134,36 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.40</version>
 		</dependency>
-	</dependencies>
+		
+		<!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
+		<dependency>
+			<groupId>jakarta.mail</groupId>
+			<artifactId>jakarta.mail-api</artifactId>
+			<version>2.1.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+
+	<!-- WebSocket API -->
+	<dependency>
+		<groupId>jakarta.websocket</groupId>
+		<artifactId>jakarta.websocket-api</artifactId>
+		<version>2.1.1</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>jakarta.websocket</groupId>
+		<artifactId>jakarta.websocket-client-api</artifactId>
+		<version>2.1.1</version>
+		<scope>provided</scope>
+	</dependency>
+
+</dependencies>
 
 	<build>
 		<plugins>
@@ -128,6 +174,13 @@
 				<configuration>
 					<source>22</source>
 					<target>22</target>
+				<annotationProcessorPaths>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>1.18.40</version>
+                    </path>
+                </annotationProcessorPaths>
 					<!-- put your configurations here -->
 				</configuration>
 			</plugin>

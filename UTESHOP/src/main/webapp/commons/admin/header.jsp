@@ -1,242 +1,197 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-    <!-- BEGIN HEADER -->
-    <div class="header">
-      <div class="container">
-        <a class="site-logo" href="shop-index.html"><img src="${URL}assets/frontend/layout/images/logo.png" alt="Metronic Shop UI"></a>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-        <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+<!-- Top Navigation -->
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow-sm">
+    <!-- Logo / Brand -->
+    <a class="navbar-brand ps-3 d-flex align-items-center" href="${pageContext.request.contextPath}/api/admin/dashboard">
+        <i class="fas fa-store me-2"></i>
+        <span class="fw-bold">UTESHOP Admin</span>
+    </a>
 
-        <!-- BEGIN CART -->
-        <div class="top-cart-block">
-          <div class="top-cart-info">
-            <a href="javascript:void(0);" class="top-cart-info-count">3 items</a>
-            <a href="javascript:void(0);" class="top-cart-info-value">$1260</a>
-          </div>
-          <i class="fa fa-shopping-cart"></i>
-                        
-          <div class="top-cart-content-wrapper">
-            <div class="top-cart-content">
-              <ul class="scroller" style="height: 250px;">
-                <li>
-                  <a href="shop-item.html"><img src="${URL}assets/frontend/layout/images/logo.png" alt="Rolex Classic Watch" width="37" height="34"></a>
-                  <span class="cart-content-count">x 1</span>
-                  <strong><a href="shop-item.html">Rolex Classic Watch</a></strong>
-                  <em>$1230</em>
-                  <a href="javascript:void(0);" class="del-goods">&nbsp;</a>
+    <!-- Sidebar Toggle -->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-white"
+            id="sidebarToggle" title="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Spacer -->
+    <div class="ms-auto"></div>
+
+    <!-- Quick Actions -->
+    <ul class="navbar-nav ms-0 me-3 d-none d-lg-flex">
+        <!-- Chat -->
+        <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/api/admin/chat" title="Chat">
+                <i class="fas fa-comments fa-fw"></i>
+            </a>
+        </li>
+        
+        <!-- Notifications -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle position-relative" id="notificationDropdown" href="#"
+               role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo">
+                <i class="fas fa-bell fa-fw"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                    3
+                </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow animated-dropdown" style="min-width: 320px;">
+                <li class="dropdown-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bell me-2"></i>Thông báo</span>
+                    <span class="badge bg-light text-primary">3</span>
                 </li>
-              </ul>
-              <div class="text-right">
-                <a href="shop-shopping-cart.html" class="btn btn-default">View Cart</a>
-                <a href="shop-checkout.html" class="btn btn-primary">Checkout</a>
-              </div>
-            </div>
-          </div>            
-        </div>
-        <!--END CART -->
-
-        <!-- BEGIN NAVIGATION -->
-        <div class="header-navigation">
-          <ul>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Woman 
-                
-              </a>
-                
-              <!-- BEGIN DROPDOWN MENU -->
-              <ul class="dropdown-menu">
-                <li class="dropdown-submenu">
-                  <a href="shop-product-list.html">Hi Tops <i class="fa fa-angle-right"></i></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="shop-product-list.html">Second Level Link</a></li>
-                    <li><a href="shop-product-list.html">Second Level Link</a></li>
-                    <li class="dropdown-submenu">
-                      <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                        Second Level Link 
-                        <i class="fa fa-angle-right"></i>
-                      </a>
-                      <ul class="dropdown-menu">
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                        <li><a href="shop-product-list.html">Third Level Link</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-                <li><a href="shop-product-list.html">Running Shoes</a></li>
-                <li><a href="shop-product-list.html">Jackets and Coats</a></li>
-              </ul>
-              <!-- END DROPDOWN MENU -->
-            </li>
-            <li class="dropdown dropdown-megamenu">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Man
-                
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <div class="header-navigation-content">
-                    <div class="row">
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Footwear</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Astro Trainers</a></li>
-                          <li><a href="shop-product-list.html">Basketball Shoes</a></li>
-                          <li><a href="shop-product-list.html">Boots</a></li>
-                          <li><a href="shop-product-list.html">Canvas Shoes</a></li>
-                          <li><a href="shop-product-list.html">Football Boots</a></li>
-                          <li><a href="shop-product-list.html">Golf Shoes</a></li>
-                          <li><a href="shop-product-list.html">Hi Tops</a></li>
-                          <li><a href="shop-product-list.html">Indoor and Court Trainers</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Clothing</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Base Layer</a></li>
-                          <li><a href="shop-product-list.html">Character</a></li>
-                          <li><a href="shop-product-list.html">Chinos</a></li>
-                          <li><a href="shop-product-list.html">Combats</a></li>
-                          <li><a href="shop-product-list.html">Cricket Clothing</a></li>
-                          <li><a href="shop-product-list.html">Fleeces</a></li>
-                          <li><a href="shop-product-list.html">Gilets</a></li>
-                          <li><a href="shop-product-list.html">Golf Tops</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-4 header-navigation-col">
-                        <h4>Accessories</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Belts</a></li>
-                          <li><a href="shop-product-list.html">Caps</a></li>
-                          <li><a href="shop-product-list.html">Gloves, Hats and Scarves</a></li>
-                        </ul>
-
-                        <h4>Clearance</h4>
-                        <ul>
-                          <li><a href="shop-product-list.html">Jackets</a></li>
-                          <li><a href="shop-product-list.html">Bottoms</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-md-12 nav-brands">
-                        <ul>
-                          <li><a href="shop-product-list.html"><img title="esprit" alt="esprit" src="${URL}assets/frontend/layout/images/logo.png"></a></li>
-                          <li><a href="shop-product-list.html"><img title="gap" alt="gap" src="${URL}assets/frontend/layout/images/logo.png"></a></li>
-                          <li><a href="shop-product-list.html"><img title="next" alt="next" src="${URL}assets/frontend/layout/images/logo.png"></a></li>
-                          <li><a href="shop-product-list.html"><img title="puma" alt="puma" src="${URL}assets/frontend/layout/images/logo.png"></a></li>
-                          <li><a href="shop-product-list.html"><img title="zara" alt="zara" src="${URL}assets/frontend/layout/images/logo.png"></a></li>
-                        </ul>
-                      </div>
+                <li><a class="dropdown-item py-2 border-bottom" href="${pageContext.request.contextPath}/api/admin/orders">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-shopping-cart text-success fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small fw-bold">Đơn hàng mới</div>
+                        </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
-            </li>
-            <li><a href="shop-item.html">Kids</a></li>
-            <li class="dropdown dropdown100 nav-catalogue">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                New
-                
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <div class="header-navigation-content">
-                    <div class="row">
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/layout/images/logo.png" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
+                </a></li>
+                <li><a class="dropdown-item py-2 border-bottom" href="${pageContext.request.contextPath}/api/admin/products/searchpaginated">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-warning fa-lg"></i>
                         </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/layout/images/logo.png" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small fw-bold">Sản phẩm sắp hết hàng</div>
                         </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/layout/images/logo.png" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
-                      <div class="col-md-3 col-sm-4 col-xs-6">
-                        <div class="product-item">
-                          <div class="pi-img-wrapper">
-                            <a href="shop-item.html"><img src="${URL}assets/frontend/layout/images/logo.png" class="img-responsive" alt="Berry Lace Dress"></a>
-                          </div>
-                          <h3><a href="shop-item.html">Berry Lace Dress</a></h3>
-                          <div class="pi-price">$29.00</div>
-                          <a href="#" class="btn btn-default add2cart">Add to cart</a>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
-            </li>
-            <li class="dropdown active">
-              <a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                Pages 
-                
-              </a>
-                
-              <ul class="dropdown-menu">
-                <li><a href="shop-index.html">Home Default</a></li>
-                <li class="active"><a href="shop-index-header-fix.html">Home Header Fixed</a></li>
-                <li><a href="shop-index-light-footer.html">Home Light Footer</a></li>
-                <li><a href="shop-product-list.html">Product List</a></li>
-                <li><a href="shop-search-result.html">Search Result</a></li>
-                <li><a href="shop-item.html">Product Page</a></li>
-                <li><a href="shop-shopping-cart-null.html">Shopping Cart (Null Cart)</a></li>
-                <li><a href="shop-shopping-cart.html">Shopping Cart</a></li>
-                <li><a href="shop-checkout.html">Checkout</a></li>
-                <li><a href="shop-about.html">About</a></li>
-                <li><a href="shop-contacts.html">Contacts</a></li>
-                <li><a href="shop-account.html">My account</a></li>
-                <li><a href="shop-wishlist.html">My Wish List</a></li>
-                <li><a href="shop-goods-compare.html">Product Comparison</a></li>
-                <li><a href="shop-standart-forms.html">Standart Forms</a></li>
-                <li><a href="shop-faq.html">FAQ</a></li>
-                <li><a href="shop-privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="shop-terms-conditions-page.html">Terms &amp; Conditions</a></li>
-              </ul>
-            </li>
-            <li><a href="index.html" target="_blank">Corporate</a></li>
-            <li><a href="onepage-index.html" target="_blank">One Page</a></li>
-            <li><a href="http://keenthemes.com/preview/metronic/theme/templates/admin&amp;page=ecommerce_index.html" target="_blank">Admin theme</a></li>
+                </a></li>
+                <li><a class="dropdown-item py-2" href="${pageContext.request.contextPath}/api/admin/review/searchpaginated">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-star text-warning fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="small fw-bold">Đánh giá mới từ khách hàng</div>
+                        </div>
+                    </div>
+                </a></li>
+               
+            </ul>
+        </li>
+    </ul>
 
-            <!-- BEGIN TOP SEARCH -->
-            <li class="menu-search">
-              <span class="sep"></span>
-              <i class="fa fa-search search-btn"></i>
-              <div class="search-box">
-                <form action="#">
-                  <div class="input-group">
-                    <input type="text" placeholder="Search" class="form-control">
-                    <span class="input-group-btn">
-                      <button class="btn btn-primary" type="submit">Search</button>
-                    </span>
-                  </div>
-                </form>
-              </div> 
-            </li>
-            <!-- END TOP SEARCH -->
-          </ul>
-        </div>
-        <!-- END NAVIGATION -->
-      </div>
-    </div>
-    <!-- Header END -->
+    <!-- User dropdown -->
+    <ul class="navbar-nav ms-0 me-3 me-lg-4">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" id="userDropdown" href="#"
+               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+               <c:set var="currentUser" value="${sessionScope.currentUser}" />
+               <c:set var="displayName" value="${not empty currentUser.fullname ? currentUser.fullname : (not empty currentUser.username ? currentUser.username : 'Admin')}" />
+               <c:set var="avatarName" value="${not empty currentUser.fullname ? currentUser.fullname : (not empty currentUser.username ? currentUser.username : 'Admin')}" />
+               <c:set var="userRole" value="${not empty currentUser.role ? currentUser.role : 'Admin'}" />
+               
+                <img src="https://ui-avatars.com/api/?name=${avatarName}&background=4e73df&color=fff&size=32" 
+                     class="rounded-circle me-2" width="32" height="32" alt="Avatar">
+                <span class="d-none d-lg-inline">${displayName}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow animated-dropdown" style="min-width: 240px;">
+                <li class="dropdown-header bg-gradient-primary text-white">
+                    <div class="text-center py-2">
+                        <img src="https://ui-avatars.com/api/?name=${avatarName}&background=4e73df&color=fff&size=64" 
+                             class="rounded-circle mb-2 border border-3 border-white" width="64" height="64" alt="Avatar">
+                        <div class="fw-bold">${displayName}</div>
+                        <small class="opacity-75">
+                            <c:choose>
+                                <c:when test="${userRole eq 'ADMIN'}">
+                                    <i class="fas fa-user-shield me-1"></i>Administrator
+                                </c:when>
+                                <c:when test="${userRole eq 'MANAGER'}">
+                                    <i class="fas fa-user-tie me-1"></i>Manager
+                                </c:when>
+                                <c:otherwise>
+                                    <i class="fas fa-user me-1"></i>${userRole}
+                                </c:otherwise>
+                            </c:choose>
+                        </small>
+                    </div>
+                </li>
+                <li><hr class="dropdown-divider my-0"></li>
+                <li>
+                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/api/admin/dashboard">
+                        <i class="fas fa-tachometer-alt fa-fw me-2 text-primary"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/home">
+                        <i class="fa fa-house text-secondary"></i> Trang chủ
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider my-0"></li>
+                <li>
+                    <a class="dropdown-item py-2 text-danger" href="${pageContext.request.contextPath}/auth/logout">
+                        <i class="fas fa-sign-out-alt fa-fw me-2"></i>Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .navbar-brand {
+        transition: all 0.3s ease;
+    }
+    
+    .navbar-brand:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+    
+    .animated-dropdown {
+        border: none;
+        animation: slideDown 0.2s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .dropdown-item {
+        transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        padding-left: 1.25rem;
+    }
+    
+    .dropdown-item i.fa-fw {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .nav-link {
+        transition: all 0.2s ease;
+    }
+    
+    .nav-link:hover {
+        opacity: 0.8;
+        transform: translateY(-1px);
+    }
+    
+    #sidebarToggle {
+        transition: all 0.2s ease;
+    }
+    
+    #sidebarToggle:hover {
+        transform: scale(1.1);
+    }
+</style>

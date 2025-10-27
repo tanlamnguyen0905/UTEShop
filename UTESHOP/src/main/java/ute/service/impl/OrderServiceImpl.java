@@ -1,0 +1,347 @@
+package ute.service.impl;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import ute.configs.JPAConfig;
+import ute.dao.impl.OrderDaoImpl;
+import ute.dao.impl.CartDaoImpl;
+import ute.entities.Addresses;
+import ute.entities.Cart;
+import ute.entities.CartDetail;
+import ute.entities.OrderDetail;
+import ute.entities.Orders;
+import ute.entities.PaymentMethod;
+import ute.entities.Product;
+import ute.entities.Voucher;
+import ute.entities.Users;
+import ute.service.inter.OrderService;
+import ute.utils.RevenueStats;
+
+public class OrderServiceImpl implements OrderService {
+    
+    private final OrderDaoImpl orderDao;
+    private final CartDaoImpl cartDao;
+    
+    public OrderServiceImpl() {
+        this.orderDao = new OrderDaoImpl();
+        this.cartDao = new CartDaoImpl();
+    }
+
+    @Override
+    public Orders createOrderFromCart(Long userId, Long addressId, Long paymentMethodId, 
+                                      String notes, Long userCouponId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        
+        try {
+            trans.begin();
+            
+            // 1. Lấy giỏ hàng của user
+            Cart cart = cartDao.findCartByUserId(userId);
+            if (cart == null || cart.getCartDetails() == null || cart.getCartDetails().isEmpty()) {
+                throw new RuntimeException("Giỏ hàng trống!");
+            }
+            
+            // 2. Lấy thông tin cần thiết
+            Users user = em.find(Users.class, userId);
+            Addresses address = em.find(Addresses.class, addressId);
+            PaymentMethod paymentMethod = em.find(PaymentMethod.class, paymentMethodId);
+            
+            if (user == null) throw new RuntimeException("User không tồn tại!");
+            if (address == null) throw new RuntimeException("Địa chỉ không tồn tại!");
+            if (paymentMethod == null) throw new RuntimeException("Phương thức thanh toán không hợp lệ!");
+            
+            // 3. Tính tổng tiền
+            double totalAmount = 0.0;
+            for (CartDetail item : cart.getCartDetails()) {
+                totalAmount += item.getQuantity() * item.getProduct().getUnitPrice();
+            }
+            
+            // 4. Xử lý coupon (nếu có)
+            double totalDiscount = 0.0;
+            Voucher userCoupon = null;
+            if (userCouponId != null) {
+                userCoupon = em.find(Voucher.class, userCouponId);
+                if (userCoupon != null && isValidCoupon(userCoupon)) {
+                    double discountAmount = totalAmount * (userCoupon.getDiscountPercent() / 100);
+                    if (userCoupon.getMaxDiscountAmount() != null && 
+                        discountAmount > userCoupon.getMaxDiscountAmount()) {
+                        discountAmount = userCoupon.getMaxDiscountAmount();
+                    }
+                    totalDiscount = discountAmount;
+                }
+            }
+            
+            // 5. Xác định trạng thái thanh toán dựa trên phương thức
+            String paymentStatus = "Chưa thanh toán"; // Mặc định
+            if (paymentMethod.getName() != null) {
+                String methodName = paymentMethod.getName().toLowerCase();
+                // COD (Cash On Delivery) - Thanh toán khi nhận hàng
+                if (methodName.contains("cod") || 
+                    methodName.contains("tiền mặt") || 
+                    methodName.contains("khi nhận hàng")) {
+                    paymentStatus = "Chưa thanh toán";
+                } else {
+                    // Các phương thức thanh toán online khác
+                    // (Chuyển khoản, ví điện tử, thẻ tín dụng)
+                    // Giả định đã thanh toán trước
+                    paymentStatus = "Đã thanh toán";
+                }
+            }
+            
+            // 6. Tạo đơn hàng
+            Orders order = Orders.builder()
+                    .user(user)
+                    .address(address)
+                    .paymentMethod(paymentMethod)
+                    .amount(totalAmount)
+                    .totalDiscount(totalDiscount)
+                    .shippingFee(25000.0)  // Default shipping fee
+                    .orderDate(LocalDateTime.now())
+                    .orderStatus("Đang chờ")
+                    .paymentStatus(paymentStatus)
+                    .phoneNumber(address.getPhone())
+                    .recipientName(address.getName())
+                    .notes(notes)
+                    .voucher(userCoupon)
+                    .build();
+            
+            // 7. Tạo order details từ cart items
+            List<OrderDetail> orderDetails = new ArrayList<>();
+            for (CartDetail cartItem : cart.getCartDetails()) {
+                Product product = cartItem.getProduct();
+                
+                // Kiểm tra tồn kho
+                if (product.getStockQuantity() < cartItem.getQuantity()) {
+                    throw new RuntimeException("Sản phẩm " + product.getProductName() + 
+                                             " không đủ số lượng trong kho!");
+                }
+                
+                OrderDetail orderDetail = OrderDetail.builder()
+                        .order(order)
+                        .product(product)
+                        .quantity(cartItem.getQuantity())
+                        .unitPrice(product.getUnitPrice())
+                        .build();
+                
+                orderDetails.add(orderDetail);
+                
+                // Cập nhật tồn kho và số lượng đã bán
+                product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
+                product.setSoldCount((product.getSoldCount() != null ? product.getSoldCount() : 0L) + cartItem.getQuantity());
+                em.merge(product);
+            }
+            
+            order.setOrderDetails(orderDetails);
+            
+            // 8. Lưu đơn hàng
+            em.persist(order);
+            
+            // 9. Xóa giỏ hàng sau khi đặt hàng thành công
+            cartDao.clearCart(cart.getCartID());
+            
+            trans.commit();
+            
+            return order;
+            
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi tạo đơn hàng: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
+    
+    private boolean isValidCoupon(Voucher coupon) {
+        LocalDateTime now = LocalDateTime.now();
+        return coupon.getStartDate() != null &&
+               coupon.getEndDate() != null &&
+               now.isAfter(coupon.getStartDate()) &&
+               now.isBefore(coupon.getEndDate());
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, String newStatus) {
+        Orders order = orderDao.findById(orderId);
+        if (order == null) {
+            throw new RuntimeException("Đơn hàng không tồn tại!");
+        }
+        order.setOrderStatus(newStatus);
+        orderDao.update(order);
+    }
+
+    @Override
+    public void updatePaymentStatus(Long orderId, String newStatus) {
+        Orders order = orderDao.findById(orderId);
+        if (order == null) {
+            throw new RuntimeException("Đơn hàng không tồn tại!");
+        }
+        order.setPaymentStatus(newStatus);
+        orderDao.update(order);
+    }
+
+    @Override
+    public void cancelOrder(Long orderId, String reason) {
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction trans = em.getTransaction();
+        
+        try {
+            trans.begin();
+            
+            Orders order = em.find(Orders.class, orderId);
+            if (order == null) {
+                throw new RuntimeException("Đơn hàng không tồn tại!");
+            }
+            
+            // Chỉ cho phép hủy đơn hàng ở trạng thái Đang chờ
+            if (!"Đang chờ".equals(order.getOrderStatus())) {
+                throw new RuntimeException("Không thể hủy đơn hàng ở trạng thái " + order.getOrderStatus());
+            }
+            
+            // Hoàn lại tồn kho
+            for (OrderDetail detail : order.getOrderDetails()) {
+                Product product = detail.getProduct();
+                product.setStockQuantity(product.getStockQuantity() + detail.getQuantity());
+                product.setSoldCount(product.getSoldCount() - detail.getQuantity());
+                em.merge(product);
+            }
+            
+            // Cập nhật trạng thái đơn hàng
+            order.setOrderStatus("Đã hủy");
+            order.setNotes((order.getNotes() != null ? order.getNotes() + "\n" : "") + 
+                          "Lý do hủy: " + reason);
+            em.merge(order);
+            
+            trans.commit();
+            
+        } catch (Exception e) {
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw new RuntimeException("Lỗi khi hủy đơn hàng: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Orders findById(Long orderId) {
+        return orderDao.findById(orderId);
+    }
+
+    @Override
+    public List<Orders> findByUserId(Long userId) {
+        return orderDao.findByUserId(userId);
+    }
+
+    @Override
+    public List<Orders> findByStatus(String status) {
+        return orderDao.findByStatus(status);
+    }
+
+    @Override
+    public List<Orders> findAll() {
+        return orderDao.findAll();
+    }
+
+    @Override
+    public List<Orders> findByUserIdPaginated(Long userId, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return orderDao.findByUserIdPaginated(userId, offset, pageSize);
+    }
+
+    @Override
+    public long countByUserId(Long userId) {
+        return orderDao.countByUserId(userId);
+    }
+
+    @Override
+    public Double calculateOrderTotal(Orders order) {
+        if (order == null) return 0.0;
+        
+        double amount = order.getAmount() != null ? order.getAmount() : 0.0;
+        double shipping = order.getShippingFee() != null ? order.getShippingFee() : 0.0;
+        double discount = order.getTotalDiscount() != null ? order.getTotalDiscount() : 0.0;
+        
+        return amount + shipping - discount;
+    }
+
+    @Override
+    public List<RevenueStats> getDailyRevenue(LocalDate fromDate, LocalDate toDate) {
+        List<Object[]> rawData = orderDao.getDailyRevenueRaw(fromDate, toDate);
+        return rawData.stream()
+                .map(row -> new RevenueStats(
+                        (LocalDate) row[0],  // date
+                        ((Number) row[1]).doubleValue()  // revenue
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RevenueStats getTotalRevenueStats(LocalDate fromDate, LocalDate toDate) {
+        Object[] raw = orderDao.getTotalRevenueStatsRaw(fromDate, toDate);
+        if (raw == null || raw.length == 0) {
+            return new RevenueStats(0.0, 0L, 0.0);
+        }
+        return new RevenueStats(
+                ((Number) raw[0]).doubleValue(),  // totalRevenue
+                ((Number) raw[1]).longValue(),    // orderCount
+                ((Number) raw[2]).doubleValue()   // avgRevenue
+        );
+    }
+    @Override
+    public List<Orders> findByStatusPaginated(String orderStatus, String paymentStatus, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return orderDao.findByStatusPaginated(orderStatus, paymentStatus, offset, pageSize);
+    }
+
+    @Override
+    public long countByStatus(String orderStatus, String paymentStatus) {
+        return orderDao.countByStatus(orderStatus, paymentStatus);
+    }
+
+    @Override
+    public Double getTotalRevenue() {
+        return orderDao.getTotalRevenue();
+    }
+
+    @Override
+    public Double getTotalRevenueByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        return orderDao.getTotalRevenueByDateRange(startDateTime, endDateTime);
+    }
+
+    @Override
+    public Long getTotalOrderCount() {
+        return orderDao.getTotalOrderCount();
+    }
+
+    @Override
+    public Long getOrderCountByStatus(String status) {
+        return orderDao.getOrderCountByStatus(status);
+    }
+
+    @Override
+    public List<Map<String, Object>> getOrderStatusDistribution() {
+        return orderDao.getOrderStatusDistribution();
+    }
+
+    @Override
+    public List<Map<String, Object>> getDailyRevenue_2(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        return orderDao.getDailyRevenue(startDateTime, endDateTime);
+    }
+}
