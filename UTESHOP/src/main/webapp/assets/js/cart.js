@@ -3,7 +3,7 @@
  */
 
 // Thêm sản phẩm vào giỏ hàng
-function addToCart(productId, quantity = 1) {
+function addToCart(productId, quantity = 1, callback = null) {
     // Kiểm tra user đã đăng nhập chưa
     // Bạn có thể thêm logic kiểm tra session ở đây
 
@@ -22,6 +22,7 @@ function addToCart(productId, quantity = 1) {
             if (response.status === 401) {
                 // Chưa đăng nhập, hiển thị modal
                 showLoginModal();
+                if (callback) callback(false);
                 throw new Error('Unauthorized');
             }
             return response.json();
@@ -35,14 +36,19 @@ function addToCart(productId, quantity = 1) {
                 window.dispatchEvent(new CustomEvent('cartUpdated', {
                     detail: { itemCount: data.itemCount }
                 }));
+                
+                // Gọi callback nếu có
+                if (callback) callback(true);
             } else {
                 showNotification(data.error || 'Có lỗi xảy ra', 'error');
+                if (callback) callback(false);
             }
         })
         .catch(error => {
             if (error.message !== 'Unauthorized') {
                 console.error('Error:', error);
                 showNotification('Không thể thêm sản phẩm vào giỏ hàng', 'error');
+                if (callback) callback(false);
             }
         });
 }

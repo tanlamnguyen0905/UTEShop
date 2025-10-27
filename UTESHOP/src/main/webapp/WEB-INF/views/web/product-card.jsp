@@ -111,6 +111,32 @@
 </div>
 
 <style>
+    /* Product Card - White background nổi bật */
+    .product-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .product-card:hover::before {
+        opacity: 1;
+    }
+    
     .product-card .product-name {
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -121,9 +147,20 @@
     }
     
     .product-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.15), 
+                    0 6px 12px rgba(0, 0, 0, 0.1) !important;
+        border-color: rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    .product-card .card-img-top {
+        background: #f8f9fa;
         transition: transform 0.3s ease;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .product-card:hover .card-img-top {
+        transform: scale(1.05);
     }
     
     /* Nút Mua ngay - Gradient cam/đỏ nổi bật */
