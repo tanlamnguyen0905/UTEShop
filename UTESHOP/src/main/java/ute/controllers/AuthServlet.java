@@ -257,7 +257,7 @@ public class AuthServlet extends HttpServlet {
 
 			// Generate JWT token
 			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-			session.setAttribute("token", token);
+			// session.setAttribute("token", token);
 
 			// Lưu token vào cookie (1 giờ)
 			Cookie tokenCookie = new Cookie("authToken", token);
