@@ -111,7 +111,7 @@
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/users">
 													<i class="fa-solid fa-users-gear me-2 text-danger"></i> Quản lý người dùng
 												</a></li>
-												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/products">
+												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/products/searchpaginated">
 													<i class="fa-solid fa-box me-2 text-danger"></i> Quản lý sản phẩm
 												</a></li>
 												<li><a class="dropdown-item" href="${pageContext.request.contextPath}/api/admin/orders">

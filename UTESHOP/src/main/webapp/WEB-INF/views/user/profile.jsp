@@ -1089,7 +1089,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hàm render danh sách địa chỉ
     function renderAddresses(addresses) {
-        const addressListDiv = document.getElementById('addressList');
+        let addressListDiv = document.getElementById('addressList');
+        const addressListContainer = document.getElementById('addressListContainer');
+        
+        // Nếu chưa có addressList div (lần đầu thêm địa chỉ), tạo mới
+        if (!addressListDiv) {
+            // Xóa noAddressMessage nếu có
+            const noAddressMsg = document.getElementById('noAddressMessage');
+            if (noAddressMsg) {
+                noAddressMsg.remove();
+            }
+            
+            // Tạo div addressList mới
+            addressListDiv = document.createElement('div');
+            addressListDiv.id = 'addressList';
+            addressListContainer.appendChild(addressListDiv);
+        }
         
         if (!addresses || addresses.length === 0) {
             addressListDiv.innerHTML = 
