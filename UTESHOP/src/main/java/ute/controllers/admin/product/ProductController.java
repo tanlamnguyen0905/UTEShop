@@ -28,6 +28,7 @@ import ute.service.impl.CategoriesServiceImpl;
 import ute.service.inter.CategoriesService;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
+import ute.utils.Constant;
 
 @MultipartConfig(
         fileSizeThreshold = 10240,    // 10KB
@@ -197,6 +198,7 @@ public class ProductController extends HttpServlet {
             String stockQuantityStr = req.getParameter("stockQuantity");
             String categoryIdStr = req.getParameter("categoryId");
             String brandIdStr = req.getParameter("brandId");
+            String status = req.getParameter("status");
 
             Long id = null;
             Product tempProduct = new Product();
@@ -309,6 +311,7 @@ public class ProductController extends HttpServlet {
             product.setStockQuantity(stockQuantity);
             product.setCategory(category);
             product.setBrand(brand);
+            product.setStatus(status != null && !status.trim().isEmpty() ? status.trim() : "ACTIVE");
 
             // Handle xóa ảnh cũ (chỉ khi edit) - CHỈ XÓA TRONG DB (thêm try-catch để tránh 500 nếu method chưa ready)
             if (id != null && product != null) {  // Chỉ edit
@@ -348,19 +351,11 @@ public class ProductController extends HttpServlet {
             List<Image> newImages = new ArrayList<>();
 
             if (!imageParts.isEmpty()) {
-                String webAppRoot = getServletContext().getRealPath("/");
-                if (webAppRoot == null) {
-                    req.setAttribute("error", "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
-                    loadDropdowns(req);
-                    req.setAttribute("product", tempProduct);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-
-                String uploadPath = webAppRoot + File.separator + "images" + File.separator + "products";
+                // Lưu trực tiếp vào D:/images/ (không cần subfolder)
+                String uploadPath = Constant.Dir;
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-                    req.setAttribute("error", "Không thể tạo thư mục images/products!");
+                    req.setAttribute("error", "Không thể tạo thư mục D:\\images!");
                     loadDropdowns(req);
                     req.setAttribute("product", tempProduct);
                     req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
@@ -398,17 +393,18 @@ public class ProductController extends HttpServlet {
                         return;
                     }
 
-                    // Dùng tên gốc sau sanitize (không thêm timestamp)
-                    String fileName = baseName;
+                    // Tạo tên file unique với timestamp và prefix "product_"
+                    String fileName = "product_" + System.currentTimeMillis() + "_" + baseName;
                     String filePath = uploadPath + File.separator + fileName;
 
-                    // Save file (ghi đè nếu trùng tên)
+                    // Save file
                     try {
                         filePart.write(filePath);
                         File savedFile = new File(filePath);
                         if (savedFile.exists() && savedFile.length() > 0) {
                             Image image = new Image();
-                            image.setDirImage(fileName);  // Lưu đường dẫn đúng vào DB
+                            // Lưu tên file đơn giản (không có prefix folder)
+                            image.setDirImage(fileName);
                             image.setProduct(product);
                             newImages.add(image);
                         } else {

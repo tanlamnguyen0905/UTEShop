@@ -45,6 +45,10 @@ public class Product {
     @Builder.Default
     private Long soldCount = 0L;
     private LocalDateTime importDate;
+    
+    @Column(name = "status", columnDefinition = "NVARCHAR(20) DEFAULT 'ACTIVE'")
+    @Builder.Default
+    private String status = "ACTIVE"; // ACTIVE hoặc INACTIVE
 
     @PrePersist
     protected void onCreate() {

@@ -117,6 +117,19 @@
                         </select>
                     </div>
 
+                    <!-- Trạng thái -->
+                    <div class="col-md-6">
+                        <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select name="status" class="form-select" required>
+                            <option value="ACTIVE" ${product == null || product.status == 'ACTIVE' ? 'selected' : ''}>
+                                <i class="fas fa-check-circle"></i> Hoạt động
+                            </option>
+                            <option value="INACTIVE" ${product.status == 'INACTIVE' ? 'selected' : ''}>
+                                <i class="fas fa-ban"></i> Ngưng hoạt động
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- Mô tả -->
                     <div class="col-12">
                         <label class="form-label">Mô tả</label>

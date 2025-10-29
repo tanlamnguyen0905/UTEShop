@@ -55,7 +55,9 @@ public class ProductDaoImpl implements ProductDao {
 			trans.begin();
 			Product p = em.find(Product.class, Long.valueOf(id));
 			if (p != null) {
-				em.remove(p);
+				// Xóa mềm: chuyển status sang INACTIVE
+				p.setStatus("INACTIVE");
+				em.merge(p);
 			}
 			trans.commit();
 		} catch (Exception e) {
@@ -103,7 +105,7 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findAll() {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM  Product p", Product.class);
+			TypedQuery<Product> query = em.createQuery("SELECT p FROM  Product p WHERE p.status = 'ACTIVE'", Product.class);
 			return query.getResultList();
 		} finally {
 			em.close();
@@ -115,7 +117,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(:name)", Product.class);
+					"SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(:name) AND p.status = 'ACTIVE'", Product.class);
 			query.setParameter("name", "%" + name + "%");
 			return query.getResultList();
 		} finally {
@@ -127,7 +129,7 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findByCategoryId(int categoryId) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.category.categoryID = :id",
+			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.category.categoryID = :id AND p.status = 'ACTIVE'",
 					Product.class);
 			query.setParameter("id", (long) categoryId);
 			List<Product> cate = query.getResultList();
@@ -147,7 +149,7 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public List<Product> findLatest(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
-		TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.productID DESC", Product.class);
+		TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.status = 'ACTIVE' ORDER BY p.productID DESC", Product.class);
 		query.setMaxResults(limit);
 		try {
 			return query.getResultList();			
@@ -162,6 +164,7 @@ public class ProductDaoImpl implements ProductDao {
 		TypedQuery<Product> query = em.createQuery(
 				"SELECT p FROM OrderDetail od " +
 				"JOIN od.product p " +
+				"WHERE p.status = 'ACTIVE' " +
 				"GROUP BY p " +
 				"ORDER BY SUM(od.quantity) DESC",
 				Product.class
@@ -188,7 +191,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM Product p WHERE p.unitPrice BETWEEN :min AND :max",
+					"SELECT p FROM Product p WHERE p.unitPrice BETWEEN :min AND :max AND p.status = 'ACTIVE'",
 					Product.class);
 			query.setParameter("min", minPrice);
 			query.setParameter("max", maxPrice);
@@ -202,7 +205,7 @@ public class ProductDaoImpl implements ProductDao {
 	public long count() {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Long> query = em.createQuery("SELECT COUNT(p) FROM Product p", Long.class);
+			TypedQuery<Long> query = em.createQuery("SELECT COUNT(p) FROM Product p WHERE p.status = 'ACTIVE'", Long.class);
 			return query.getSingleResult();
 		} finally {
 			em.close();
@@ -213,7 +216,7 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findPage(int page, int pageSize) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p", Product.class);
+			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.status = 'ACTIVE'", Product.class);
 			query.setFirstResult((page - 1) * pageSize);
 			query.setMaxResults(pageSize);
 			return query.getResultList();
@@ -226,7 +229,7 @@ public class ProductDaoImpl implements ProductDao {
 	public List<Product> findNewProduct(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p ORDER BY p.importDate DESC",
+			TypedQuery<Product> query = em.createQuery("SELECT p FROM Product p WHERE p.status = 'ACTIVE' ORDER BY p.importDate DESC",
 					Product.class);
 			query.setMaxResults(limit);
 			List<Product> products = query.getResultList();
@@ -249,7 +252,7 @@ public class ProductDaoImpl implements ProductDao {
 		try {
 			// ORDER BY số lượng reviews thực tế
 			TypedQuery<Product> query = em.createQuery(
-				"SELECT p FROM Product p LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC",
+				"SELECT p FROM Product p LEFT JOIN p.reviews r WHERE p.status = 'ACTIVE' GROUP BY p ORDER BY COUNT(r) DESC",
 				Product.class);
 			query.setMaxResults(limit);
 			List<Product> products = query.getResultList();
@@ -275,6 +278,7 @@ public class ProductDaoImpl implements ProductDao {
 			TypedQuery<Object[]> query = em.createQuery(
 					"SELECT p, COUNT(f) as favCount " +
 							"FROM Product p LEFT JOIN p.favorites f " +
+							"WHERE p.status = 'ACTIVE' " +
 							"GROUP BY p " +
 							"ORDER BY favCount DESC",
 					Object[].class);
@@ -307,6 +311,7 @@ public class ProductDaoImpl implements ProductDao {
 			TypedQuery<Object[]> query = em.createQuery(
 					"SELECT p, COUNT(f) as favCount " +
 							"FROM Product p LEFT JOIN p.favorites f " +
+							"WHERE p.status = 'ACTIVE' " +
 							"GROUP BY p " +
 							"ORDER BY favCount DESC",
 					Object[].class);
@@ -338,7 +343,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM Product p WHERE p.category.categoryID = :cate ORDER BY p.productID DESC",
+					"SELECT p FROM Product p WHERE p.category.categoryID = :cate AND p.status = 'ACTIVE' ORDER BY p.productID DESC",
 					Product.class);
 			query.setParameter("cate", (long) categoryId);
 			query.setFirstResult((page - 1) * pageSize);
@@ -354,7 +359,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM OrderDetail od right JOIN od.product p GROUP BY p ORDER BY SUM(od.quantity) DESC",
+					"SELECT p FROM OrderDetail od right JOIN od.product p WHERE p.status = 'ACTIVE' GROUP BY p ORDER BY SUM(od.quantity) DESC",
 					Product.class);
 			query.setFirstResult((page - 1) * pageSize);
 			query.setMaxResults(pageSize);
@@ -394,7 +399,7 @@ public class ProductDaoImpl implements ProductDao {
 			jpql.append(" LEFT JOIN p.banners b");
 		}
 
-		jpql.append(" WHERE 1=1");
+		jpql.append(" WHERE p.status = 'ACTIVE'");
 
 		// Thêm các điều kiện filter
 		if (filter.getCategoryId() != null) {
@@ -515,7 +520,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Product> query = em.createQuery(
-					"SELECT p FROM Product p WHERE p.unitPrice BETWEEN :min AND :max ORDER BY p.productID DESC",
+					"SELECT p FROM Product p WHERE p.unitPrice BETWEEN :min AND :max AND p.status = 'ACTIVE' ORDER BY p.productID DESC",
 					Product.class);
 			query.setParameter("min", minPrice);
 			query.setParameter("max", maxPrice);
@@ -532,7 +537,7 @@ public class ProductDaoImpl implements ProductDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Long> query = em.createQuery(
-				"SELECT COUNT(p) FROM Product p WHERE p.stockQuantity > 0",
+				"SELECT COUNT(p) FROM Product p WHERE p.stockQuantity > 0 AND p.status = 'ACTIVE'",
 				Long.class
 			);
 			return query.getSingleResult();
@@ -543,7 +548,7 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public int countProductsByFilter(ProductFilter filter) {
-		String jpql = "SELECT COUNT(DISTINCT p) FROM Product p LEFT JOIN p.orderDetails od LEFT JOIN p.favorites f LEFT JOIN p.banners b WHERE 1=1";
+		String jpql = "SELECT COUNT(DISTINCT p) FROM Product p LEFT JOIN p.orderDetails od LEFT JOIN p.favorites f LEFT JOIN p.banners b WHERE p.status = 'ACTIVE'";
 
 		if (filter.getCategoryId() != null) {
 			jpql += " AND p.category.categoryID = :categoryId";

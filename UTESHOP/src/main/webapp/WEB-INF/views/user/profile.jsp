@@ -21,7 +21,7 @@
         <div class="avatar-glow rounded-circle p-2 position-relative"
              style="background: linear-gradient(135deg, #007bff, #ff4b5c);
                     box-shadow: 0 0 20px rgba(255,75,92,0.5);">
-            <img id="avatarImg" src="${pageContext.request.contextPath}${sessionScope.currentUser.avatar != null && sessionScope.currentUser.avatar != 'default-avatar.png' ? '/uploads/avatar/'.concat(sessionScope.currentUser.avatar) : '/assets/images/avatar/default-avatar.png'}"
+            <img id="avatarImg" src="${pageContext.request.contextPath}${sessionScope.currentUser.avatar != null && sessionScope.currentUser.avatar != 'default-avatar.png' ? '/image?fname='.concat(sessionScope.currentUser.avatar) : '/assets/images/avatar/default-avatar.png'}"
                  alt="Avatar"
                  class="rounded-circle border border-4 border-white shadow"
                  style="width: 120px; height: 120px; object-fit: cover; background-color: #fff;">

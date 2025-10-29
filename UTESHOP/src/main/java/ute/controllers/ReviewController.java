@@ -109,7 +109,7 @@ public class ReviewController extends HttpServlet {
                 return;
             }
             
-            // Lấy product
+            // Kiểm tra product tồn tại
             Product product = productService.findById(productId);
             if (product == null) {
                 if (isAjax) {
@@ -182,7 +182,7 @@ public class ReviewController extends HttpServlet {
                 }
             }
             
-            // Tạo review mới
+            // Tạo review mới - dùng product đã load (merge sẽ xử lý)
             Review review = Review.builder()
                     .user(currentUser)
                     .product(product)

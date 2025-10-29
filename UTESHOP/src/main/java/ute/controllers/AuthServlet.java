@@ -78,7 +78,6 @@ public class AuthServlet extends HttpServlet {
 	}
 
 	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI
-	// =====================
 	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();
@@ -191,15 +190,54 @@ public class AuthServlet extends HttpServlet {
 				return;
 			}
 
-			// Upload ảnh
-			if (avatarPart != null && avatarPart.getSize() > 0) {
-				String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
+		// Upload ảnh vào D:\images\avatar\
+		if (avatarPart != null && avatarPart.getSize() > 0) {
+			try {
+				// Validate file type
+				String contentType = avatarPart.getContentType();
+				if (!contentType.startsWith("image/")) {
+					out.print("{\"success\":false, \"error\":\"Chỉ chấp nhận file hình ảnh!\"}");
+					return;
+				}
+				
+				// Validate file size (max 5MB)
+				if (avatarPart.getSize() > 5 * 1024 * 1024) {
+					out.print("{\"success\":false, \"error\":\"Kích thước ảnh tối đa 5MB!\"}");
+					return;
+				}
+				
+				// Lưu vào D:\images\avatar\
+				String uploadDir = ute.utils.Constant.Dir + java.io.File.separator + "avatar";
 				java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
-				avatarFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
-				avatarPart.write(uploadDir + avatarFileName);
-			} else {
+				
+				// Tạo tên file unique
+				String originalFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
+				String fileExtension = "";
+				int lastDot = originalFileName.lastIndexOf('.');
+				if (lastDot > 0) {
+					fileExtension = originalFileName.substring(lastDot);
+				}
+				String uniqueFileName = System.currentTimeMillis() + "_" + username + fileExtension;
+				String filePath = uploadDir + java.io.File.separator + uniqueFileName;
+				
+				avatarPart.write(filePath);
+				
+				// Kiểm tra file đã lưu thành công
+				java.io.File savedFile = new java.io.File(filePath);
+				if (savedFile.exists() && savedFile.length() > 0) {
+					avatarFileName = "avatar/" + uniqueFileName;
+				} else {
+					if (savedFile.exists()) savedFile.delete();
+					avatarFileName = "default-avatar.png";
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				// Nếu upload lỗi, dùng avatar mặc định
 				avatarFileName = "default-avatar.png";
 			}
+		} else {
+			avatarFileName = "default-avatar.png";
+		}
 
 			// Mã hóa mật khẩu
 			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());

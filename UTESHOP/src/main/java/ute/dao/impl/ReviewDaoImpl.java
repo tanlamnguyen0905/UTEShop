@@ -9,6 +9,8 @@ import jakarta.persistence.TypedQuery;
 import ute.configs.JPAConfig;
 import ute.dao.inter.ReviewDao;
 import ute.entities.Review;
+import ute.entities.Product;
+import ute.entities.Users;
 
 public class ReviewDaoImpl implements ReviewDao {
 
@@ -18,6 +20,16 @@ public class ReviewDaoImpl implements ReviewDao {
 		EntityTransaction trans = em.getTransaction();
 		try {
 			trans.begin();
+			// Merge Product nếu nó ở trạng thái detached để tránh TransientObjectException
+			if (review.getProduct() != null && review.getProduct().getProductID() != null) {
+				Product managedProduct = em.merge(review.getProduct());
+				review.setProduct(managedProduct);
+			}
+			// Merge User nếu cần
+			if (review.getUser() != null && review.getUser().getUserID() != null) {
+				Users managedUser = em.merge(review.getUser());
+				review.setUser(managedUser);
+			}
 			em.persist(review);
 			trans.commit();
 		} catch (Exception e) {

@@ -244,7 +244,8 @@ public class UserController extends HttpServlet {
                     return;
                 }
 
-                String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
+                // Lưu vào D:\images\avatar\
+                String uploadDir = ute.utils.Constant.Dir + java.io.File.separator + "avatar";
                 java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
                 
                 // Tạo tên file unique
@@ -254,12 +255,14 @@ public class UserController extends HttpServlet {
                 if (lastDot > 0) {
                     fileExtension = originalFileName.substring(lastDot);
                 }
-                avatarFileName = System.currentTimeMillis() + "_" + currentUser.getUserID() + fileExtension;
+                String uniqueFileName = System.currentTimeMillis() + "_" + currentUser.getUserID() + fileExtension;
+                String filePath = uploadDir + java.io.File.separator + uniqueFileName;
                 
-                avatarPart.write(uploadDir + avatarFileName);
+                avatarPart.write(filePath);
+                avatarFileName = "avatar/" + uniqueFileName;
                 
                 // Kiểm tra file đã lưu thành công
-                java.io.File savedFile = new java.io.File(uploadDir + avatarFileName);
+                java.io.File savedFile = new java.io.File(filePath);
                 if (!savedFile.exists() || savedFile.length() == 0) {
                     if (savedFile.exists()) savedFile.delete();
                     if (isAjax) {
