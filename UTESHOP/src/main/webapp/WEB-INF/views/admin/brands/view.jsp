@@ -42,7 +42,7 @@
                     <div class="col-md-6">
                         <c:if test="${not empty brand.brandLogo}">
                             <p><strong>Logo:</strong></p>
-                            <img src="${pageContext.request.contextPath}/assets/${brand.brandLogo}" alt="Logo" class="img-fluid">
+                            <img src="${pageContext.request.contextPath}/image?fname=${brand.brandLogo}" alt="Logo" class="img-fluid">
                         </c:if>
                         <c:if test="${empty brand.brandLogo}">
                             <p class="text-muted">Không có logo.</p>

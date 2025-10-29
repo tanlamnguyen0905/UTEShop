@@ -35,6 +35,84 @@ public class OrderApiController extends HttpServlet {
     }
 
     @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        try {
+            HttpSession session = req.getSession();
+            Users user = (Users) session.getAttribute("user");
+            if (user == null) {
+                user = (Users) session.getAttribute("currentUser");
+            }
+
+            if (user == null) {
+                out.print("{\"success\":false,\"message\":\"Vui lòng đăng nhập để thực hiện hành động này\"}");
+                return;
+            }
+
+            // Extract order ID from URL. Expecting paths like: /{orderId}/cancel
+            String pathInfo = req.getPathInfo(); // e.g. "/123/cancel"
+            if (pathInfo == null || pathInfo.equals("/") || pathInfo.trim().isEmpty()) {
+                out.print("{\"success\":false,\"message\":\"URL không hợp lệ\"}");
+                return;
+            }
+
+            String[] parts = pathInfo.split("/");
+            if (parts.length < 3 || parts[1].trim().isEmpty()) {
+                out.print("{\"success\":false,\"message\":\"ID đơn hàng không hợp lệ\"}");
+                return;
+            }
+
+            String orderIdStr = parts[1];
+            String action = parts[2];
+
+            if (!"cancel".equalsIgnoreCase(action)) {
+                out.print("{\"success\":false,\"message\":\"Hành động không được hỗ trợ\"}");
+                return;
+            }
+
+            Long orderId;
+            try {
+                orderId = Long.parseLong(orderIdStr);
+            } catch (NumberFormatException nfe) {
+                out.print("{\"success\":false,\"message\":\"ID đơn hàng không hợp lệ\"}");
+                return;
+            }
+
+            // Get the order and verify ownership
+            Orders order = orderService.findById(orderId);
+            if (order == null) {
+                out.print("{\"success\":false,\"message\":\"Không tìm thấy đơn hàng\"}");
+                return;
+            }
+
+            if (order.getUser() == null || !order.getUser().getUserID().equals(user.getUserID())) {
+                out.print("{\"success\":false,\"message\":\"Bạn không có quyền hủy đơn hàng này\"}");
+                return;
+            }
+
+            // Get cancel reason from request
+            String reason = req.getParameter("reason");
+            if (reason == null || reason.trim().isEmpty()) {
+                reason = "Khách hàng yêu cầu hủy";
+            }
+
+            // Cancel the order
+            orderService.cancelOrder(orderId, reason);
+            
+            out.print("{\"success\":true,\"message\":\"Đơn hàng đã được hủy thành công\"}");
+
+        } catch (RuntimeException e) {
+            out.print("{\"success\":false,\"message\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.print("{\"success\":false,\"message\":\"Lỗi hệ thống. Vui lòng thử lại sau\"}");
+        }
+    }
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json;charset=UTF-8");
         PrintWriter out = resp.getWriter();

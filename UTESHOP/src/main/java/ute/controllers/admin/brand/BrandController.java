@@ -15,6 +15,7 @@ import jakarta.servlet.http.Part;
 import ute.entities.Brand;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
+import ute.utils.Constant;
 
 @MultipartConfig(
         fileSizeThreshold = 10240,    // 10KB
@@ -159,22 +160,15 @@ public class BrandController extends HttpServlet {
                 brand.setBrandLogo(null);  // Chỉ set null trong DB, không xóa file
             }
 
-            // Handle upload logo mới (1 file)
+            // Handle upload logo mới (1 file) - Lưu vào D:/images/brands/
             Part logoPart = req.getPart("brandLogo");
             boolean uploadSuccess = true;
             if (logoPart != null && logoPart.getSize() > 0) {
-                String webAppRoot = getServletContext().getRealPath("/");
-                if (webAppRoot == null) {
-                    req.setAttribute("error", "Không thể lưu file!");
-                    req.setAttribute("brand", tempBrand);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/brands/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-
-                String uploadPath = webAppRoot + File.separator + "images" + File.separator + "brands";
+                // Lưu trực tiếp vào D:/images/brands/ (giống product, avatar, chat)
+                String uploadPath = Constant.Dir + File.separator + "brands";
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-                    req.setAttribute("error", "Không thể tạo thư mục images/brands!");
+                    req.setAttribute("error", "Không thể tạo thư mục D:\\images\\brands!");
                     req.setAttribute("brand", tempBrand);
                     req.getRequestDispatcher("/WEB-INF/views/admin/brands/addOrEdit.jsp").forward(req, resp);
                     return;
@@ -205,14 +199,16 @@ public class BrandController extends HttpServlet {
                         return;
                     }
 
-                    String fileName = baseName;
+                    // Tạo tên file unique với prefix "brand_"
+                    String fileName = "brand_" + System.currentTimeMillis() + "_" + baseName;
                     String filePath = uploadPath + File.separator + fileName;
 
                     try {
                         logoPart.write(filePath);
                         File savedFile = new File(filePath);
                         if (savedFile.exists() && savedFile.length() > 0) {
-                            brand.setBrandLogo("images/brands/" + fileName);
+                            // Lưu với prefix "brands/" để DownloadFileController tìm đúng
+                            brand.setBrandLogo("brands/" + fileName);
                         } else {
                             if (savedFile.exists()) savedFile.delete();
                             uploadSuccess = false;

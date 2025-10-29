@@ -60,7 +60,7 @@
                         <label class="form-label">Logo hiện tại (nếu có)</label>
                         <c:if test="${not empty brand && not empty brand.brandLogo}">
                             <div class="position-relative">
-                                <img src="${pageContext.request.contextPath}/assets/${brand.brandLogo}" alt="Logo" class="img-thumbnail d-block mb-2"
+                                <img src="${pageContext.request.contextPath}/image?fname=${brand.brandLogo}" alt="Logo" class="img-thumbnail d-block mb-2"
                                      onerror="this.style.display='none';">
                                 <c:if test="${not empty brand.brandID}">  <!-- Chỉ hiển thị khi edit -->
                                     <div class="form-check">

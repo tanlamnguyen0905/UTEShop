@@ -381,6 +381,7 @@ public class ProductDaoImpl implements ProductDao {
 		// Xác định xem cần JOIN bảng nào dựa trên filter và sortBy
 		boolean needOrderDetails = "0".equals(filter.getSortBy()); // Bán chạy
 		boolean needBanners = filter.getBannerId() != null; // Chỉ JOIN khi filter theo banner
+		boolean needReviews = "2".equals(filter.getSortBy()); // Nhiều đánh giá
 
 		// Xây dựng JPQL động dựa trên loại sắp xếp
 		StringBuilder jpql = new StringBuilder();
@@ -389,9 +390,13 @@ public class ProductDaoImpl implements ProductDao {
 		if ("3".equals(sortBy)) { // Trường hợp sắp xếp theo yêu thích
 			jpql.append("SELECT p, COUNT(f) as favCount FROM Product p LEFT JOIN p.favorites f");
 		} else {
-			jpql.append("SELECT DISTINCT p FROM Product p");
+			// Bỏ DISTINCT vì đã có GROUP BY (case "2") hoặc không cần thiết
+			jpql.append("SELECT p FROM Product p");
 			if (needOrderDetails) {
 				jpql.append(" LEFT JOIN p.orderDetails od");
+			}
+			if (needReviews) {
+				jpql.append(" LEFT JOIN p.reviews r");
 			}
 		}
 
@@ -430,7 +435,7 @@ public class ProductDaoImpl implements ProductDao {
 				jpql.append(" ORDER BY p.productID DESC");
 				break;
 			case "2": // Nhiều đánh giá
-				jpql.append(" LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC");
+				jpql.append(" GROUP BY p ORDER BY COUNT(r) DESC");
 				break;
 			case "3": // Yêu thích
 				jpql.append(" GROUP BY p ORDER BY favCount DESC");

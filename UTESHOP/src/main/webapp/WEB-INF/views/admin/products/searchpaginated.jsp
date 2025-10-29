@@ -182,13 +182,19 @@
                                     </a>
                                     <c:choose>
                                         <c:when test="${product.status == 'ACTIVE'}">
-                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" class="btn btn-secondary btn-sm" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa sản phẩm này?')" title="Vô hiệu hóa">
+                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" 
+                                               class="btn btn-secondary btn-sm" 
+                                               onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa sản phẩm này? Sản phẩm sẽ không hiển thị trên trang web.')" 
+                                               title="Vô hiệu hóa">
                                                 <i class="fas fa-ban"></i>
                                             </a>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" class="btn btn-danger btn-sm" onclick="return confirm('Sản phẩm này đã ngưng hoạt động.')" title="Đã vô hiệu hóa">
-                                                <i class="fas fa-trash"></i>
+                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" 
+                                               class="btn btn-success btn-sm" 
+                                               onclick="return confirm('Bạn có muốn kích hoạt lại sản phẩm này?')" 
+                                               title="Kích hoạt lại">
+                                                <i class="fas fa-check-circle"></i>
                                             </a>
                                         </c:otherwise>
                                     </c:choose>

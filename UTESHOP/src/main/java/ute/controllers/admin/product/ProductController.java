@@ -174,11 +174,24 @@ public class ProductController extends HttpServlet {
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
         } else if (uri.contains("/admin/products/delete")) {
+            // Toggle status: ACTIVE <-> INACTIVE
             String idStr = req.getParameter("id");
             try {
-                productService.delete(Long.parseLong(idStr));
+                Long id = Long.parseLong(idStr);
+                Product product = productService.findById(id);
+                if (product != null) {
+                    // Toggle status
+                    if ("ACTIVE".equals(product.getStatus())) {
+                        product.setStatus("INACTIVE");
+                        req.getSession().setAttribute("message", "Đã vô hiệu hóa sản phẩm!");
+                    } else {
+                        product.setStatus("ACTIVE");
+                        req.getSession().setAttribute("message", "Đã kích hoạt lại sản phẩm!");
+                    }
+                    productService.update(product);
+                }
             } catch (NumberFormatException e) {
-                // Log error nếu cần, nhưng vẫn redirect
+                // Log error nếu cần
             }
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
