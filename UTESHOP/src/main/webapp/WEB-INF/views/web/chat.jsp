@@ -409,7 +409,7 @@
                 contentHtml += '<div>' + escapeHtml(data.content) + '</div>';
             }
             if (data.imageUrl) {
-                const imgSrc = '${pageContext.request.contextPath}/image?fname=' + encodeURIComponent(data.imageUrl);
+                const imgSrc = '${pageContext.request.contextPath}/assets/uploads/chat/' + encodeURIComponent(data.imageUrl);
                 contentHtml += '<img src="' + imgSrc + '" class="message-image" alt="Image" onclick="window.open(\'' + imgSrc + '\', \'_blank\')">';
             }
             
