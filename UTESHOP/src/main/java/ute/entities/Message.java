@@ -42,13 +42,14 @@ public class Message {
     private String role;
 
 
-    @Column(name = "Content", nullable = false, columnDefinition = "NVARCHAR(2000)")
+    @Column(name = "Content", columnDefinition = "NVARCHAR(2000)")
     private String content;
 
+    @Column(name = "ImageUrl", length = 500)
+    private String imageUrl;
 
     @Column(name = "CreatedAt", nullable = false)
     private OffsetDateTime createdAt;
-
 
     @Column(name = "Seen", nullable = false)
     private boolean seen;
