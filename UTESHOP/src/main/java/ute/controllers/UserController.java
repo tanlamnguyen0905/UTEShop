@@ -19,8 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-import ute.dao.impl.UserDaoImpl;
-import ute.dao.inter.UserDao;
 import ute.dto.UserDTO;
 import ute.entities.Addresses;
 import ute.entities.Users;
@@ -28,6 +26,8 @@ import ute.service.impl.AddressServiceImpl;
 import ute.service.impl.UserServiceImpl;
 import ute.service.inter.AddressService;
 import ute.service.inter.UserService;
+import ute.utils.Constant;
+import ute.utils.FileStorage;
 
 /**
  * Unified User Controller - xử lý cả API endpoints và View endpoints
@@ -45,7 +45,6 @@ public class UserController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private final UserService userService = new UserServiceImpl();
-    private final UserDao userDao = new UserDaoImpl();
     private final AddressService addressService = new AddressServiceImpl();
     private final ute.service.impl.OrderServiceImpl orderService = new ute.service.impl.OrderServiceImpl();
     private final Gson gson = new Gson();
@@ -201,9 +200,9 @@ public class UserController extends HttpServlet {
 
         // Kiểm tra email đã tồn tại
         if (email != null && !email.equals(currentUser.getEmail())) {
-            if (userDao.existsByEmail(email)) {
-                req.setAttribute("error", "Email đã được sử dụng bởi tài khoản khác!");
-                req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+            if (userService.existsByEmail(email)) {
+                resp.setContentType("application/json;charset=UTF-8");
+                resp.getWriter().print("{\"success\":true, error:\"Email đã được sử dụng bởi tài khoản khác!\"}");
                 return;
             }
         }
@@ -211,10 +210,15 @@ public class UserController extends HttpServlet {
         // Upload avatar (nếu có)
         String avatarFileName = currentUser.getAvatar();
         if (avatarPart != null && avatarPart.getSize() > 0) {
-            String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
-            java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
-            avatarFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
-            avatarPart.write(uploadDir + avatarFileName);
+            FileStorage avatarStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_AVATAR);
+            String newAvatar = null;
+            try {
+                newAvatar = avatarStorage.save(avatarPart);
+            } catch (Exception e) {
+                newAvatar = Constant.DEFAULT_AVATAR;
+            }
+            if (newAvatar != null)
+                avatarFileName = newAvatar;
         }
 
         // Cập nhật dữ liệu
@@ -223,11 +227,12 @@ public class UserController extends HttpServlet {
         currentUser.setPhone(phone);
         currentUser.setAvatar(avatarFileName);
 
-        userDao.update(currentUser);
-        req.getSession().setAttribute("currentUser", currentUser);
+        userService.update(currentUser);
+        req.getSession().setAttribute("currentUser", userService.getById(currentUser.getUserID()));
 
         req.setAttribute("success", "Cập nhật thông tin thành công!");
-        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.getWriter().print("{\"success\":true}");
     }
 
     private void changePasswordForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)
@@ -246,7 +251,7 @@ public class UserController extends HttpServlet {
         // Cập nhật mật khẩu mới
         String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         currentUser.setPassword(hashed);
-        userDao.update(currentUser);
+        userService.update(currentUser);
         req.getSession().setAttribute("currentUser", currentUser);
 
         req.setAttribute("success", "Đổi mật khẩu thành công! Hệ thống sẽ quay lại hồ sơ sau ít giây...");
@@ -267,7 +272,7 @@ public class UserController extends HttpServlet {
         }
 
         try {
-            userDao.delete(currentUser.getUserID());
+            userService.delete(currentUser.getUserID());
             session.invalidate();
             resp.sendRedirect(req.getContextPath() + "/");
         } catch (Exception e) {
@@ -437,7 +442,7 @@ public class UserController extends HttpServlet {
         }
 
         try {
-            userDao.delete(currentUser.getUserID());
+            userService.delete(currentUser.getUserID());
             session.invalidate();
             sendSuccess(resp, out, null, "Account deleted successfully");
         } catch (Exception e) {

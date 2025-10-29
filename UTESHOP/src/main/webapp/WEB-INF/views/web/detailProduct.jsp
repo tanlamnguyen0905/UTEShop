@@ -25,7 +25,7 @@
                     <div class="product-gallery-wrapper">
                         <div class="main-image-container">
                             <c:set var="mainImage" value="${empty productDTO.images ? 'logo.png' : productDTO.images[0]}" />
-                            <img src="${pageContext.request.contextPath}/image?fname=${mainImage}" 
+                            <img src="${pageContext.request.contextPath}/assets/uploads/product/${mainImage}" 
                                  id="mainImage" 
                                  class="main-product-image" 
                                  alt="${productDTO.productName}">
@@ -39,8 +39,8 @@
                         <div class="thumbnail-gallery">
                             <c:forEach items="${productDTO.images}" var="imageUrl" varStatus="status">
                                 <div class="thumbnail-item ${status.index == 0 ? 'active' : ''}" 
-                                     onclick="changeMainImage('${pageContext.request.contextPath}/image?fname=${imageUrl}', this)">
-                                    <img src="${pageContext.request.contextPath}/image?fname=${imageUrl}" alt="Thumbnail">
+                                     onclick="changeMainImage('${pageContext.request.contextPath}/assets/uploads/product/${imageUrl}', this)">
+                                    <img src="${pageContext.request.contextPath}/assets/uploads/product/${imageUrl}" alt="Thumbnail">
                                 </div>
                             </c:forEach>
                         </div>
@@ -230,7 +230,7 @@
                                                     <p>${review.content}</p>
                                                     <c:if test="${not empty review.image && review.image != 'logo.png'}">
                                                         <div class="review-image">
-                                                            <img src="${pageContext.request.contextPath}/image?fname=${review.image}" 
+                                                            <img src="${pageContext.request.contextPath}/assets/uploads/review/${review.image}" 
                                                                  alt="Review image">
                                                         </div>
                                                     </c:if>

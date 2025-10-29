@@ -204,7 +204,7 @@
                 <div class="product-row" data-product-id="${p.productID}">
                   <c:choose>
                     <c:when test="${not empty p.images and fn:length(p.images) > 0}">
-                      <img src="${pageContext.request.contextPath}/image?fname=${p.images[0]}" 
+                      <img src="${pageContext.request.contextPath}/assets/uploads/category/${p.images[0]}" 
                            alt="${p.productName}"
                            onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png'">
                     </c:when>
@@ -508,7 +508,7 @@
           
           let imageUrl = DEFAULT_IMAGE;
           if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-            imageUrl = CONTEXT_PATH + '/image?fname=' + encodeURIComponent(product.images[0]);
+            imageUrl = CONTEXT_PATH + '/assets/uploads/banner/' + encodeURIComponent(product.images[0]);
           }
 
           return [

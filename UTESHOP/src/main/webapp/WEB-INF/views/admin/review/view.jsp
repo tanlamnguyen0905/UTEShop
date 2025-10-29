@@ -34,7 +34,7 @@
                 <p><strong>Nội dung:</strong> ${review.content}</p>
                 <p><strong>Hình ảnh:</strong>
                     <c:if test="${not empty review.image}">
-                        <img src="${pageContext.request.contextPath}/${review.image}" alt="Review Image" class="image-thumbnail">
+                        <img src="${pageContext.request.contextPath}/assets/uploads/review/${review.image}" alt="Review Image" class="image-thumbnail">
                     </c:if>
                     <c:if test="${empty review.image}">Không có</c:if>
                 </p>

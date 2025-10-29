@@ -1,6 +1,5 @@
 package ute.controllers.admin.category;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +13,7 @@ import jakarta.servlet.http.Part;
 import ute.entities.Categories;
 import ute.service.inter.CategoriesService;
 import ute.utils.Constant;
+import ute.utils.FileStorage;
 import ute.service.impl.CategoriesServiceImpl;
 
 @MultipartConfig(
@@ -129,7 +129,7 @@ public class CategoriesController extends HttpServlet {
                 category = categoriesService.findById(id);
             }
 
-            // ⚠️ Kiểm tra tên danh mục
+            // Kiểm tra tên danh mục
             if (categoryName == null || categoryName.trim().isEmpty()) {
                 req.setAttribute("error", "Tên danh mục không được để trống!");
                 req.setAttribute("category", category);
@@ -137,7 +137,7 @@ public class CategoriesController extends HttpServlet {
                 return;
             }
 
-            // ⚠️ Kiểm tra trùng tên
+            // Kiểm tra trùng tên
             Categories existing = categoriesService.findByNameExact(categoryName.trim());
             if (existing != null && !Objects.equals(existing.getCategoryID(), id)) {
                 req.setAttribute("error", "Tên danh mục đã tồn tại! Vui lòng nhập tên khác!");
@@ -150,23 +150,15 @@ public class CategoriesController extends HttpServlet {
             category.setCategoryName(categoryName.trim());
             category.setDescription(description != null ? description.trim() : null);
 
-            // 🖼️ Xử lý upload ảnh (sử dụng Constant.Dir)
+            // Xử lý upload ảnh
             Part filePart = req.getPart("image");
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    String uploadDir = Constant.Dir + File.separator + "images/categories";
-                    File dir = new File(uploadDir);
-                    if (!dir.exists())
-                        dir.mkdirs();
-
-                    String fileName = System.currentTimeMillis() + "_"
-                            + filePart.getSubmittedFileName().replaceAll("[^a-zA-Z0-9.]", "_");
-
-                    filePart.write(uploadDir + File.separator + fileName);
-
-                    category.setImage(fileName);
-
-                    System.out.println("✅ Ảnh danh mục đã upload: " + fileName);
+                    FileStorage catStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_CATEGORY);
+                    String image = catStorage.save(filePart);
+                    if (image == null)
+                        throw new Exception("Không thể lưu file");
+                    category.setImage(image);
 
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -24,7 +24,7 @@
             <c:if test="${not empty category.image}">
                 <p>
                     <strong>Hình ảnh:</strong><br>
-                    <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
+                    <img src="${pageContext.request.contextPath}/assets/uploads/category/${category.image}"
                          alt="${category.categoryName}"
                          width="200"
                          class="img-thumbnail"

@@ -75,7 +75,7 @@
                                 <td>${banner.description}</td>
                                 <td>
                                     <c:if test="${not empty banner.bannerImage}">
-                                        <img src="${pageContext.request.contextPath}/image?fname=${banner.bannerImage}"
+                                        <img src="${pageContext.request.contextPath}/assets/uploads/banner/${banner.bannerImage}"
                                              alt="${banner.bannerName}"
                                              width="100" height="100" class="img-thumbnail"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">

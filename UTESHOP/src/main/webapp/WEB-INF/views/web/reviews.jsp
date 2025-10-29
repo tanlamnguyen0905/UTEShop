@@ -167,10 +167,10 @@
                                         
                                         <c:if test="${not empty review.image}">
                                             <div class="review-image mb-3">
-                                                <img src="${pageContext.request.contextPath}/image?fname=${review.image}" 
+                                                <img src="${pageContext.request.contextPath}/assets/uploads/review/${review.image}" 
                                                      class="img-thumbnail" 
                                                      style="max-width: 200px; max-height: 200px; cursor: pointer;"
-                                                     onclick="openImageModal('${pageContext.request.contextPath}/image?fname=${review.image}')"
+                                                     onclick="openImageModal('${pageContext.request.contextPath}/assets/uploads/review/${review.image}')"
                                                      alt="Review image">
                                             </div>
                                         </c:if>

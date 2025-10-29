@@ -1,8 +1,6 @@
 package ute.controllers.admin.brand;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import jakarta.servlet.ServletException;
@@ -15,6 +13,8 @@ import jakarta.servlet.http.Part;
 import ute.entities.Brand;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
+import ute.utils.Constant;
+import ute.utils.FileStorage;
 
 @MultipartConfig(
         fileSizeThreshold = 10240,    // 10KB
@@ -163,32 +163,8 @@ public class BrandController extends HttpServlet {
             Part logoPart = req.getPart("brandLogo");
             boolean uploadSuccess = true;
             if (logoPart != null && logoPart.getSize() > 0) {
-                String webAppRoot = getServletContext().getRealPath("/");
-                if (webAppRoot == null) {
-                    req.setAttribute("error", "Không thể lưu file!");
-                    req.setAttribute("brand", tempBrand);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/brands/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-
-                String uploadPath = webAppRoot + File.separator + "images" + File.separator + "brands";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-                    req.setAttribute("error", "Không thể tạo thư mục images/brands!");
-                    req.setAttribute("brand", tempBrand);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/brands/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-
                 String submittedFileName = logoPart.getSubmittedFileName();
                 if (submittedFileName != null && !submittedFileName.isEmpty()) {
-                    // Sanitize filename
-                    String baseName = submittedFileName;
-                    int lastSeparator = baseName.lastIndexOf(File.separatorChar);
-                    if (lastSeparator > 0) {
-                        baseName = baseName.substring(lastSeparator + 1);
-                    }
-                    baseName = baseName.replaceAll("[^a-zA-Z0-9._-]", "_");
 
                     // Validate
                     String contentType = logoPart.getContentType();
@@ -205,26 +181,11 @@ public class BrandController extends HttpServlet {
                         return;
                     }
 
-                    String fileName = baseName;
-                    String filePath = uploadPath + File.separator + fileName;
-
-                    try {
-                        logoPart.write(filePath);
-                        File savedFile = new File(filePath);
-                        if (savedFile.exists() && savedFile.length() > 0) {
-                            brand.setBrandLogo("images/brands/" + fileName);
-                        } else {
-                            if (savedFile.exists()) savedFile.delete();
-                            uploadSuccess = false;
-                        }
-                    } catch (IOException e) {
-                        File errorFile = new File(filePath);
-                        if (errorFile.exists()) errorFile.delete();
-                        req.setAttribute("error", "Lỗi lưu file: " + e.getMessage());
-                        req.setAttribute("brand", tempBrand);
-                        req.getRequestDispatcher("/WEB-INF/views/admin/brands/addOrEdit.jsp").forward(req, resp);
-                        return;
-                    }
+                    FileStorage brandStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_BRAND);
+                    String filePath = brandStorage.save(logoPart);
+                    uploadSuccess = filePath != null;
+                    if (uploadSuccess)
+                        brand.setBrandLogo(filePath);
                 }
             }
 

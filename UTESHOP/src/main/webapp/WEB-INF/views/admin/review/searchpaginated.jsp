@@ -97,7 +97,7 @@
                                     <td>${review.content}</td>
                                     <td>
                                         <c:if test="${not empty review.image}">
-                                            <img src="${pageContext.request.contextPath}/${review.image}" alt="Image" width="50" height="50">
+                                            <img src="${pageContext.request.contextPath}/assets/uploads/review/${review.image}" alt="Image" width="50" height="50">
                                         </c:if>
                                     </td>
                                     <td>${review.rating} sao</td>
