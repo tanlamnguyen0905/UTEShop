@@ -1,6 +1,5 @@
 package ute.controllers.admin.product;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -26,6 +25,8 @@ import ute.service.admin.Impl.ProductServiceImpl;
 import ute.service.admin.inter.ProductService;
 import ute.service.impl.CategoriesServiceImpl;
 import ute.service.inter.CategoriesService;
+import ute.utils.Constant;
+import ute.utils.FileStorage;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
 
@@ -348,38 +349,15 @@ public class ProductController extends HttpServlet {
             List<Image> newImages = new ArrayList<>();
 
             if (!imageParts.isEmpty()) {
-                String webAppRoot = getServletContext().getRealPath("/");
-                if (webAppRoot == null) {
-                    req.setAttribute("error", "Không thể lưu file do môi trường triển khai. Vui lòng liên hệ admin.");
-                    loadDropdowns(req);
-                    req.setAttribute("product", tempProduct);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
-
-                String uploadPath = webAppRoot + File.separator + "images" + File.separator + "products";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-                    req.setAttribute("error", "Không thể tạo thư mục images/products!");
-                    loadDropdowns(req);
-                    req.setAttribute("product", tempProduct);
-                    req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                    return;
-                }
+                FileStorage productStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_PRODUCT);
 
                 for (Part filePart : imageParts) {
-                    String submittedFileName = filePart.getSubmittedFileName();
-                    if (submittedFileName == null || submittedFileName.isEmpty()) {
-                        continue;  // Bỏ qua file rỗng
-                    }
+                    if (filePart == null || filePart.getSize() == 0)
+                        continue; // Bỏ qua file rỗng
 
-                    // Sanitize filename (giữ nguyên tên gốc sau sanitize)
-                    String baseName = submittedFileName;
-                    int lastSeparator = baseName.lastIndexOf(File.separatorChar);
-                    if (lastSeparator > 0) {
-                        baseName = baseName.substring(lastSeparator + 1);
-                    }
-                    baseName = baseName.replaceAll("[^a-zA-Z0-9._-]", "_");  // Chỉ thay ký tự đặc biệt thành _
+                    String submittedFileName = filePart.getSubmittedFileName();
+                    if (submittedFileName == null || submittedFileName.isEmpty())
+                        continue; // Bỏ qua file rỗng
 
                     // Validate type và size
                     String contentType = filePart.getContentType();
@@ -397,34 +375,10 @@ public class ProductController extends HttpServlet {
                         req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
                         return;
                     }
-
-                    // Dùng tên gốc sau sanitize (không thêm timestamp)
-                    String fileName = baseName;
-                    String filePath = uploadPath + File.separator + fileName;
-
-                    // Save file (ghi đè nếu trùng tên)
-                    try {
-                        filePart.write(filePath);
-                        File savedFile = new File(filePath);
-                        if (savedFile.exists() && savedFile.length() > 0) {
-                            Image image = new Image();
-                            image.setDirImage(fileName);  // Lưu đường dẫn đúng vào DB
-                            image.setProduct(product);
-                            newImages.add(image);
-                        } else {
-                            if (savedFile.exists()) savedFile.delete();
-                            fileUploadSuccess = false;
-                            break;
-                        }
-                    } catch (IOException e) {
-                        File errorFile = new File(filePath);
-                        if (errorFile.exists()) errorFile.delete();
-                        req.setAttribute("error", "Lỗi IO khi lưu file: " + e.getMessage());
-                        loadDropdowns(req);
-                        req.setAttribute("product", tempProduct);
-                        req.getRequestDispatcher("/WEB-INF/views/admin/products/addOrEdit.jsp").forward(req, resp);
-                        return;
-                    }
+                    Image img = new Image();
+                    img.setDirImage(productStorage.save(filePart));
+                    img.setProduct(product);
+                    newImages.add(img);
                 }
             }
 

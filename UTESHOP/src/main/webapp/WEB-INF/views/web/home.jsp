@@ -17,7 +17,7 @@
                     <div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
                         <div class="carousel-inner">
                             <c:forEach var="banner" items="${listBanner}" varStatus="loop">
-                                <c:url value="/image?fname=${banner.bannerImage}" var="imgUrl" />
+                                <c:url value="/assets/uploads/banner/${banner.bannerImage}" var="imgUrl" />
                                 <div class="carousel-item ${loop.first ? 'active' : ''}">
                                     <a href="${pageContext.request.contextPath}/filter?banner=${banner.bannerID}">
                                         <img src="${imgUrl}" class="d-block w-100 rounded-4" alt="${banner.bannerName}"
@@ -50,7 +50,7 @@
                             <c:forEach var="cate" items="${listCate}" end="5">
                                 <div class="col-6 col-md-4 col-lg-2">
                                     <div class="card border-0 shadow-sm rounded-4 h-100">
-                                        <c:url value="/image?fname=${cate.image}" var="imgUrl" />
+                                        <c:url value="/assets/uploads/category/${cate.image}" var="imgUrl" />
                                         <a href="${pageContext.request.contextPath}/filter?category=${cate.categoryID}"
                                             class="text-decoration-none">
                                             <img src="${imgUrl}" class="card-img-top rounded-4"

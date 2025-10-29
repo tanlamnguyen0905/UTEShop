@@ -1,7 +1,6 @@
 package ute.utils;
 
 public class Constant {
-	public static final String Dir = "D:\\images";
 	
 	// User Roles
 	public static final String ROLE_ADMIN = "ADMIN";
@@ -26,4 +25,23 @@ public class Constant {
 	// payment status
 	public static final String PAYMENT_PAID = "Đã thanh toán";
 	public static final String PAYMENT_UNPAID = "Chưa thanh toán";
+
+	// Uploading
+	public static final String UPLOAD_DIR_BANNER = "assets/uploads/banner";
+    public static final String UPLOAD_DIR_BRAND = "assets/uploads/brand";
+    public static final String UPLOAD_DIR_CATEGORY = "assets/uploads/category";
+    public static final String UPLOAD_DIR_PRODUCT = "assets/uploads/product";
+    public static final String UPLOAD_DIR_REVIEW = "assets/uploads/review";
+    public static final String UPLOAD_DIR_AVATAR = "assets/uploads/avatar";
+
+    public static final String[] ALL_UPLOAD_DIRS = {
+        UPLOAD_DIR_BANNER,
+        UPLOAD_DIR_BRAND,
+        UPLOAD_DIR_CATEGORY,
+        UPLOAD_DIR_PRODUCT,
+        UPLOAD_DIR_REVIEW,
+        UPLOAD_DIR_AVATAR
+    };
+
+	public static final String DEFAULT_AVATAR = "default-avatar.png";
 }

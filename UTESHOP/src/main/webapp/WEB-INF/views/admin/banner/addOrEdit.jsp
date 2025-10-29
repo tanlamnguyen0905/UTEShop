@@ -79,7 +79,7 @@
                     <c:if test="${not empty banner.bannerImage}">
                         <div class="mt-3">
                             <div class="fw-semibold mb-1">Ảnh hiện tại:</div>
-                            <img src="${pageContext.request.contextPath}/image?fname=${banner.bannerImage}"
+                            <img src="${pageContext.request.contextPath}/assets/uploads/banner/${banner.bannerImage}"
                                  alt="Ảnh hiện tại" class="preview-img"
                                  onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png'">
                         </div>

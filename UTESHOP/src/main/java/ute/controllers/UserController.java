@@ -19,8 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-import ute.dao.impl.UserDaoImpl;
-import ute.dao.inter.UserDao;
 import ute.dto.UserDTO;
 import ute.entities.Addresses;
 import ute.entities.Users;
@@ -28,6 +26,8 @@ import ute.service.impl.AddressServiceImpl;
 import ute.service.impl.UserServiceImpl;
 import ute.service.inter.AddressService;
 import ute.service.inter.UserService;
+import ute.utils.Constant;
+import ute.utils.FileStorage;
 
 /**
  * Unified User Controller - xử lý cả API endpoints và View endpoints
@@ -45,7 +45,6 @@ public class UserController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private final UserService userService = new UserServiceImpl();
-    private final UserDao userDao = new UserDaoImpl();
     private final AddressService addressService = new AddressServiceImpl();
     private final ute.service.impl.OrderServiceImpl orderService = new ute.service.impl.OrderServiceImpl();
     private final Gson gson = new Gson();
@@ -206,7 +205,7 @@ public class UserController extends HttpServlet {
 
         // Kiểm tra email đã tồn tại
         if (email != null && !email.isEmpty() && !email.equals(currentUser.getEmail())) {
-            if (userDao.existsByEmail(email)) {
+            if (userService.existsByEmail(email)) {
                 if (isAjax) {
                     sendJsonResponse(resp, false, "Email đã được sử dụng bởi tài khoản khác!");
                 } else {
@@ -220,66 +219,43 @@ public class UserController extends HttpServlet {
         // Upload avatar (nếu có)
         String avatarFileName = currentUser.getAvatar();
         if (avatarPart != null && avatarPart.getSize() > 0) {
-            try {
-                // Validate file type
-                String contentType = avatarPart.getContentType();
-                if (!contentType.startsWith("image/")) {
-                    if (isAjax) {
-                        sendJsonResponse(resp, false, "Chỉ chấp nhận file hình ảnh!");
-                    } else {
-                        req.setAttribute("error", "Chỉ chấp nhận file hình ảnh!");
-                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-                    }
-                    return;
-                }
-
-                // Validate file size (max 5MB)
-                if (avatarPart.getSize() > 5 * 1024 * 1024) {
-                    if (isAjax) {
-                        sendJsonResponse(resp, false, "Kích thước file tối đa 5MB!");
-                    } else {
-                        req.setAttribute("error", "Kích thước file tối đa 5MB!");
-                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-                    }
-                    return;
-                }
-
-                String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
-                java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
-                
-                // Tạo tên file unique
-                String originalFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
-                String fileExtension = "";
-                int lastDot = originalFileName.lastIndexOf('.');
-                if (lastDot > 0) {
-                    fileExtension = originalFileName.substring(lastDot);
-                }
-                avatarFileName = System.currentTimeMillis() + "_" + currentUser.getUserID() + fileExtension;
-                
-                avatarPart.write(uploadDir + avatarFileName);
-                
-                // Kiểm tra file đã lưu thành công
-                java.io.File savedFile = new java.io.File(uploadDir + avatarFileName);
-                if (!savedFile.exists() || savedFile.length() == 0) {
-                    if (savedFile.exists()) savedFile.delete();
-                    if (isAjax) {
-                        sendJsonResponse(resp, false, "Lỗi khi lưu file!");
-                    } else {
-                        req.setAttribute("error", "Lỗi khi lưu file!");
-                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
-                    }
-                    return;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            // Validate file type
+            String contentType = avatarPart.getContentType();
+            if (!contentType.startsWith("image/")) {
                 if (isAjax) {
-                    sendJsonResponse(resp, false, "Lỗi upload ảnh: " + e.getMessage());
+                    sendJsonResponse(resp, false, "Chỉ chấp nhận file hình ảnh!");
                 } else {
-                    req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
+                    req.setAttribute("error", "Chỉ chấp nhận file hình ảnh!");
                     req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
                 }
                 return;
             }
+
+            // Validate file size (max 5MB)
+            if (avatarPart.getSize() > 5 * 1024 * 1024) {
+                if (isAjax) {
+                    sendJsonResponse(resp, false, "Kích thước file tối đa 5MB!");
+                } else {
+                    req.setAttribute("error", "Kích thước file tối đa 5MB!");
+                    req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                }
+                return;
+            }
+
+            FileStorage avatarStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_AVATAR);
+            String newAvatar = avatarStorage.save(avatarPart);
+            if (newAvatar == null)
+            {
+                if (isAjax) {
+                    sendJsonResponse(resp, false, "Lỗi khi lưu file!");
+                } else {
+                    req.setAttribute("error", "Lỗi khi lưu file!");
+                    req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                }
+                return;
+            }
+            else
+                avatarFileName = newAvatar;
         }
 
         // Cập nhật dữ liệu
@@ -294,8 +270,8 @@ public class UserController extends HttpServlet {
         }
         currentUser.setAvatar(avatarFileName);
 
-        userDao.update(currentUser);
-        req.getSession().setAttribute("currentUser", currentUser);
+        userService.update(currentUser);
+        req.getSession().setAttribute("currentUser", userService.getById(currentUser.getUserID()));
 
         // Trả về response phù hợp
         if (isAjax) {
@@ -332,7 +308,7 @@ public class UserController extends HttpServlet {
         // Cập nhật mật khẩu mới
         String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         currentUser.setPassword(hashed);
-        userDao.update(currentUser);
+        userService.update(currentUser);
         req.getSession().setAttribute("currentUser", currentUser);
 
         req.setAttribute("success", "Đổi mật khẩu thành công! Hệ thống sẽ quay lại hồ sơ sau ít giây...");
@@ -353,7 +329,7 @@ public class UserController extends HttpServlet {
         }
 
         try {
-            userDao.delete(currentUser.getUserID());
+            userService.delete(currentUser.getUserID());
             session.invalidate();
             resp.sendRedirect(req.getContextPath() + "/");
         } catch (Exception e) {
@@ -523,7 +499,7 @@ public class UserController extends HttpServlet {
         }
 
         try {
-            userDao.delete(currentUser.getUserID());
+            userService.delete(currentUser.getUserID());
             session.invalidate();
             sendSuccess(resp, out, null, "Account deleted successfully");
         } catch (Exception e) {

@@ -79,7 +79,7 @@
                             <div class="row">
                                 <c:forEach var="image" items="${product.images}">
                                     <div class="col-md-4 mb-3">
-                                        <img src="${pageContext.request.contextPath}/image?fname=${image.dirImage}"
+                                        <img src="${pageContext.request.contextPath}/assets/uploads/product/${image.dirImage}"
                                              alt="${product.productName}"
                                              class="img-thumbnail w-100" style="height: 150px;"
                                              onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">

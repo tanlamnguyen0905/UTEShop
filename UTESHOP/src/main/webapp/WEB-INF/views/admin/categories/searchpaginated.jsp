@@ -75,7 +75,7 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${not empty category.image}">
-                                            <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
+                                            <img src="${pageContext.request.contextPath}/assets/uploads/category/${category.image}"
                                                  alt="${category.categoryName}"
                                                  width="50" height="50" class="img-thumbnail"
                                                  onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">

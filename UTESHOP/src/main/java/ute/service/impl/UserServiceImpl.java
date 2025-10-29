@@ -11,6 +11,7 @@ import ute.dto.UpdateUserDTO;
 import ute.dto.UserDTO;
 import ute.entities.Users;
 import ute.service.inter.UserService;
+import ute.utils.Constant;
 
 public class UserServiceImpl implements UserService {
 	private UserDaoImpl userDao = new UserDaoImpl();
@@ -27,16 +28,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean create(Users user) {
-    	if (user.getPassword().isEmpty())
-    		return false;
+		String[] keys = {user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus() };
+		for (String k : keys)
+			if (k.isBlank())
+				return false;
+		if (user.getAvatar() == null)
+			user.setAvatar(Constant.DEFAULT_AVATAR);
     	user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         return userDao.insert(user);
     }
 
     @Override
     public boolean update(Users user) {
-    	if (!user.getPassword().isEmpty())
-    		user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         return userDao.update(user);
     }
 
@@ -73,6 +76,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean existsByUsername(String username) {
 		return userDao.existsByUsername(username);
+	}
+
+	@Override
+	public Users findByEmail(String email) {
+		return userDao.findByEmail(email);
 	}
 
 	@Override

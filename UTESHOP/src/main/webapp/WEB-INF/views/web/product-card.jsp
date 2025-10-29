@@ -12,7 +12,7 @@
             <c:set var="productImage" value="images/logo.png" />
         </c:otherwise>
     </c:choose>
-    <c:url value="/image?fname=${productImage}" var="imgUrl" />
+    <c:url value="/assets/uploads/product/${productImage}" var="imgUrl" />
     
     <div class="position-relative">
         <a href="${pageContext.request.contextPath}/detailProduct?productID=${p.productID}" 

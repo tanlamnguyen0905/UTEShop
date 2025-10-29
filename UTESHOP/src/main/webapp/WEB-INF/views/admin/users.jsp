@@ -5,20 +5,7 @@
 <html>
 <head>
     <title>Quản lý người dùng - Admin</title>
-    <style>
-        .stats-card {
-            border-left: 4px solid;
-            transition: transform 0.2s;
-        }
-        .stats-card:hover {
-            transform: translateY(-5px);
-        }
-        .stats-card.total { border-left-color: #007bff; }
-        .stats-card.admin { border-left-color: #dc3545; }
-        .stats-card.manager { border-left-color: #6f42c1; }
-        .stats-card.shipper { border-left-color: #28a745; }
-        .stats-card.user { border-left-color: #ffc107; }
-    </style>
+    <link href="${pageContext.request.contextPath}/assets/styles/users.css" rel="stylesheet"/>
 </head>
 <body>
     <div class="container-fluid px-4">
@@ -53,79 +40,122 @@
         <!-- Statistics -->
         <div class="row mb-4">
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-                <div class="card stats-card total">
+                <div class="stats-card gradient-blue">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-muted mb-1">Tổng người dùng</h6>
-                                <h3 class="mb-0">${totalUsers}</h3>
+                                <div class="stat-label text-white-50">Người dùng</div>
+                                <div class="stat-value text-white">${totalUsers}</div>
                             </div>
-                            <div class="text-primary">
-                                <i class="fas fa-users fa-2x"></i>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-                <div class="card stats-card admin">
+                <div class="stats-card gradient-red">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-muted mb-1">Admin</h6>
-                                <h3 class="mb-0">${adminCount}</h3>
+                                <div class="stat-label text-white-50">Admin</div>
+                                <div class="stat-value text-white">${adminCount}</div>
                             </div>
-                            <div class="text-danger">
-                                <i class="fas fa-user-shield fa-2x"></i>
+                            <div class="stat-icon">
+                                <i class="fas fa-user-shield"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-                <div class="card stats-card manager">
+                <div class="stats-card gradient-purple">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-muted mb-1">Manager</h6>
-                                <h3 class="mb-0">${managerCount}</h3>
+                                <div class="stat-label text-white-50">Manager</div>
+                                <div class="stat-value text-white">${managerCount}</div>
                             </div>
-                            <div style="color: #6f42c1;">
-                                <i class="fas fa-user-tie fa-2x"></i>
+                            <div class="stat-icon">
+                                <i class="fas fa-user-tie"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-                <div class="card stats-card shipper">
+                <div class="stats-card gradient-green">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-muted mb-1">Shipper</h6>
-                                <h3 class="mb-0">${shipperCount}</h3>
+                                <div class="stat-label text-white-50">Shipper</div>
+                                <div class="stat-value text-white">${shipperCount}</div>
                             </div>
-                            <div class="text-success">
-                                <i class="fas fa-shipping-fast fa-2x"></i>
+                            <div class="stat-icon">
+                                <i class="fas fa-shipping-fast"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-                <div class="card stats-card user">
+                <div class="stats-card gradient-orange">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="text-muted mb-1">Khách hàng</h6>
-                                <h3 class="mb-0">${userCount}</h3>
+                                <div class="stat-label text-white-50">Khách hàng</div>
+                                <div class="stat-value text-white">${userCount}</div>
                             </div>
-                            <div class="text-warning">
-                                <i class="fas fa-user fa-2x"></i>
+                            <div class="stat-icon">
+                                <i class="fas fa-user"></i>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-search me-2"></i>Tìm kiếm người dùng
+            </div>
+            <div class="card-body">
+                <form id="searchForm" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Từ khóa</label>
+                        <input type="text" id="searchInput" class="form-control"
+                            placeholder="Tìm theo username, email, họ tên...">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Vai trò</label>
+                        <select id="roleSelect" class="form-select">
+                            <option value="">-- Chọn vai trò --</option>
+                            <option value="ADMIN">ADMIN</option>
+                            <option value="MANAGER">MANAGER</option>
+                            <option value="SHIPPER">SHIPPER</option>
+                            <option value="USER">USER</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select id="statusSelect" class="form-select status-select">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="ACTIVE" class="status-active">ACTIVE</option>
+                            <option value="LOCKED" class="status-locked">LOCKED</option>
+                            <option value="PENDING" class="status-pending">PENDING</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="button" id="btnAddUser" class="btn btn-primary w-100">
+                            <i class="fas fa-plus me-2"></i>Thêm mới
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -136,19 +166,13 @@
                 Danh sách người dùng
             </div>
             <div class="card-body">
-                <c:if test="${empty users}">
-                    <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Chưa có người dùng nào trong hệ thống
-                    </div>
-                </c:if>
-
-                <c:if test="${not empty users}">
+                <div id="message" class="text-center text-muted py-4">Đang tải thông tin...</div>
+                
+                <div id="usersTableContainer" class="d-none">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped">
+                        <table class="table table-hover table-striped align-middle" id="usersTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Username</th>
                                     <th>Họ tên</th>
                                     <th>Email</th>
@@ -156,81 +180,93 @@
                                     <th>Vai trò</th>
                                     <th>Trạng thái</th>
                                     <th>Ngày tạo</th>
-                                    <th>Thao tác</th>
+                                    <th class="text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach items="${users}" var="user">
-                                    <tr>
-                                        <td><strong>#${user.userID}</strong></td>
-                                        <td>${user.username}</td>
-                                        <td>${user.fullname}</td>
-                                        <td>${user.email}</td>
-                                        <td>${not empty user.phone ? user.phone : '-'}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${user.role == 'ADMIN'}">
-                                                    <span class="badge bg-danger">
-                                                        <i class="fas fa-user-shield me-1"></i>Admin
-                                                    </span>
-                                                </c:when>
-                                                <c:when test="${user.role == 'MANAGER'}">
-                                                    <span class="badge" style="background-color: #6f42c1;">
-                                                        <i class="fas fa-user-tie me-1"></i>Manager
-                                                    </span>
-                                                </c:when>
-                                                <c:when test="${user.role == 'SHIPPER'}">
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-shipping-fast me-1"></i>Shipper
-                                                    </span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge bg-info">
-                                                        <i class="fas fa-user me-1"></i>User
-                                                    </span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${user.status == 'ACTIVE' || user.status == 'active'}">
-                                                    <span class="badge bg-success">Hoạt động</span>
-                                                </c:when>
-                                                <c:when test="${user.status == 'LOCKED'}">
-                                                    <span class="badge bg-danger">Khóa</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge bg-secondary">${user.status}</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:if test="${not empty user.createAt}">
-                                                ${user.createAt.toString().replace('T', ' ').substring(0, 16)}
-                                            </c:if>
-                                            <c:if test="${empty user.createAt}">
-                                                -
-                                            </c:if>
-                                        </td>
-                                        <td>
-                                            <a href="${pageContext.request.contextPath}/api/admin/user/edit?id=${user.userID}" 
-                                               class="btn btn-sm btn-warning" title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger btn-delete" 
-                                                    data-user-id="${user.userID}"
-                                                    data-username="${user.username}"
-                                                    title="Xóa">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
+                                <!-- Populated by JavaScript -->
                             </tbody>
                         </table>
                     </div>
-                </c:if>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="addUserForm" method="post" action="${pageContext.request.contextPath}/api/admin/user/insert" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel"><i class="fas fa-user-lock me-2"></i>Thêm tài khoản mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="mb-3">
+							<label class="form-label">Tên đăng nhập <span
+								class="text-danger">*</span></label> <input type="text" name="username"
+								class="form-control" required>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Mật khẩu <span
+								class="text-danger">*</span></label> <input type="password"
+								name="password" id="addPassword" class="form-control" required>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Nhập lại mật khẩu <span
+								class="text-danger">*</span></label> <input type="password"
+								name="password2" id="addPassword2" class="form-control" required>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Vai trò <span
+									class="text-danger">*</span></label> <select name="role"
+									class="form-select" required>
+									<option value="">-- Chọn vai trò --</option>
+									<option value="ADMIN">ADMIN</option>
+									<option value="MANAGER">MANAGER</option>
+									<option value="SHIPPER">SHIPPER</option>
+									<option value="USER">USER</option>
+								</select>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Trạng thái <span
+									class="text-danger">*</span></label> <select name="status"
+									class="form-select" required>
+									<option value="">-- Chọn trạng thái --</option>
+									<option value="ACTIVE">ACTIVE</option>
+									<option value="LOCKED">LOCKED</option>
+									<option value="PENDING">PENDING</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="mb-3">
+								<label class="form-label">Họ tên <span
+									class="text-danger">*</span></label> <input type="text" name="fullname"
+									class="form-control" required>
+							</div>
+						</div>
+						<div class="row">
+							<div class="mb-3">
+								<label class="form-label">Email <span
+									class="text-danger">*</span></label> <input type="email" name="email"
+									class="form-control" required>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Lưu
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -261,22 +297,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle delete button clicks
-            document.querySelectorAll('.btn-delete').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-user-id');
-                    const username = this.getAttribute('data-username');
-                    
-                    document.getElementById('deleteUsername').textContent = username;
-                    document.getElementById('deleteForm').action = '${pageContext.request.contextPath}/api/admin/user/delete?id=' + userId;
-                    
-                    var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                    modal.show();
-                });
-            });
-        });
+        const contextPath = '${pageContext.request.contextPath}';
     </script>
+    <script src="${pageContext.request.contextPath}/assets/scripts/users.js"></script>
 </body>
 </html>
-

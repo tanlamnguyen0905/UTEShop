@@ -183,7 +183,7 @@
                                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                         </c:when>
                                         <c:otherwise>
-                                            <img src="${user.avatar}" 
+                                            <img src="${pageContext.request.contextPath}${user.avatar != 'default-avatar.png' ? '/assets/uploads/avatar/'.concat(user.avatar) : '/assets/images/avatar/default-avatar.png'}" 
                                                  class="user-avatar-preview" alt="${user.fullname}"
                                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                         </c:otherwise>

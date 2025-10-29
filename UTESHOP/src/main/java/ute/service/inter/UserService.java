@@ -22,6 +22,7 @@ public interface UserService {
     List<Map<String, Object>> getTopCustomersByOrderCount(int limit);
     List<Map<String, Object>> getTopCustomersBySpending(int limit);
 	Users findByUsername(String username);
+	Users findByEmail(String email);
 
 	boolean existsByUsername(String username);
 

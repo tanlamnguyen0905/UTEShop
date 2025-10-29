@@ -1,6 +1,5 @@
 package ute.controllers.admin.banner;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +14,7 @@ import ute.entities.Banner;
 import ute.service.impl.BannerServiceImpl;
 import ute.service.inter.BannerService;
 import ute.utils.Constant;
+import ute.utils.FileStorage;
 
 @WebServlet(urlPatterns = { "/api/admin/banner/*" })
 @MultipartConfig(fileSizeThreshold = 10240, maxFileSize = 10485760, maxRequestSize = 20971520)
@@ -149,30 +149,11 @@ public class BannerController extends HttpServlet {
         // 🖼️ Xử lý upload ảnh
         Part filePart = req.getPart("image");
         if (filePart != null && filePart.getSize() > 0) {
-            try {
-                String uploadDir = Constant.Dir;
-                File dir = new File(uploadDir);
-                if (!dir.exists())
-                    dir.mkdirs();
-
-                // Tên file an toàn, tránh ký tự đặc biệt
-                String fileName = System.currentTimeMillis() + "_" +
-                        filePart.getSubmittedFileName().replaceAll("[^a-zA-Z0-9.]", "_");
-
-                filePart.write(uploadDir + File.separator + fileName);
-                banner.setBannerImage(fileName);
-
-                System.out.println("✅ Ảnh đã upload: " + fileName);
-            } catch (Exception e) {
-                e.printStackTrace();
-                req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
-                req.setAttribute("banner", banner);
-                req.getRequestDispatcher("/WEB-INF/views/admin/banner/addOrEdit.jsp").forward(req, resp);
-                return;
-            }
+            FileStorage bannerStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_BANNER);
+            banner.setBannerImage(bannerStorage.save(filePart));
         } else if (!isEdit) {
             // Nếu là banner mới mà không upload ảnh
-            banner.setBannerImage("images/banner/default.png");
+            banner.setBannerImage("/images/banner/default.png");
         }
 
         // 💾 Lưu hoặc cập nhật banner

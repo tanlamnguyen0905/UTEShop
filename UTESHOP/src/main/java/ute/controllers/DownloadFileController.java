@@ -33,12 +33,13 @@ public class DownloadFileController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String fileName = request.getParameter("fname");
-		File file = new File(Constant.Dir + "/" + fileName);
-		response.setContentType("image/jpeg");
-		if (file.exists()) {
-			IOUtils.copy(new FileInputStream(file), response.getOutputStream());
-		}
+		throw new ServletException("Không tìm thấy ảnh");
+		// String fileName = request.getParameter("fname");
+		// File file = new File(Constant.Dir + "/" + fileName);
+		// response.setContentType("image/jpeg");
+		// if (file.exists()) {
+		// 	IOUtils.copy(new FileInputStream(file), response.getOutputStream());
+		// }
 	}
 
 	/**
