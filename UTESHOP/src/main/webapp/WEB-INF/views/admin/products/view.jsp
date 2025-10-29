@@ -68,6 +68,20 @@
                         <p><strong>Số đánh giá:</strong> ${product.reviewCount}</p>
                         <p><strong>Điểm đánh giá trung bình:</strong> ${product.rating}/5</p>
                         <p><strong>Ngày nhập:</strong> ${product.importDate}</p>
+                        <p><strong>Trạng thái:</strong> 
+                            <c:choose>
+                                <c:when test="${product.status == 'ACTIVE'}">
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-ban me-1"></i>Ngưng hoạt động
+                                    </span>
+                                </c:otherwise>
+                            </c:choose>
+                        </p>
                     </div>
                     <div class="col-md-6">
                         <h5 class="mb-3">Danh mục & Thương hiệu</h5>

@@ -126,6 +126,7 @@
                         <th>Thương hiệu</th>
                         <th>Đã bán</th>
                         <th>Đánh giá</th>
+                        <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -158,6 +159,20 @@
                             <td>${product.soldCount}</td>
                             <td>${product.reviewCount} (${product.rating}/5)</td>
                             <td>
+                                <c:choose>
+                                    <c:when test="${product.status == 'ACTIVE'}">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-ban me-1"></i>Ngưng hoạt động
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
                                 <div class="btn-group" role="group">
                                     <a href="${pageContext.request.contextPath}/api/admin/products/view?id=${product.productID}" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i>
@@ -165,16 +180,31 @@
                                     <a href="${pageContext.request.contextPath}/api/admin/products/saveOrUpdate?id=${product.productID}" class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <c:choose>
+                                        <c:when test="${product.status == 'ACTIVE'}">
+                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" 
+                                               class="btn btn-secondary btn-sm" 
+                                               onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa sản phẩm này? Sản phẩm sẽ không hiển thị trên trang web.')" 
+                                               title="Vô hiệu hóa">
+                                                <i class="fas fa-ban"></i>
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="${pageContext.request.contextPath}/api/admin/products/delete?id=${product.productID}" 
+                                               class="btn btn-success btn-sm" 
+                                               onclick="return confirm('Bạn có muốn kích hoạt lại sản phẩm này?')" 
+                                               title="Kích hoạt lại">
+                                                <i class="fas fa-check-circle"></i>
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </td>
                         </tr>
                     </c:forEach>
                     <c:if test="${empty productList}">
                         <tr>
-                            <td colspan="10" class="text-center text-muted">Không có sản phẩm nào.</td>
+                            <td colspan="11" class="text-center text-muted">Không có sản phẩm nào.</td>
                         </tr>
                     </c:if>
                     </tbody>

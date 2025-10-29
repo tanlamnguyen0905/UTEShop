@@ -29,6 +29,7 @@ import ute.utils.Constant;
 import ute.utils.FileStorage;
 import ute.service.admin.Impl.BrandServiceImpl;
 import ute.service.admin.inter.BrandService;
+import ute.utils.Constant;
 
 @MultipartConfig(
         fileSizeThreshold = 10240,    // 10KB
@@ -174,11 +175,24 @@ public class ProductController extends HttpServlet {
             }
             req.getRequestDispatcher("/WEB-INF/views/admin/products/view.jsp").forward(req, resp);
         } else if (uri.contains("/admin/products/delete")) {
+            // Toggle status: ACTIVE <-> INACTIVE
             String idStr = req.getParameter("id");
             try {
-                productService.delete(Long.parseLong(idStr));
+                Long id = Long.parseLong(idStr);
+                Product product = productService.findById(id);
+                if (product != null) {
+                    // Toggle status
+                    if ("ACTIVE".equals(product.getStatus())) {
+                        product.setStatus("INACTIVE");
+                        req.getSession().setAttribute("message", "Đã vô hiệu hóa sản phẩm!");
+                    } else {
+                        product.setStatus("ACTIVE");
+                        req.getSession().setAttribute("message", "Đã kích hoạt lại sản phẩm!");
+                    }
+                    productService.update(product);
+                }
             } catch (NumberFormatException e) {
-                // Log error nếu cần, nhưng vẫn redirect
+                // Log error nếu cần
             }
             resp.sendRedirect(req.getContextPath() + "/api/admin/products/searchpaginated");
         }
@@ -198,6 +212,7 @@ public class ProductController extends HttpServlet {
             String stockQuantityStr = req.getParameter("stockQuantity");
             String categoryIdStr = req.getParameter("categoryId");
             String brandIdStr = req.getParameter("brandId");
+            String status = req.getParameter("status");
 
             Long id = null;
             Product tempProduct = new Product();
@@ -310,6 +325,7 @@ public class ProductController extends HttpServlet {
             product.setStockQuantity(stockQuantity);
             product.setCategory(category);
             product.setBrand(brand);
+            product.setStatus(status != null && !status.trim().isEmpty() ? status.trim() : "ACTIVE");
 
             // Handle xóa ảnh cũ (chỉ khi edit) - CHỈ XÓA TRONG DB (thêm try-catch để tránh 500 nếu method chưa ready)
             if (id != null && product != null) {  // Chỉ edit

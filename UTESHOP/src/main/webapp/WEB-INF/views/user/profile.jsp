@@ -43,13 +43,20 @@
 
     <!-- Stats -->
     <c:set var="totalSpent" value="0" />
+    <c:set var="completedOrderCount" value="0" />
     <c:forEach var="order" items="${orders}">
-        <c:set var="totalSpent" value="${totalSpent + order.amount}" />
+        <!-- Chỉ tính các đơn hàng không bị hủy -->
+        <c:if test="${order.orderStatus ne 'Đã hủy'}">
+            <!-- Tính tổng tiền cuối cùng: Tổng tiền hàng + Phí ship - Giảm giá -->
+            <c:set var="orderTotal" value="${order.amount + order.shippingFee - order.totalDiscount}" />
+            <c:set var="totalSpent" value="${totalSpent + orderTotal}" />
+            <c:set var="completedOrderCount" value="${completedOrderCount + 1}" />
+        </c:if>
     </c:forEach>
     
     <div class="d-flex justify-content-center gap-5 mt-4">
         <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-            <h4 class="fw-bold mb-1">${not empty orders ? orders.size() : 0}</h4>
+            <h4 class="fw-bold mb-1">${completedOrderCount}</h4>
             <span class="small">Đơn hàng</span>
         </div>
         <div class="text-center px-4 py-2 rounded-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
@@ -701,12 +708,64 @@
                                                             <fmt:formatNumber value="${order.amount + order.shippingFee - order.totalDiscount}" type="number" maxFractionDigits="0" />₫
                                                         </span>
                                                     </div>
+                                                    
+                                                    <!-- Nút hủy đơn hàng (chỉ hiển thị khi đang chờ xác nhận) -->
+                                                    <c:if test="${order.orderStatus eq 'Đang chờ'}">
+                                                        <div class="mt-3 d-grid">
+                                                            <button class="btn btn-danger btn-cancel-order" 
+                                                                    data-order-id="${order.orderID}"
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#cancelOrderModal_${order.orderID}">
+                                                                <i class="fas fa-times-circle me-1"></i> Hủy đơn hàng
+                                                            </button>
+                                                        </div>
+                                                    </c:if>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Modal xác nhận hủy đơn -->
+                            <c:if test="${order.orderStatus eq 'Đang chờ'}">
+                                <div class="modal fade" id="cancelOrderModal_${order.orderID}" tabindex="-1" aria-labelledby="cancelOrderModalLabel_${order.orderID}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="cancelOrderModalLabel_${order.orderID}">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận hủy đơn hàng
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="mb-3">Bạn có chắc chắn muốn hủy đơn hàng <strong>#${order.orderID}</strong> không?</p>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="cancelReason_${order.orderID}" class="form-label fw-bold">Lý do hủy đơn (không bắt buộc)</label>
+                                                    <textarea class="form-control" 
+                                                              id="cancelReason_${order.orderID}" 
+                                                              rows="3" 
+                                                              placeholder="Nhập lý do hủy đơn hàng..."></textarea>
+                                                </div>
+                                                
+                                                <div class="alert alert-warning mb-0">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <small>Sau khi hủy, đơn hàng sẽ không thể khôi phục được.</small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-confirm-cancel-order" data-order-id="${order.orderID}">
+                                                    <i class="fas fa-times-circle me-1"></i> Xác nhận hủy
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </c:forEach>
                     </c:otherwise>
                 </c:choose>
@@ -1566,8 +1625,64 @@ function showToast(message, type) {
     new bootstrap.Toast(toast).show();
 }
 
-// Show success/error messages from server
+// Cancel Order & Show messages on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to all cancel order confirm buttons
+    document.querySelectorAll('.btn-confirm-cancel-order').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            const reasonTextarea = document.getElementById('cancelReason_' + orderId);
+            const reason = reasonTextarea ? reasonTextarea.value.trim() : '';
+            
+            // Disable button to prevent double submission
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang xử lý...';
+            
+            const confirmBtn = this; // Store reference for error handling
+            
+            // Create form data
+            const formData = new FormData();
+            if (reason) {
+                formData.append('reason', reason);
+            }
+            
+            // Send AJAX request
+            fetch(contextPath + '/api/order/' + orderId + '/cancel', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('cancelOrderModal_' + orderId));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                if (data.success) {
+                    showToast(data.message || 'Đơn hàng đã được hủy thành công!', 'success');
+                    // Reload page after 1.5 seconds
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Không thể hủy đơn hàng. Vui lòng thử lại!', 'error');
+                    // Re-enable button
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<i class="fas fa-times-circle me-1"></i> Xác nhận hủy';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra khi hủy đơn hàng!', 'error');
+                // Re-enable button
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-times-circle me-1"></i> Xác nhận hủy';
+            });
+        });
+    });
+    
+    // Show success/error messages from server
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get('success');
     const error = urlParams.get('error');
