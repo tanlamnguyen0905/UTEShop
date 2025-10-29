@@ -159,7 +159,7 @@ public class BrandController extends HttpServlet {
                 brand.setBrandLogo(null);  // Chỉ set null trong DB, không xóa file
             }
 
-            // Handle upload logo mới (1 file)
+            // Handle upload logo mới (1 file) - Lưu vào D:/images/brands/
             Part logoPart = req.getPart("brandLogo");
             boolean uploadSuccess = true;
             if (logoPart != null && logoPart.getSize() > 0) {

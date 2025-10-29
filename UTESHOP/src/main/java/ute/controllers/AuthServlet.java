@@ -80,7 +80,6 @@ public class AuthServlet extends HttpServlet {
 	}
 
 	// ===================== KIỂM TRA USERNAME/EMAIL ĐÃ TỒN TẠI
-	// =====================
 	private void checkUserExist(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = resp.getWriter();

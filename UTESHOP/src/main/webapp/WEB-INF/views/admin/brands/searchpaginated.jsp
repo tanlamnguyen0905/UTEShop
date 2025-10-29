@@ -90,7 +90,7 @@
                         <td>
                             <c:choose>
                                 <c:when test="${not empty brand.brandLogo}">
-                                    <img src="${pageContext.request.contextPath}/assets/${brand.brandLogo}" alt="Logo" class="img-thumbnail"
+                                    <img src="${pageContext.request.contextPath}/image?fname=${brand.brandLogo}" alt="Logo" class="img-thumbnail"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                     <span style="display:none; color: #6c757d;">Không tải được</span>
                                 </c:when>
