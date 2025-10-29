@@ -59,11 +59,11 @@ public class ChatImageController extends HttpServlet {
                 return;
             }
             
-            FileStorage chatStorage = new FileStorage(request.getServletContext(), Constant.UPLOAD_DIR_BANNER);
+            FileStorage chatStorage = new FileStorage(request.getServletContext(), Constant.UPLOAD_DIR_CHAT);
             String filename = chatStorage.save(filePart);
             
             if (filename != null) {
-                String imageUrl = Constant.UPLOAD_DIR_CHAT + "/" + filename;
+                String imageUrl = filename;
                 sendJsonResponse(response, true, "Upload ảnh thành công!", imageUrl);
             } else {
                 sendJsonResponse(response, false, "Lỗi khi lưu file!", null);
