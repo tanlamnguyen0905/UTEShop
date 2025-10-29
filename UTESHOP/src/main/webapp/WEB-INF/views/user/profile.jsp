@@ -590,7 +590,7 @@
                                                                             <!-- Form đánh giá collapse -->
                                                                             <div class="collapse mt-2" id="reviewForm_${detail.product.productID}_${order.orderID}">
                                                                                 <div class="card card-body p-3">
-                                                                                    <form action="${pageContext.request.contextPath}/review/submit" method="post">
+                                                                                    <form action="${pageContext.request.contextPath}/review/submit" method="post" enctype="multipart/form-data">
                                                                                         <input type="hidden" name="productId" value="${detail.product.productID}">
                                                                                         
                                                                                         <div class="mb-2">
@@ -616,6 +616,15 @@
                                                                                                 class="form-control form-control-sm" 
                                                                                                 rows="2" 
                                                                                                 placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                                                                                        </div>
+                                                                                        
+                                                                                        <div class="mb-2">
+                                                                                            <label class="form-label small">Hình ảnh (không bắt buộc)</label>
+                                                                                            <input type="file" 
+                                                                                                   name="image" 
+                                                                                                   class="form-control form-control-sm" 
+                                                                                                   accept="image/*">
+                                                                                            <small class="text-muted">Tải lên hình ảnh để minh họa đánh giá của bạn</small>
                                                                                         </div>
                                                                                         
                                                                                         <button type="submit" class="btn btn-warning btn-sm">
@@ -1089,7 +1098,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hàm render danh sách địa chỉ
     function renderAddresses(addresses) {
-        const addressListDiv = document.getElementById('addressList');
+        let addressListDiv = document.getElementById('addressList');
+        const addressListContainer = document.getElementById('addressListContainer');
+        
+        // Nếu chưa có addressList div (lần đầu thêm địa chỉ), tạo mới
+        if (!addressListDiv) {
+            // Xóa noAddressMessage nếu có
+            const noAddressMsg = document.getElementById('noAddressMessage');
+            if (noAddressMsg) {
+                noAddressMsg.remove();
+            }
+            
+            // Tạo div addressList mới
+            addressListDiv = document.createElement('div');
+            addressListDiv.id = 'addressList';
+            addressListContainer.appendChild(addressListDiv);
+        }
         
         if (!addresses || addresses.length === 0) {
             addressListDiv.innerHTML = 
@@ -1500,19 +1524,31 @@ function uploadAvatar(file) {
     
     fetch(contextPath + '/user/update-profile', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             showToast('Cập nhật avatar thành công!', 'success');
+            // Reload để cập nhật avatar trong session
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         } else {
-            showToast('Có lỗi xảy ra khi cập nhật avatar!', 'error');
+            showToast(data.message || 'Có lỗi xảy ra khi cập nhật avatar!', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Có lỗi xảy ra!', 'error');
+        showToast('Có lỗi xảy ra khi cập nhật avatar!', 'error');
     });
 }
 

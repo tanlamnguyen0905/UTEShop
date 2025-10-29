@@ -94,8 +94,8 @@
 
                                 <!-- Comment Input -->
                                 <div class="mb-3">
-                                    <label for="comment" class="form-label">Nhận xét:</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="4" 
+                                    <label for="content" class="form-label">Nhận xét:</label>
+                                    <textarea class="form-control" id="content" name="content" rows="4" 
                                               placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
                                 </div>
 

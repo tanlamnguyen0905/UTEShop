@@ -20,7 +20,7 @@ public class UserDaoImpl implements UserDao {
 	public List<Users> search(String keyword, String role, String status) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			StringBuilder jpql = new StringBuilder("SELECT u FROM Users u WHERE 1=1");
+			StringBuilder jpql = new StringBuilder("SELECT u FROM Users u WHERE u.status != 'DELETED'");
 			boolean hasKeyword = keyword != null && !keyword.isEmpty();
 			boolean hasRole = role != null && !role.isEmpty();
 			boolean hasStatus = status != null && !status.isEmpty();
@@ -66,7 +66,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
         try {
             Long count = em.createQuery(
-                "SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
+                "SELECT COUNT(u) FROM Users u WHERE u.username = :username AND u.status != 'DELETED'", Long.class)
                 .setParameter("username", username)
                 .getSingleResult();
             return count > 0;
@@ -80,7 +80,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			Long count = em.createQuery(
-				"SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class)
+				"SELECT COUNT(u) FROM Users u WHERE u.email = :email AND u.status != 'DELETED'", Long.class)
 				.setParameter("email", email)
 				.getSingleResult();
 			return count > 0;
@@ -170,7 +170,14 @@ public class UserDaoImpl implements UserDao {
 			tx.begin();
 			Users user = em.find(Users.class, id);
 			if (user != null) {
-				em.remove(user);
+				// Soft delete: Chỉ đánh dấu là đã xóa, không xóa thật
+				// Giữ lại dữ liệu để phục vụ thống kê (orders, reviews, messages, v.v.)
+				user.setStatus("DELETED");
+				user.setEmail("deleted_" + id + "_" + user.getEmail()); // Đổi email để tránh trùng khi đăng ký lại
+				user.setUsername("deleted_" + id + "_" + user.getUsername()); // Đổi username để tránh trùng
+				user.setPassword(""); // Xóa password để bảo mật
+				em.merge(user);
+				System.out.println("Soft deleted user ID: " + id + " (data preserved for statistics)");
 			}
 			tx.commit();
 			result = true;
@@ -249,7 +256,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Users> query = em.createQuery(
-				"SELECT u FROM Users u WHERE u.role = :role AND u.status = 'active' ORDER BY u.fullname", 
+				"SELECT u FROM Users u WHERE u.role = :role AND u.status = 'ACTIVE' AND u.status != 'DELETED' ORDER BY u.fullname", 
 				Users.class);
 			query.setParameter("role", role);
 			return query.getResultList();
@@ -263,7 +270,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Users> query = em.createQuery(
-				"SELECT u FROM Users u ORDER BY u.createAt DESC", 
+				"SELECT u FROM Users u WHERE u.status != 'DELETED' ORDER BY u.createAt DESC", 
 				Users.class);
 			return query.getResultList();
 		} finally {
@@ -275,7 +282,7 @@ public class UserDaoImpl implements UserDao {
 	public long countAll() {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			return em.createQuery("SELECT COUNT(u) FROM Users u", Long.class)
+			return em.createQuery("SELECT COUNT(u) FROM Users u WHERE u.status != 'DELETED'", Long.class)
 				.getSingleResult();
 		} finally {
 			em.close();
@@ -287,7 +294,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			return em.createQuery(
-				"SELECT COUNT(u) FROM Users u WHERE u.role = :role", Long.class)
+				"SELECT COUNT(u) FROM Users u WHERE u.role = :role AND u.status != 'DELETED'", Long.class)
 				.setParameter("role", role)
 				.getSingleResult();
 		} finally {
@@ -300,7 +307,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Long> query = em.createQuery(
-				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER'",
+				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER' AND u.status != 'DELETED'",
 				Long.class
 			);
 			return query.getSingleResult();
@@ -314,7 +321,7 @@ public class UserDaoImpl implements UserDao {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
 			TypedQuery<Long> query = em.createQuery(
-				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER' AND u.status = 'ACTIVE'",
+				"SELECT COUNT(u) FROM Users u WHERE u.role = 'USER' AND u.status = 'ACTIVE' AND u.status != 'DELETED'",
 				Long.class
 			);
 			return query.getSingleResult();
@@ -331,7 +338,7 @@ public class UserDaoImpl implements UserDao {
 				"SELECT u.fullname, COUNT(o), COALESCE(SUM(o.amount), 0.0) " +
 				"FROM Users u " +
 				"JOIN u.orders o " +
-				"WHERE u.role = 'USER' " +
+				"WHERE u.role = 'USER' AND u.status != 'DELETED' " +
 				"GROUP BY u.userID, u.fullname " +
 				"ORDER BY COUNT(o) DESC",
 				Object[].class

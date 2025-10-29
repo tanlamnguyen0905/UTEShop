@@ -130,6 +130,26 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
+        .attach-btn {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .attach-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
         .send-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -150,6 +170,20 @@
         
         .send-btn:active {
             transform: scale(0.95);
+        }
+        
+        .message-image {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: block;
+        }
+        
+        .message-image:hover {
+            transform: scale(1.02);
         }
         
         .system-message {
@@ -226,7 +260,21 @@
             </div>
             
             <div class="chat-input">
+                <!-- Image Preview -->
+                <div id="imagePreview" style="display: none; padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                    <div style="position: relative; display: inline-block;">
+                        <img id="previewImg" src="" alt="Preview" style="max-width: 120px; max-height: 120px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                        <button type="button" id="removeImageBtn" style="position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="input-group">
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="attach-btn" id="attachBtn" title="Đính kèm ảnh">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
                     <textarea 
                         id="messageInput" 
                         placeholder="Nhập tin nhắn của bạn..." 
@@ -337,6 +385,7 @@
                     senderName: msg.senderName,
                     role: msg.role,
                     content: msg.content,
+                    imageUrl: msg.imageUrl,
                     timestamp: msg.createdAt
                 }, false);
             });
@@ -354,10 +403,20 @@
             const roleClass = data.role ? data.role.toLowerCase() : 'user';
             const roleBadge = data.role ? '<span class="role-badge ' + roleClass + '">' + data.role + '</span>' : '';
             
+            // Build content with text and/or image
+            let contentHtml = '';
+            if (data.content) {
+                contentHtml += '<div>' + escapeHtml(data.content) + '</div>';
+            }
+            if (data.imageUrl) {
+                const imgSrc = '${pageContext.request.contextPath}/image?fname=' + encodeURIComponent(data.imageUrl);
+                contentHtml += '<img src="' + imgSrc + '" class="message-image" alt="Image" onclick="window.open(\'' + imgSrc + '\', \'_blank\')">';
+            }
+            
             messageDiv.innerHTML = 
                 '<div class="message-content">' +
                     (!isSent ? '<div class="sender-name">' + escapeHtml(data.senderName) + roleBadge + '</div>' : '') +
-                    '<div>' + escapeHtml(data.content) + '</div>' +
+                    contentHtml +
                     '<div class="message-meta">' + formatTime(data.timestamp) + '</div>' +
                 '</div>';
             
@@ -377,15 +436,18 @@
             scrollToBottom();
         }
 
+        let uploadedImageUrl = null;
+        
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const content = input.value.trim();
             
-            console.log('Send message clicked, content:', content);
+            console.log('Send message clicked, content:', content, 'imageUrl:', uploadedImageUrl);
             console.log('WebSocket state:', ws ? ws.readyState : 'null');
             
-            if (!content) {
-                alert('Vui lòng nhập tin nhắn!');
+            // Phải có content hoặc imageUrl
+            if (!content && !uploadedImageUrl) {
+                alert('Vui lòng nhập tin nhắn hoặc chọn ảnh!');
                 return;
             }
             
@@ -396,9 +458,19 @@
             }
             
             try {
-                ws.send(JSON.stringify({ content: content }));
+                const message = {
+                    content: content || '',
+                    imageUrl: uploadedImageUrl || ''
+                };
+                ws.send(JSON.stringify(message));
                 input.value = '';
                 input.style.height = 'auto';
+                
+                // Clear image preview
+                uploadedImageUrl = null;
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('imageInput').value = '';
+                
                 console.log('Message sent successfully');
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -433,11 +505,80 @@
         // Get DOM elements
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
+        const attachBtn = document.getElementById('attachBtn');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const removeImageBtn = document.getElementById('removeImageBtn');
 
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        // Attach button
+        attachBtn.addEventListener('click', function() {
+            imageInput.click();
+        });
+
+        // File input change
+        imageInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Vui lòng chọn file ảnh!');
+                return;
+            }
+
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Kích thước ảnh tối đa 10MB!');
+                return;
+            }
+
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload image
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('${pageContext.request.contextPath}/chat/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    uploadedImageUrl = result.imageUrl;
+                    console.log('Image uploaded:', uploadedImageUrl);
+                } else {
+                    alert(result.message || 'Lỗi khi upload ảnh!');
+                    imagePreview.style.display = 'none';
+                    imageInput.value = '';
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Lỗi khi upload ảnh!');
+                imagePreview.style.display = 'none';
+                imageInput.value = '';
+            }
+        });
+
+        // Remove image button
+        removeImageBtn.addEventListener('click', function() {
+            uploadedImageUrl = null;
+            imagePreview.style.display = 'none';
+            imageInput.value = '';
         });
 
         // Add event listeners

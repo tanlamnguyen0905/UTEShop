@@ -194,16 +194,25 @@ public class UserController extends HttpServlet {
     private void updateProfileForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)
             throws IOException, ServletException {
 
+        // Kiểm tra xem có phải AJAX request không
+        boolean isAjax = "XMLHttpRequest".equals(req.getHeader("X-Requested-With")) 
+                         || req.getContentType() != null && req.getContentType().contains("multipart/form-data")
+                         && req.getParameter("ajax") != null;
+
         String fullname = req.getParameter("fullname");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         Part avatarPart = req.getPart("avatar");
 
         // Kiểm tra email đã tồn tại
-        if (email != null && !email.equals(currentUser.getEmail())) {
+        if (email != null && !email.isEmpty() && !email.equals(currentUser.getEmail())) {
             if (userDao.existsByEmail(email)) {
-                req.setAttribute("error", "Email đã được sử dụng bởi tài khoản khác!");
-                req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                if (isAjax) {
+                    sendJsonResponse(resp, false, "Email đã được sử dụng bởi tài khoản khác!");
+                } else {
+                    req.setAttribute("error", "Email đã được sử dụng bởi tài khoản khác!");
+                    req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                }
                 return;
             }
         }
@@ -211,23 +220,100 @@ public class UserController extends HttpServlet {
         // Upload avatar (nếu có)
         String avatarFileName = currentUser.getAvatar();
         if (avatarPart != null && avatarPart.getSize() > 0) {
-            String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
-            java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
-            avatarFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
-            avatarPart.write(uploadDir + avatarFileName);
+            try {
+                // Validate file type
+                String contentType = avatarPart.getContentType();
+                if (!contentType.startsWith("image/")) {
+                    if (isAjax) {
+                        sendJsonResponse(resp, false, "Chỉ chấp nhận file hình ảnh!");
+                    } else {
+                        req.setAttribute("error", "Chỉ chấp nhận file hình ảnh!");
+                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                    }
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                if (avatarPart.getSize() > 5 * 1024 * 1024) {
+                    if (isAjax) {
+                        sendJsonResponse(resp, false, "Kích thước file tối đa 5MB!");
+                    } else {
+                        req.setAttribute("error", "Kích thước file tối đa 5MB!");
+                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                    }
+                    return;
+                }
+
+                String uploadDir = req.getServletContext().getRealPath("/uploads/avatar/");
+                java.nio.file.Files.createDirectories(java.nio.file.Paths.get(uploadDir));
+                
+                // Tạo tên file unique
+                String originalFileName = java.nio.file.Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
+                String fileExtension = "";
+                int lastDot = originalFileName.lastIndexOf('.');
+                if (lastDot > 0) {
+                    fileExtension = originalFileName.substring(lastDot);
+                }
+                avatarFileName = System.currentTimeMillis() + "_" + currentUser.getUserID() + fileExtension;
+                
+                avatarPart.write(uploadDir + avatarFileName);
+                
+                // Kiểm tra file đã lưu thành công
+                java.io.File savedFile = new java.io.File(uploadDir + avatarFileName);
+                if (!savedFile.exists() || savedFile.length() == 0) {
+                    if (savedFile.exists()) savedFile.delete();
+                    if (isAjax) {
+                        sendJsonResponse(resp, false, "Lỗi khi lưu file!");
+                    } else {
+                        req.setAttribute("error", "Lỗi khi lưu file!");
+                        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                    }
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (isAjax) {
+                    sendJsonResponse(resp, false, "Lỗi upload ảnh: " + e.getMessage());
+                } else {
+                    req.setAttribute("error", "Lỗi upload ảnh: " + e.getMessage());
+                    req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+                }
+                return;
+            }
         }
 
         // Cập nhật dữ liệu
-        currentUser.setFullname(fullname);
-        currentUser.setEmail(email);
-        currentUser.setPhone(phone);
+        if (fullname != null && !fullname.isEmpty()) {
+            currentUser.setFullname(fullname);
+        }
+        if (email != null && !email.isEmpty()) {
+            currentUser.setEmail(email);
+        }
+        if (phone != null && !phone.isEmpty()) {
+            currentUser.setPhone(phone);
+        }
         currentUser.setAvatar(avatarFileName);
 
         userDao.update(currentUser);
         req.getSession().setAttribute("currentUser", currentUser);
 
-        req.setAttribute("success", "Cập nhật thông tin thành công!");
-        req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+        // Trả về response phù hợp
+        if (isAjax) {
+            sendJsonResponse(resp, true, "Cập nhật thông tin thành công!");
+        } else {
+            req.setAttribute("success", "Cập nhật thông tin thành công!");
+            req.getRequestDispatcher("/WEB-INF/views/user/profile.jsp").forward(req, resp);
+        }
+    }
+    
+    private void sendJsonResponse(HttpServletResponse resp, boolean success, String message) 
+            throws IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        JsonObject json = new JsonObject();
+        json.addProperty("success", success);
+        json.addProperty("message", message);
+        resp.getWriter().write(json.toString());
     }
 
     private void changePasswordForm(HttpServletRequest req, HttpServletResponse resp, Users currentUser)

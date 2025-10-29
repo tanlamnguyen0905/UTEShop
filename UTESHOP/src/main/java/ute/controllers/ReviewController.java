@@ -1,13 +1,16 @@
 package ute.controllers;
 
+import java.io.File;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import ute.entities.Product;
 import ute.entities.Review;
 import ute.entities.Users;
@@ -15,12 +18,34 @@ import ute.service.impl.ProductServiceImpl;
 import ute.service.impl.ReviewServiceImpl;
 import ute.service.inter.ProductService;
 import ute.service.inter.ReviewService;
+import ute.utils.Constant;
+import com.google.gson.JsonObject;
 
-@WebServlet(urlPatterns = {"/review/submit"})
+@WebServlet(urlPatterns = {"/review/submit", "/review/add"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+    maxFileSize = 1024 * 1024 * 5,        // 5 MB
+    maxRequestSize = 1024 * 1024 * 10     // 10 MB
+)
 public class ReviewController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private ReviewService reviewService = new ReviewServiceImpl();
     private ProductService productService = new ProductServiceImpl();
+    
+    private boolean isAjaxRequest(HttpServletRequest request) {
+        String requestedWith = request.getHeader("X-Requested-With");
+        return "XMLHttpRequest".equals(requestedWith) || 
+               request.getRequestURI().contains("/review/add");
+    }
+    
+    private void sendJsonResponse(HttpServletResponse response, boolean success, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        JsonObject json = new JsonObject();
+        json.addProperty("success", success);
+        json.addProperty("message", message);
+        response.getWriter().write(json.toString());
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -29,11 +54,16 @@ public class ReviewController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         
+        boolean isAjax = isAjaxRequest(request);
         HttpSession session = request.getSession(false);
         
         // Kiểm tra đăng nhập
         if (session == null || session.getAttribute("currentUser") == null) {
-            response.sendRedirect(request.getContextPath() + "/auth/login");
+            if (isAjax) {
+                sendJsonResponse(response, false, "Vui lòng đăng nhập để đánh giá sản phẩm");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/auth/login");
+            }
             return;
         }
         
@@ -46,14 +76,22 @@ public class ReviewController extends HttpServlet {
             String content = request.getParameter("content");
             
             if (productIdStr == null || productIdStr.isEmpty()) {
-                session.setAttribute("error", "Thiếu thông tin sản phẩm!");
-                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Thiếu thông tin sản phẩm!");
+                } else {
+                    session.setAttribute("error", "Thiếu thông tin sản phẩm!");
+                    response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                }
                 return;
             }
             
             if (ratingStr == null || ratingStr.isEmpty()) {
-                session.setAttribute("error", "Vui lòng chọn số sao đánh giá!");
-                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Vui lòng chọn số sao đánh giá!");
+                } else {
+                    session.setAttribute("error", "Vui lòng chọn số sao đánh giá!");
+                    response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                }
                 return;
             }
             
@@ -62,25 +100,86 @@ public class ReviewController extends HttpServlet {
             
             // Validate rating
             if (rating < 1 || rating > 5) {
-                session.setAttribute("error", "Đánh giá phải từ 1 đến 5 sao!");
-                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Đánh giá phải từ 1 đến 5 sao!");
+                } else {
+                    session.setAttribute("error", "Đánh giá phải từ 1 đến 5 sao!");
+                    response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                }
                 return;
             }
             
             // Lấy product
             Product product = productService.findById(productId);
             if (product == null) {
-                session.setAttribute("error", "Không tìm thấy sản phẩm!");
-                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Không tìm thấy sản phẩm!");
+                } else {
+                    session.setAttribute("error", "Không tìm thấy sản phẩm!");
+                    response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                }
                 return;
             }
             
             // Kiểm tra đã đánh giá chưa
             Review existingReview = reviewService.getUserProductReview(currentUser.getUserID(), productId);
             if (existingReview != null) {
-                session.setAttribute("error", "Bạn đã đánh giá sản phẩm này rồi!");
-                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Bạn đã đánh giá sản phẩm này rồi!");
+                } else {
+                    session.setAttribute("error", "Bạn đã đánh giá sản phẩm này rồi!");
+                    response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                }
                 return;
+            }
+            
+            // Xử lý upload ảnh
+            String imageFileName = null;
+            Part filePart = request.getPart("image");
+            if (filePart != null && filePart.getSize() > 0) {
+                try {
+                    // Lấy tên file gốc
+                    String fileName = filePart.getSubmittedFileName();
+                    
+                    // Validate file type
+                    String contentType = filePart.getContentType();
+                    if (!contentType.startsWith("image/")) {
+                        if (isAjax) {
+                            sendJsonResponse(response, false, "Chỉ chấp nhận file hình ảnh!");
+                        } else {
+                            session.setAttribute("error", "Chỉ chấp nhận file hình ảnh!");
+                            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+                        }
+                        return;
+                    }
+                    
+                    // Tạo thư mục reviews trong Constant.Dir nếu chưa tồn tại
+                    String uploadPath = Constant.Dir + File.separator + "reviews";
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+                    
+                    // Tạo tên file unique để tránh trùng lặp
+                    String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.]", "_");
+                    String filePath = uploadPath + File.separator + uniqueFileName;
+                    
+                    // Lưu file
+                    filePart.write(filePath);
+                    
+                    // Kiểm tra file đã được lưu thành công
+                    File savedFile = new File(filePath);
+                    if (savedFile.exists() && savedFile.length() > 0) {
+                        imageFileName = "reviews/" + uniqueFileName;
+                    } else {
+                        if (savedFile.exists()) {
+                            savedFile.delete();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // Không dừng lại nếu upload ảnh lỗi, vẫn cho phép gửi review
+                }
             }
             
             // Tạo review mới
@@ -89,21 +188,33 @@ public class ReviewController extends HttpServlet {
                     .product(product)
                     .rating(rating)
                     .content(content != null && !content.trim().isEmpty() ? content.trim() : null)
-                    .image(null) // Không xử lý upload ảnh để đơn giản
+                    .image(imageFileName) // Lưu tên file ảnh
                     .build();
             
             reviewService.addReview(review);
             
-            session.setAttribute("success", "Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.");
-            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            if (isAjax) {
+                sendJsonResponse(response, true, "Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.");
+            } else {
+                session.setAttribute("success", "Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            }
             
         } catch (NumberFormatException e) {
-            session.setAttribute("error", "Dữ liệu không hợp lệ!");
-            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            if (isAjax) {
+                sendJsonResponse(response, false, "Dữ liệu không hợp lệ!");
+            } else {
+                session.setAttribute("error", "Dữ liệu không hợp lệ!");
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("error", "Lỗi: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            if (isAjax) {
+                sendJsonResponse(response, false, "Lỗi: " + e.getMessage());
+            } else {
+                session.setAttribute("error", "Lỗi: " + e.getMessage());
+                response.sendRedirect(request.getContextPath() + "/user/profile#orders");
+            }
         }
     }
 }

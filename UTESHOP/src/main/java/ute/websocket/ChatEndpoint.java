@@ -26,7 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatEndpoint {
 	private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
 	private static final Map<Session, UserCtx> CONTEXT = new ConcurrentHashMap<>();
-	private static final Gson GSON = GsonConfig.getGson();
+	private static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(OffsetDateTime.class, 
+				(JsonSerializer<OffsetDateTime>) (src, type, context) -> 
+					context.serialize(src.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
+			.registerTypeAdapter(OffsetDateTime.class,
+				(JsonDeserializer<OffsetDateTime>) (json, type, context) ->
+					OffsetDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+			.create();
 	private static final MessageDao messageDao = new MessageDaoImpl();
 
 	public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
@@ -104,31 +111,38 @@ public class ChatEndpoint {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> msg = GSON.fromJson(text, Map.class);
 			String content = Objects.toString(msg.get("content"), "").trim();
-			if (content.isEmpty()) {
+			String imageUrl = Objects.toString(msg.get("imageUrl"), "").trim();
+			
+			// Message phải có content hoặc imageUrl
+			if (content.isEmpty() && imageUrl.isEmpty()) {
 				return;
 			}
 
-			System.out.println("Received message from " + ctx.username + ": " + content);
+			System.out.println("Received message from " + ctx.username + ": " + content + 
+							   (imageUrl.isEmpty() ? "" : " [with image: " + imageUrl + "]"));
 
 			Message m = Message.builder()
 					.roomId(ctx.room)
 					.senderId(ctx.userId)
 					.senderName(ctx.username)
 					.role(ctx.role)
-					.content(content)
+					.content(content.isEmpty() ? null : content)
+					.imageUrl(imageUrl.isEmpty() ? null : imageUrl)
 					.seen(false)
 					.build();
 			messageDao.save(m);
 
-			broadcast(ctx.room, Map.of(
-				"type", "CHAT", 
-				"room", ctx.room, 
-				"senderId", ctx.userId, 
-				"senderName", ctx.username,
-				"role", ctx.role, 
-				"content", content, 
-				"timestamp", OffsetDateTime.now().toString()
-			));
+			Map<String, Object> broadcastPayload = new HashMap<>();
+			broadcastPayload.put("type", "CHAT");
+			broadcastPayload.put("room", ctx.room);
+			broadcastPayload.put("senderId", ctx.userId);
+			broadcastPayload.put("senderName", ctx.username);
+			broadcastPayload.put("role", ctx.role);
+			broadcastPayload.put("content", content.isEmpty() ? null : content);
+			broadcastPayload.put("imageUrl", imageUrl.isEmpty() ? null : imageUrl);
+			broadcastPayload.put("timestamp", OffsetDateTime.now().toString());
+			
+			broadcast(ctx.room, broadcastPayload);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

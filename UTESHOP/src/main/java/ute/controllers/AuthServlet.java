@@ -244,6 +244,21 @@ public class AuthServlet extends HttpServlet {
 				out.print("{\"success\":false, \"error\":\"Tài khoản không tồn tại!\"}");
 				return;
 			}
+			
+			// Chỉ cho phép tài khoản ACTIVE đăng nhập
+			if (!"ACTIVE".equals(user.getStatus())) {
+				String errorMsg = "Tài khoản không thể đăng nhập!";
+				if ("DELETED".equals(user.getStatus())) {
+					errorMsg = "Tài khoản đã bị xóa!";
+				} else if ("INACTIVE".equals(user.getStatus())) {
+					errorMsg = "Tài khoản đã bị vô hiệu hóa!";
+				} else if ("PENDING".equals(user.getStatus())) {
+					errorMsg = "Tài khoản chưa được kích hoạt!";
+				}
+				out.print("{\"success\":false, \"error\":\"" + errorMsg + "\"}");
+				return;
+			}
+			
 			if (!BCrypt.checkpw(password, user.getPassword())) {
 				out.print("{\"success\":false, \"error\":\"Sai mật khẩu!\"}");
 				return;
@@ -257,7 +272,7 @@ public class AuthServlet extends HttpServlet {
 
 			// Generate JWT token
 			String token = JwtUtil.generateToken(user.getUsername(), user.getRole(), user.getUserID());
-			session.setAttribute("token", token);
+			// session.setAttribute("token", token);
 
 			// Lưu token vào cookie (1 giờ)
 			Cookie tokenCookie = new Cookie("authToken", token);
