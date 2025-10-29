@@ -147,7 +147,7 @@
                                     <c:forEach var="img" items="${product.images}" varStatus="status">
                                         <div class="col-md-3 mb-3">
                                             <div class="position-relative">
-                                                <img src="${pageContext.request.contextPath}/image?fname=${img.dirImage}"
+                                                <img src="${pageContext.request.contextPath}/assets/uploads/product/${img.dirImage}"
                                                      alt="Ảnh ${status.index + 1}"
                                                      class="img-thumbnail w-100"
                                                      style="height: 150px;"

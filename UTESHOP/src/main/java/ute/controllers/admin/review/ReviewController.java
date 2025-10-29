@@ -25,6 +25,8 @@ import ute.service.admin.inter.ReviewService;
 import ute.service.admin.Impl.ReviewServiceImpl;
 import ute.service.impl.ProductServiceImpl;
 import ute.service.inter.ProductService;
+import ute.utils.Constant;
+import ute.utils.FileStorage;
 import ute.service.admin.inter.UserService;
 
 @WebServlet(urlPatterns = { "/api/admin/review/searchpaginated", "/api/admin/review/saveOrUpdate",
@@ -242,16 +244,8 @@ public class ReviewController extends HttpServlet {
             Part filePart = req.getPart("image");
             String image = null;
             if (filePart != null && filePart.getSize() > 0) {
-                String fileName = filePart.getSubmittedFileName();
-                String uploadPath = getServletContext().getRealPath("") + "uploads";
-                java.io.File uploadDir = new java.io.File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-                String filePath = uploadPath + java.io.File.separator + uniqueFileName;
-                filePart.write(filePath);
-                image = "uploads/" + uniqueFileName;
+                FileStorage reviewStorage = new FileStorage(req.getServletContext(), Constant.UPLOAD_DIR_REVIEW);
+                image = reviewStorage.save(filePart);
             } else if (id != null) {
                 image = review.getImage();
             }

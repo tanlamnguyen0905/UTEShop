@@ -365,20 +365,19 @@ public class UserDaoImpl implements UserDao {
 	public List<Map<String, Object>> getTopCustomersBySpending(int limit) {
 		EntityManager em = JPAConfig.getEntityManager();
 		try {
-			TypedQuery<Object[]> query = em.createQuery(
-				"SELECT u.fullname, COUNT(o), COALESCE(SUM(o.amount), 0.0) " +
-				"FROM Users u " +
-				"JOIN u.orders o " +
-				"WHERE u.role = 'USER' AND u.status != 'DELETED' " +
-				"GROUP BY u.userID, u.fullname " +
-				"ORDER BY SUM(o.amount) DESC",
-				Object[].class
-			);
+			String jpql = "SELECT u.fullname, COUNT(o), COALESCE(SUM(o.amount - o.totalDiscount + o.shippingFee), 0.0) " +
+                      "FROM Users u " +
+                      "JOIN u.orders o " +
+                      "WHERE u.role = 'USER'" +
+                      "GROUP BY u.userID, u.fullname " +
+                      "ORDER BY SUM(o.amount - o.totalDiscount + o.shippingFee) DESC";
+
+			TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
 			query.setMaxResults(limit);
-			
+
 			List<Object[]> results = query.getResultList();
 			List<Map<String, Object>> topCustomers = new ArrayList<>();
-			
+
 			for (Object[] row : results) {
 				Map<String, Object> map = new HashMap<>();
 				map.put("name", row[0]);
@@ -386,6 +385,7 @@ public class UserDaoImpl implements UserDao {
 				map.put("spend", row[2]);
 				topCustomers.add(map);
 			}
+
 			return topCustomers;
 		} finally {
 			em.close();

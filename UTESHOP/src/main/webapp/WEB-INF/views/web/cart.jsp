@@ -201,7 +201,7 @@
                                 <div class="col-auto">
                                     <c:choose>
                                         <c:when test="${not empty item.product.images && item.product.images.size() > 0}">
-                                            <img src="${pageContext.request.contextPath}/image?fname=${item.product.images[0].dirImage}" 
+                                            <img src="${pageContext.request.contextPath}/assets/uploads/product/${item.product.images[0].dirImage}" 
                                                  alt="${item.product.productName}" 
                                                  class="product-image">
                                         </c:when>

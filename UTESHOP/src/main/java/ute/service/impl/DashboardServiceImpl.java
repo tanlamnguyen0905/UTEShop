@@ -44,8 +44,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<Map<String, Object>> getOrderStatusDistribution() {
-        return orderService.getOrderStatusDistribution();
+    public Map<String, Long> countOrdersByStatus() {
+        return orderService.countOrdersByStatus();
     }
 
     @Override

@@ -87,8 +87,7 @@ public class DashboardApiController extends HttpServlet {
 	}
 
 	private void handleOrderStatus(HttpServletResponse resp) throws IOException {
-		List<Map<String, Object>> statuses = dashboardService.getOrderStatusDistribution();
-		resp.getWriter().write(gson.toJson(statuses));
+		resp.getWriter().write(gson.toJson(dashboardService.countOrdersByStatus()));
 	}
 
 	private void handleTopProducts(HttpServletRequest req, HttpServletResponse resp) throws IOException {

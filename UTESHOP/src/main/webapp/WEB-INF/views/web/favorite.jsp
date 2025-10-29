@@ -92,7 +92,7 @@
                     <a class="flex-shrink-0" href="${pageContext.request.contextPath}/detailProduct?productID=${item.productID}">
                       <c:choose>
                         <c:when test="${not empty item.images && item.images.size() > 0}">
-                          <img class="fav-image" src="${pageContext.request.contextPath}/image?fname=${item.images[0]}" alt="${item.productName}" />
+                          <img class="fav-image" src="${pageContext.request.contextPath}/assets/uploads/product/${item.images[0]}" alt="${item.productName}" />
                         </c:when>
                         <c:otherwise>
                           <img class="fav-image" src="${pageContext.request.contextPath}/assets/images/logo.png" alt="No image" />

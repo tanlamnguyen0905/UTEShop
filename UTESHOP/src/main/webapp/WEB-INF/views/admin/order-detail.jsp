@@ -256,7 +256,7 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <c:choose>
                                             <c:when test="${not empty detail.product.images and not empty detail.product.images[0]}">
-                                                <img src="${pageContext.request.contextPath}/image?fname=${detail.product.images[0].dirImage}" 
+                                                <img src="${pageContext.request.contextPath}/assets/uploads/product/${detail.product.images[0].dirImage}" 
                                                      class="product-img" alt="${detail.product.productName}">
                                             </c:when>
                                             <c:otherwise>

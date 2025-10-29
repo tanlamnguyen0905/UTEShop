@@ -43,7 +43,7 @@
                     <small class="form-text text-muted">Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 10MB.</small>
                     <c:if test="${not empty category.image}">
                         <div class="mt-2">
-                            <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
+                            <img src="${pageContext.request.contextPath}/assets/uploads/category/${category.image}"
                                  alt="${category.categoryName}"
                                  width="50" height="50" class="img-thumbnail"
                                  onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">

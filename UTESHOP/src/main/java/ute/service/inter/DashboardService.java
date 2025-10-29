@@ -12,7 +12,7 @@ public interface DashboardService {
     List<Map<String, Object>> getRevenueDailyByDateRange(LocalDate startDate, LocalDate endDate);
     
     // Order status distribution
-    List<Map<String, Object>> getOrderStatusDistribution();
+    Map<String, Long> countOrdersByStatus();
     
     // Top performing products
     List<Map<String, Object>> getTopProducts(int limit);

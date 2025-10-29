@@ -610,7 +610,7 @@
                                     <div class="product-item">
                                         <c:choose>
                                             <c:when test="${not empty item.product.images and not empty item.product.images[0]}">
-                                                <img src="${pageContext.request.contextPath}/image?fname=${item.product.images[0].dirImage}" 
+                                                <img src="${pageContext.request.contextPath}/assets/uploads/product/${item.product.images[0].dirImage}" 
                                                      class="product-image" alt="${item.product.productName}">
                                             </c:when>
                                             <c:otherwise>

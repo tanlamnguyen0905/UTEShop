@@ -1,9 +1,6 @@
 package ute.websocket;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
 import jakarta.websocket.*;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.PathParam;
@@ -18,7 +15,6 @@ import ute.entities.Users;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,14 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatEndpoint {
 	private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
 	private static final Map<Session, UserCtx> CONTEXT = new ConcurrentHashMap<>();
-	private static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(OffsetDateTime.class, 
-				(JsonSerializer<OffsetDateTime>) (src, type, context) -> 
-					context.serialize(src.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
-			.registerTypeAdapter(OffsetDateTime.class,
-				(JsonDeserializer<OffsetDateTime>) (json, type, context) ->
-					OffsetDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-			.create();
+	private static final Gson GSON = GsonConfig.getGson();
 	private static final MessageDao messageDao = new MessageDaoImpl();
 
 	public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
@@ -79,7 +68,7 @@ public class ChatEndpoint {
 			ctx.role = currentUser.getRole();
 			CONTEXT.put(session, ctx);
 
-			ROOMS.computeIfAbsent(room, _ -> ConcurrentHashMap.newKeySet()).add(session);
+			ROOMS.computeIfAbsent(room, k -> ConcurrentHashMap.newKeySet()).add(session);
 
 			// Gửi lịch sử gần nhất
 			List<Message> history = messageDao.findRecentByRoom(room, 50);
