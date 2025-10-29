@@ -22,14 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatEndpoint {
 	private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
 	private static final Map<Session, UserCtx> CONTEXT = new ConcurrentHashMap<>();
-	private static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(OffsetDateTime.class, 
-				(JsonSerializer<OffsetDateTime>) (src, type, context) -> 
-					context.serialize(src.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
-			.registerTypeAdapter(OffsetDateTime.class,
-				(JsonDeserializer<OffsetDateTime>) (json, type, context) ->
-					OffsetDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-			.create();
+	private static final Gson GSON = GsonConfig.getGson();
 	private static final MessageDao messageDao = new MessageDaoImpl();
 
 	public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
