@@ -19,6 +19,8 @@ import ute.service.impl.ReviewServiceImpl;
 import ute.service.inter.ProductService;
 import ute.service.inter.ReviewService;
 import ute.utils.Constant;
+import ute.utils.FileStorage;
+
 import com.google.gson.JsonObject;
 
 @WebServlet(urlPatterns = {"/review/submit", "/review/add"})
@@ -138,9 +140,6 @@ public class ReviewController extends HttpServlet {
             Part filePart = request.getPart("image");
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    // Lấy tên file gốc
-                    String fileName = filePart.getSubmittedFileName();
-                    
                     // Validate file type
                     String contentType = filePart.getContentType();
                     if (!contentType.startsWith("image/")) {
@@ -153,32 +152,10 @@ public class ReviewController extends HttpServlet {
                         return;
                     }
                     
-                    // Tạo thư mục reviews trong Constant.Dir nếu chưa tồn tại
-                    String uploadPath = Constant.Dir + File.separator + "reviews";
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) {
-                        uploadDir.mkdirs();
-                    }
-                    
-                    // Tạo tên file unique để tránh trùng lặp
-                    String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9.]", "_");
-                    String filePath = uploadPath + File.separator + uniqueFileName;
-                    
-                    // Lưu file
-                    filePart.write(filePath);
-                    
-                    // Kiểm tra file đã được lưu thành công
-                    File savedFile = new File(filePath);
-                    if (savedFile.exists() && savedFile.length() > 0) {
-                        imageFileName = "reviews/" + uniqueFileName;
-                    } else {
-                        if (savedFile.exists()) {
-                            savedFile.delete();
-                        }
-                    }
+                    FileStorage reviewStorage = new FileStorage(request.getServletContext(), Constant.UPLOAD_DIR_REVIEW);
+                    imageFileName = reviewStorage.save(filePart);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    // Không dừng lại nếu upload ảnh lỗi, vẫn cho phép gửi review
                 }
             }
             

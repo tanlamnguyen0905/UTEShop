@@ -33,6 +33,7 @@ public class Constant {
     public static final String UPLOAD_DIR_PRODUCT = "assets/uploads/product";
     public static final String UPLOAD_DIR_REVIEW = "assets/uploads/review";
     public static final String UPLOAD_DIR_AVATAR = "assets/uploads/avatar";
+	public static final String UPLOAD_DIR_CHAT = "assets/uploads/chat";
 
     public static final String[] ALL_UPLOAD_DIRS = {
         UPLOAD_DIR_BANNER,
@@ -40,7 +41,8 @@ public class Constant {
         UPLOAD_DIR_CATEGORY,
         UPLOAD_DIR_PRODUCT,
         UPLOAD_DIR_REVIEW,
-        UPLOAD_DIR_AVATAR
+        UPLOAD_DIR_AVATAR,
+		UPLOAD_DIR_CHAT
     };
 
 	public static final String DEFAULT_AVATAR = "default-avatar.png";

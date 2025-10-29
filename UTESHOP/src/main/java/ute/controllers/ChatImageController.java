@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import ute.utils.Constant;
+import ute.utils.FileStorage;
 
 import com.google.gson.JsonObject;
 
@@ -58,37 +59,13 @@ public class ChatImageController extends HttpServlet {
                 return;
             }
             
-            // Lấy tên file gốc
-            String fileName = filePart.getSubmittedFileName();
+            FileStorage chatStorage = new FileStorage(request.getServletContext(), Constant.UPLOAD_DIR_BANNER);
+            String filename = chatStorage.save(filePart);
             
-            // Tạo thư mục chat trong Constant.Dir
-            String uploadPath = Constant.Dir + File.separator + "chat";
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            
-            // Tạo tên file unique
-            String fileExtension = "";
-            int lastDot = fileName.lastIndexOf('.');
-            if (lastDot > 0) {
-                fileExtension = fileName.substring(lastDot);
-            }
-            String uniqueFileName = System.currentTimeMillis() + "_" + fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
-            String filePath = uploadPath + File.separator + uniqueFileName;
-            
-            // Lưu file
-            filePart.write(filePath);
-            
-            // Kiểm tra file đã lưu thành công
-            File savedFile = new File(filePath);
-            if (savedFile.exists() && savedFile.length() > 0) {
-                String imageUrl = "chat/" + uniqueFileName;
+            if (filename != null) {
+                String imageUrl = Constant.UPLOAD_DIR_CHAT + "/" + filename;
                 sendJsonResponse(response, true, "Upload ảnh thành công!", imageUrl);
             } else {
-                if (savedFile.exists()) {
-                    savedFile.delete();
-                }
                 sendJsonResponse(response, false, "Lỗi khi lưu file!", null);
             }
             
