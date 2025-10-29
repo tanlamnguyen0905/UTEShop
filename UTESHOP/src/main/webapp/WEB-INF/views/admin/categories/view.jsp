@@ -21,20 +21,21 @@
             <p><strong>Tên danh mục:</strong> ${category.categoryName}</p>
             <p><strong>Mô tả:</strong> ${category.description}</p>
 
-            <c:if test="${not empty category.image}">
-                <p>
-                    <strong>Hình ảnh:</strong><br>
-                    <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
-                         alt="${category.categoryName}"
-                         width="200"
-                         class="img-thumbnail"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <span style="display:none; color: #6c757d;">Không tải được ảnh</span>
-                </p>
-            </c:if>
-            <c:if test="${empty category.image}">
-                <p><strong>Hình ảnh:</strong> <span class="text-muted">Không có ảnh</span></p>
-            </c:if>
+            <c:choose>
+                <c:when test="${not empty category.image}">
+                    <p>
+                        <strong>Hình ảnh:</strong><br>
+                        <img src="${pageContext.request.contextPath}/image?fname=${category.image}"
+                             alt="${category.categoryName}"
+                             width="200"
+                             class="img-thumbnail"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">
+                    </p>
+                </c:when>
+                <c:otherwise>
+                    <p><strong>Hình ảnh:</strong> <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="No image" width="200" class="img-thumbnail"></p>
+                </c:otherwise>
+            </c:choose>
 
             <p><strong>Số sản phẩm:</strong>
                 ${category.products != null ? category.products.size() : 0}

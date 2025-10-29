@@ -140,8 +140,7 @@
                                              alt="${product.productName}"
                                              width="50" height="50"
                                              class="img-thumbnail"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                        <span style="display:none; color: #6c757d;">Không tải được ảnh</span>
+                                             onerror="this.src='${pageContext.request.contextPath}/assets/images/logo.png';">
                                     </c:when>
                                     <c:otherwise>
                                         <img src="${pageContext.request.contextPath}/assets/images/logo.png"
