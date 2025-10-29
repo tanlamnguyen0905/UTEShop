@@ -408,7 +408,7 @@ public class ProductController extends HttpServlet {
                         File savedFile = new File(filePath);
                         if (savedFile.exists() && savedFile.length() > 0) {
                             Image image = new Image();
-                            image.setDirImage("images/products/" + fileName);  // Lưu đường dẫn đúng vào DB
+                            image.setDirImage(fileName);  // Lưu đường dẫn đúng vào DB
                             image.setProduct(product);
                             newImages.add(image);
                         } else {

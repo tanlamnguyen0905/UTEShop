@@ -9,6 +9,7 @@ import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
+import ute.configs.GsonConfig;
 import ute.dao.impl.MessageDaoImpl;
 import ute.dao.inter.MessageDao;
 import ute.entities.Message;
